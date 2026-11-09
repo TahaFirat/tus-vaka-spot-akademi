@@ -271,7 +271,7 @@ final class TUSMedicalSpotlightIndexer {
         ]
 
         let searchableItems: [CSSearchableItem] = itemsData.map { entry in
-            let attr = CSSearchableItemAttributeSet(ItemContentType: "public.text")
+            let attr = CSSearchableItemAttributeSet(itemContentType: "public.text")
             attr.title = entry.title
             attr.contentDescription = entry.desc
             attr.keywords = entry.keywords
