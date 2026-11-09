@@ -1,0 +1,14 @@
+node_modules/
+dist/
+dist-ssr/
+*.local
+.DS_Store
+scratch/
+apple_certs/
+app_store_assets/
+*.ipa
+*.p12
+*.p8
+*.key
+*.cer
+*.mobileprovision
