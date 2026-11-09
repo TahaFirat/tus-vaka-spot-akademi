@@ -1,12 +1,17 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
+  Activity,
   Award,
   BookOpen,
+  Calculator,
   Clock,
+  ExternalLink,
   Lock,
   Play,
   RotateCcw,
   Search,
+  Share2,
+  ShieldAlert,
   Sparkles,
 } from 'lucide-react';
 import {
@@ -18,7 +23,11 @@ import {
   TusBranchId,
   TusVakaQuestion,
 } from '../data/tusMedicalRepository';
-import { FREE_QUESTION_LIMIT, triggerHaptic } from '../services/nativeBridge';
+import {
+  FREE_QUESTION_LIMIT,
+  shareClinicalSummary,
+  triggerHaptic,
+} from '../services/nativeBridge';
 import {
   calculateEstimatedTusScore,
   calculateOsymNet,
@@ -96,10 +105,30 @@ export const DenemeRehberScreen: React.FC<DenemeRehberScreenProps> = ({
   onRecordVakaAnswer,
   onOpenPaywall,
 }) => {
-  const [subTab, setSubTab] = useState<'deneme' | 'rehber'>('deneme');
+  const [subTab, setSubTab] = useState<'deneme' | 'hesap' | 'rehber'>('deneme');
   const [selectedBranches, setSelectedBranches] = useState<TusBranchId[]>(
     TUS_BRANCHES.map((b) => b.id)
   );
+
+  // Interactive Medical Specialty Calculator States
+  const [agNa, setAgNa] = useState<number>(140);
+  const [agCl, setAgCl] = useState<number>(104);
+  const [agHco3, setAgHco3] = useState<number>(14);
+  const [agAlbumin, setAgAlbumin] = useState<number>(2.5);
+  const [agPco2, setAgPco2] = useState<number>(29);
+
+  const [fenaUNa, setFenaUNa] = useState<number>(12);
+  const [fenaPNa, setFenaPNa] = useState<number>(140);
+  const [fenaUCr, setFenaUCr] = useState<number>(120);
+  const [fenaPCr, setFenaPCr] = useState<number>(2.4);
+
+  const [burnWeight, setBurnWeight] = useState<number>(70);
+  const [burnTbsa, setBurnTbsa] = useState<number>(30);
+
+  const [corrCa, setCorrCa] = useState<number>(7.8);
+  const [corrAlb, setCorrAlb] = useState<number>(2.0);
+  const [corrNa, setCorrNa] = useState<number>(128);
+  const [corrGlucose, setCorrGlucose] = useState<number>(500);
 
   const [activeMode, setActiveMode] = useState<ExamModeConfig | null>(null);
   const [examQuestions, setExamQuestions] = useState<TusVakaQuestion[]>([]);
@@ -312,9 +341,9 @@ export const DenemeRehberScreen: React.FC<DenemeRehberScreenProps> = ({
 
   return (
     <div className="space-y-2.5">
-      {/* Compact Sub-Tab Switcher */}
+      {/* Compact 3-Way Sub-Tab Switcher */}
       <div
-        className={`rounded-2xl border p-1 grid grid-cols-2 gap-1 ${
+        className={`rounded-2xl border p-1 grid grid-cols-3 gap-1 ${
           isLight
             ? 'bg-white border-slate-200 shadow-sm'
             : 'bg-[#0C1B24] border-white/10 shadow-md'
@@ -326,7 +355,7 @@ export const DenemeRehberScreen: React.FC<DenemeRehberScreenProps> = ({
             triggerHaptic('light');
             setSubTab('deneme');
           }}
-          className={`py-2 px-3 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 transition ${
+          className={`py-2 px-2 rounded-xl text-[11px] sm:text-xs font-extrabold flex items-center justify-center gap-1 transition ${
             subTab === 'deneme'
               ? 'bg-emerald-600 text-white shadow-sm'
               : isLight
@@ -334,8 +363,26 @@ export const DenemeRehberScreen: React.FC<DenemeRehberScreenProps> = ({
               : 'text-slate-400 hover:text-slate-200'
           }`}
         >
-          <Award className="w-4 h-4 shrink-0" />
-          <span className="truncate">TUS Deneme Sınavı</span>
+          <Award className="w-3.5 h-3.5 shrink-0" />
+          <span className="truncate">TUS Deneme</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            triggerHaptic('light');
+            setSubTab('hesap');
+          }}
+          className={`py-2 px-2 rounded-xl text-[11px] sm:text-xs font-extrabold flex items-center justify-center gap-1 transition ${
+            subTab === 'hesap'
+              ? 'bg-amber-500 text-slate-950 shadow-sm'
+              : isLight
+              ? 'text-slate-600 hover:text-slate-900'
+              : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <Calculator className="w-3.5 h-3.5 shrink-0" />
+          <span className="truncate">Klinik Hesaplayıcı</span>
         </button>
 
         <button
@@ -344,7 +391,7 @@ export const DenemeRehberScreen: React.FC<DenemeRehberScreenProps> = ({
             triggerHaptic('light');
             setSubTab('rehber');
           }}
-          className={`py-2 px-3 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 transition ${
+          className={`py-2 px-2 rounded-xl text-[11px] sm:text-xs font-extrabold flex items-center justify-center gap-1 transition ${
             subTab === 'rehber'
               ? 'bg-teal-600 text-white shadow-sm'
               : isLight
@@ -352,8 +399,8 @@ export const DenemeRehberScreen: React.FC<DenemeRehberScreenProps> = ({
               : 'text-slate-400 hover:text-slate-200'
           }`}
         >
-          <BookOpen className="w-4 h-4 shrink-0" />
-          <span className="truncate">Klinik Rehber & Tablolar</span>
+          <BookOpen className="w-3.5 h-3.5 shrink-0" />
+          <span className="truncate">Klinik Rehber</span>
         </button>
       </div>
 
@@ -800,7 +847,334 @@ export const DenemeRehberScreen: React.FC<DenemeRehberScreenProps> = ({
         </>
       )}
 
-      {/* SUB-TAB B: KLİNİK REHBER */}
+      {/* SUB-TAB B: İNTERAKTİF TUS KLİNİK HESAPLAYICILAR (FENa, Winter, Anyon Açığı, Parkland, Düzeltilmiş Ca/Na) */}
+      {subTab === 'hesap' && (
+        <div className="space-y-3">
+          {/* Calculator 1: Anyon Açığı, Albümin Düzeltmeli AG & Winter Formülü */}
+          {(() => {
+            const rawAg = +(agNa - (agCl + agHco3)).toFixed(1);
+            const correctedAg = +(rawAg + 2.5 * Math.max(0, 4 - agAlbumin)).toFixed(1);
+            const winterExpected = +(1.5 * agHco3 + 8).toFixed(1);
+            const winterLow = +(winterExpected - 2).toFixed(1);
+            const winterHigh = +(winterExpected + 2).toFixed(1);
+            const isHighAg = correctedAg > 12;
+            const respCompStatus =
+              agPco2 < winterLow
+                ? 'Ek Solunumsal Alkaloz (PaCO2 beklenenden düşük — örn. Salisilat zehirlenmesi / Sepsis)'
+                : agPco2 > winterHigh
+                ? 'Ek Solunumsal Asidoz (PaCO2 beklenenden yüksek — Dekompanse / Solunum yorgunluğu)'
+                : 'Uygun Solunumsal Kompanzasyon (Winter aralığında)';
+
+            return (
+              <div
+                className={`rounded-2xl border p-3.5 space-y-2.5 ${
+                  isLight ? 'bg-white border-slate-200 shadow-sm' : 'bg-[#0C1B24] border-white/10 shadow-md'
+                }`}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <Activity className="w-4 h-4 text-emerald-500" />
+                    <h3 className="text-xs sm:text-sm font-extrabold">
+                      1. Anyon Açığı, Albümin Düzeltmesi & Winter Formülü
+                    </h3>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      triggerHaptic('light');
+                      shareClinicalSummary(
+                        `TUS Klinik Hesaplama • Anyon Açığı: ${rawAg} mEq/L (Albümin düzeltmeli: ${correctedAg} mEq/L) • Winter Beklenen PaCO2: ${winterLow}–${winterHigh} mmHg (${respCompStatus})`
+                      );
+                    }}
+                    className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-emerald-500/15 text-emerald-500 text-[11px] font-bold"
+                  >
+                    <Share2 className="w-3 h-3" />
+                    <span>Paylaş</span>
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                  {[
+                    { label: 'Na+ (mEq/L)', val: agNa, set: setAgNa, step: 1 },
+                    { label: 'Cl- (mEq/L)', val: agCl, set: setAgCl, step: 1 },
+                    { label: 'HCO3- (mEq/L)', val: agHco3, set: setAgHco3, step: 1 },
+                    { label: 'Albümin (g/dL)', val: agAlbumin, set: setAgAlbumin, step: 0.1 },
+                    { label: 'Ölçülen PaCO2', val: agPco2, set: setAgPco2, step: 1 },
+                  ].map((f, idx) => (
+                    <label key={idx} className="space-y-1 text-[11px] font-bold">
+                      <span className="text-slate-400 block truncate">{f.label}</span>
+                      <input
+                        type="number"
+                        step={f.step}
+                        value={f.val}
+                        onChange={(e) => f.set(Number(e.target.value) || 0)}
+                        className={`w-full rounded-xl px-2.5 py-1.5 text-xs font-extrabold border outline-none ${
+                          isLight
+                            ? 'bg-slate-50 border-slate-200 text-slate-900'
+                            : 'bg-[#071117] border-white/10 text-white'
+                        }`}
+                      />
+                    </label>
+                  ))}
+                </div>
+
+                <div
+                  className={`rounded-xl border p-2.5 text-xs space-y-1 ${
+                    isLight
+                      ? 'bg-emerald-50/70 border-emerald-200 text-slate-800'
+                      : 'bg-emerald-950/35 border-emerald-500/30 text-slate-100'
+                  }`}
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-2 font-extrabold">
+                    <span>
+                      Standart AG: <strong className="text-emerald-500">{rawAg} mEq/L</strong> • Albümin Düzeltmeli AG:{' '}
+                      <strong className="text-amber-500">{correctedAg} mEq/L</strong>
+                    </span>
+                    <span>
+                      Winter Beklenen PaCO2: <strong>{winterLow} – {winterHigh} mmHg</strong>
+                    </span>
+                  </div>
+                  <div className="text-[11px] font-semibold">
+                    • <strong>Ayırıcı Tanı:</strong>{' '}
+                    {isHighAg
+                      ? 'Yüksek Anyon Açıklı Metabolik Asidoz (MUDPILES: Metanol, Üremi, DKA, Paraldehit/Propilen glikol, İzoniyazid/Demir, Laktik asidoz, Etilen glikol, Salisilat).'
+                      : 'Normal Anyon Açıklı (Hiperkloremik) Metabolik Asidoz (HARDASS: İshal, Renal Tübüler Asidoz Tip 1/2/4, Asetazolamid, Üreterosigmoidostomi).'}
+                  </div>
+                  <div className="text-[11px] font-semibold text-teal-500">
+                    • <strong>Solunumsal Durum:</strong> {respCompStatus}
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* Calculator 2: FENa (Fraksiyone Sodyum Ekskresyonu — Prerenal vs ATN) */}
+          {(() => {
+            const denom = Math.max(0.001, fenaPNa * fenaUCr);
+            const fenaPct = +(((fenaUNa * fenaPCr) / denom) * 100).toFixed(2);
+            const fenaStatus =
+              fenaPct < 1
+                ? 'Prerenal Akut Böbrek Hasarı (FENa < %1 • Tübül fonksiyonu sağlam, sodyum ve su tutulumu aktif)'
+                : fenaPct > 2
+                ? 'İntrinsik Renal / Akut Tübüler Nekroz — ATN (FENa > %2 • Tübüler epitel hasarına bağlı idrarla sodyum kaybı)'
+                : 'Ara Bölge (%1 – %2 • Diüretik kullanımı veya erken evre ATN açısından klinik korelasyon gerekir)';
+
+            return (
+              <div
+                className={`rounded-2xl border p-3.5 space-y-2.5 ${
+                  isLight ? 'bg-white border-slate-200 shadow-sm' : 'bg-[#0C1B24] border-white/10 shadow-md'
+                }`}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <Calculator className="w-4 h-4 text-teal-500" />
+                    <h3 className="text-xs sm:text-sm font-extrabold">
+                      2. FENa Hesaplayıcı (Prerenal ABH vs. Akut Tübüler Nekroz)
+                    </h3>
+                  </div>
+                  <span className="px-2 py-0.5 rounded-md bg-teal-500/15 text-teal-500 text-xs font-extrabold">
+                    FENa: %{fenaPct}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {[
+                    { label: 'İdrar Na (mEq/L)', val: fenaUNa, set: setFenaUNa, step: 1 },
+                    { label: 'Plazma Na (mEq/L)', val: fenaPNa, set: setFenaPNa, step: 1 },
+                    { label: 'İdrar Kreatinin (mg/dL)', val: fenaUCr, set: setFenaUCr, step: 5 },
+                    { label: 'Plazma Kreatinin (mg/dL)', val: fenaPCr, set: setFenaPCr, step: 0.1 },
+                  ].map((f, idx) => (
+                    <label key={idx} className="space-y-1 text-[11px] font-bold">
+                      <span className="text-slate-400 block truncate">{f.label}</span>
+                      <input
+                        type="number"
+                        step={f.step}
+                        value={f.val}
+                        onChange={(e) => f.set(Number(e.target.value) || 0)}
+                        className={`w-full rounded-xl px-2.5 py-1.5 text-xs font-extrabold border outline-none ${
+                          isLight
+                            ? 'bg-slate-50 border-slate-200 text-slate-900'
+                            : 'bg-[#071117] border-white/10 text-white'
+                        }`}
+                      />
+                    </label>
+                  ))}
+                </div>
+
+                <div
+                  className={`rounded-xl border p-2.5 text-xs font-semibold ${
+                    fenaPct < 1
+                      ? isLight
+                        ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
+                        : 'bg-emerald-950/35 border-emerald-500/30 text-emerald-200'
+                      : isLight
+                      ? 'bg-amber-50 border-amber-200 text-amber-900'
+                      : 'bg-amber-950/35 border-amber-500/30 text-amber-200'
+                  }`}
+                >
+                  • <strong>TUS Yorumu:</strong> {fenaStatus} (Not: Diüretik kullanan hastada FENa yerine{' '}
+                  <strong>FEÜre &lt; %35</strong> prerenal lehinedir).
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* Calculator 3 & 4: Parkland Yanık Sıvı Resüsitasyonu + Düzeltilmiş Ca / Na */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+            {(() => {
+              const totalMl = Math.round(4 * burnWeight * burnTbsa);
+              const first8hMl = Math.round(totalMl / 2);
+              const first8hRate = Math.round(first8hMl / 8);
+              const next16hRate = Math.round(first8hMl / 16);
+              return (
+                <div
+                  className={`rounded-2xl border p-3.5 space-y-2.5 ${
+                    isLight ? 'bg-white border-slate-200 shadow-sm' : 'bg-[#0C1B24] border-white/10 shadow-md'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xs sm:text-sm font-extrabold">
+                      3. Parkland Yanık Sıvı Formülü (4 mL × kg × %Yanık)
+                    </h3>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <label className="space-y-1 text-[11px] font-bold">
+                      <span className="text-slate-400">Vücut Ağırlığı (kg)</span>
+                      <input
+                        type="number"
+                        value={burnWeight}
+                        onChange={(e) => setBurnWeight(Number(e.target.value) || 0)}
+                        className={`w-full rounded-xl px-2.5 py-1.5 text-xs font-extrabold border outline-none ${
+                          isLight
+                            ? 'bg-slate-50 border-slate-200 text-slate-900'
+                            : 'bg-[#071117] border-white/10 text-white'
+                        }`}
+                      />
+                    </label>
+                    <label className="space-y-1 text-[11px] font-bold">
+                      <span className="text-slate-400">2°/3° Yanık Yüzdesi (%TBSA)</span>
+                      <input
+                        type="number"
+                        value={burnTbsa}
+                        onChange={(e) => setBurnTbsa(Number(e.target.value) || 0)}
+                        className={`w-full rounded-xl px-2.5 py-1.5 text-xs font-extrabold border outline-none ${
+                          isLight
+                            ? 'bg-slate-50 border-slate-200 text-slate-900'
+                            : 'bg-[#071117] border-white/10 text-white'
+                        }`}
+                      />
+                    </label>
+                  </div>
+                  <div
+                    className={`rounded-xl border p-2.5 text-xs space-y-1 ${
+                      isLight ? 'bg-slate-50 border-slate-200' : 'bg-[#071117] border-white/10'
+                    }`}
+                  >
+                    <div className="font-extrabold text-emerald-500">
+                      24 Saatlik Toplam Ringer Laktat: {totalMl.toLocaleString('tr-TR')} mL
+                    </div>
+                    <div className="text-[11px]">
+                      • <strong>İlk 8 Saat (%50):</strong> {first8hMl.toLocaleString('tr-TR')} mL ({first8hRate} mL/saat — yanık anından itibaren hesaplanır)
+                    </div>
+                    <div className="text-[11px]">
+                      • <strong>Sonraki 16 Saat (%50):</strong> {first8hMl.toLocaleString('tr-TR')} mL ({next16hRate} mL/saat)
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {(() => {
+              const adjCa = +(corrCa + 0.8 * (4 - corrAlb)).toFixed(2);
+              const adjNa = +(corrNa + 1.6 * ((corrGlucose - 100) / 100)).toFixed(1);
+              return (
+                <div
+                  className={`rounded-2xl border p-3.5 space-y-2.5 ${
+                    isLight ? 'bg-white border-slate-200 shadow-sm' : 'bg-[#0C1B24] border-white/10 shadow-md'
+                  }`}
+                >
+                  <h3 className="text-xs sm:text-sm font-extrabold">
+                    4. Düzeltilmiş Kalsiyum & Hiperglisemide Düzeltilmiş Sodyum
+                  </h3>
+                  <div className="grid grid-cols-2 gap-2">
+                    <label className="space-y-1 text-[11px] font-bold">
+                      <span className="text-slate-400">Ölçülen Ca (mg/dL)</span>
+                      <input
+                        type="number"
+                        step={0.1}
+                        value={corrCa}
+                        onChange={(e) => setCorrCa(Number(e.target.value) || 0)}
+                        className={`w-full rounded-xl px-2.5 py-1.5 text-xs font-extrabold border outline-none ${
+                          isLight
+                            ? 'bg-slate-50 border-slate-200 text-slate-900'
+                            : 'bg-[#071117] border-white/10 text-white'
+                        }`}
+                      />
+                    </label>
+                    <label className="space-y-1 text-[11px] font-bold">
+                      <span className="text-slate-400">Albümin (g/dL)</span>
+                      <input
+                        type="number"
+                        step={0.1}
+                        value={corrAlb}
+                        onChange={(e) => setCorrAlb(Number(e.target.value) || 0)}
+                        className={`w-full rounded-xl px-2.5 py-1.5 text-xs font-extrabold border outline-none ${
+                          isLight
+                            ? 'bg-slate-50 border-slate-200 text-slate-900'
+                            : 'bg-[#071117] border-white/10 text-white'
+                        }`}
+                      />
+                    </label>
+                    <label className="space-y-1 text-[11px] font-bold">
+                      <span className="text-slate-400">Ölçülen Na (mEq/L)</span>
+                      <input
+                        type="number"
+                        value={corrNa}
+                        onChange={(e) => setCorrNa(Number(e.target.value) || 0)}
+                        className={`w-full rounded-xl px-2.5 py-1.5 text-xs font-extrabold border outline-none ${
+                          isLight
+                            ? 'bg-slate-50 border-slate-200 text-slate-900'
+                            : 'bg-[#071117] border-white/10 text-white'
+                        }`}
+                      />
+                    </label>
+                    <label className="space-y-1 text-[11px] font-bold">
+                      <span className="text-slate-400">Glukoz (mg/dL)</span>
+                      <input
+                        type="number"
+                        step={10}
+                        value={corrGlucose}
+                        onChange={(e) => setCorrGlucose(Number(e.target.value) || 0)}
+                        className={`w-full rounded-xl px-2.5 py-1.5 text-xs font-extrabold border outline-none ${
+                          isLight
+                            ? 'bg-slate-50 border-slate-200 text-slate-900'
+                            : 'bg-[#071117] border-white/10 text-white'
+                        }`}
+                      />
+                    </label>
+                  </div>
+                  <div
+                    className={`rounded-xl border p-2.5 text-xs space-y-1 ${
+                      isLight ? 'bg-slate-50 border-slate-200' : 'bg-[#071117] border-white/10'
+                    }`}
+                  >
+                    <div>
+                      • <strong>Düzeltilmiş Kalsiyum:</strong>{' '}
+                      <span className="font-extrabold text-emerald-500">{adjCa} mg/dL</span> (Her 1 g/dL albümin düşüşü için +0.8 mg/dL)
+                    </div>
+                    <div>
+                      • <strong>Düzeltilmiş Sodyum:</strong>{' '}
+                      <span className="font-extrabold text-cyan-500">{adjNa} mEq/L</span> (100 üzerindeki her 100 mg/dL glukoz artışı için +1.6 mEq/L)
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+        </div>
+      )}
+
+      {/* SUB-TAB C: KLİNİK REHBER */}
       {subTab === 'rehber' && (
         <div className="space-y-2.5">
           <div
@@ -934,6 +1308,78 @@ export const DenemeRehberScreen: React.FC<DenemeRehberScreenProps> = ({
           </div>
         </div>
       )}
+
+      {/* Guideline 1.4.1 Medical Reference Citations & Clinical Disclaimer */}
+      <div
+        className={`rounded-2xl border p-3.5 space-y-2 text-xs ${
+          isLight
+            ? 'bg-slate-50 border-slate-200 text-slate-700'
+            : 'bg-[#08131A] border-white/10 text-slate-300'
+        }`}
+      >
+        <div className="flex items-center gap-1.5 font-extrabold text-amber-500">
+          <ShieldAlert className="w-4 h-4 shrink-0" />
+          <span>Tıbbi Sorumluluk Reddi & Akademik Kaynakça (Medical References)</span>
+        </div>
+        <p className="text-[11px] leading-relaxed">
+          Bu uygulamadaki tüm vaka soruları, klinik hesaplayıcılar ve spot bilgiler yalnızca{' '}
+          <strong>Tıpta Uzmanlık Eğitimi Giriş Sınavı (TUS)</strong> hazırlığı ve akademik tıp eğitimi amaçlıdır; doğrudan hasta tanı veya tedavi kararı yerine geçmez. Klinik uygulamada her zaman resmi kılavuzlara ve uzman hekim görüşüne başvurulmalıdır.
+        </p>
+        <div className="text-[11px] space-y-1">
+          <div className="font-bold">Temel Akademik Referans Kaynaklar:</div>
+          <div>
+            • İç Hastalıkları & Patoloji: <em>Harrison&apos;s Principles of Internal Medicine (21e)</em>,{' '}
+            <em>Robbins &amp; Cotran Pathologic Basis of Disease (10e)</em>
+          </div>
+          <div>
+            • Pediatri, Cerrahi & Kadın Doğum: <em>Nelson Textbook of Pediatrics (21e)</em>,{' '}
+            <em>Sabiston Textbook of Surgery (21e)</em>, <em>Williams Obstetrics (26e)</em>
+          </div>
+          <div>
+            • Temel Bilimler: <em>Harper&apos;s Illustrated Biochemistry</em>,{' '}
+            <em>Katzung Basic &amp; Clinical Pharmacology</em>, <em>Guyton &amp; Hall Medical Physiology</em>,{' '}
+            <em>Murray Medical Microbiology</em>
+          </div>
+        </div>
+        <div className="flex flex-wrap items-center gap-2 pt-1">
+          <a
+            href="https://www.ncbi.nlm.nih.gov/books/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-500 text-[11px] font-bold hover:underline"
+          >
+            <span>NCBI Bookshelf / StatPearls</span>
+            <ExternalLink className="w-3 h-3" />
+          </a>
+          <a
+            href="https://pubmed.ncbi.nlm.nih.gov/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-teal-500/30 bg-teal-500/10 text-teal-500 text-[11px] font-bold hover:underline"
+          >
+            <span>NIH PubMed</span>
+            <ExternalLink className="w-3 h-3" />
+          </a>
+          <a
+            href="https://www.who.int/publications/i"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-cyan-500/30 bg-cyan-500/10 text-cyan-500 text-[11px] font-bold hover:underline"
+          >
+            <span>WHO Clinical Guidelines</span>
+            <ExternalLink className="w-3 h-3" />
+          </a>
+          <a
+            href="https://www.osym.gov.tr/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-500 text-[11px] font-bold hover:underline"
+          >
+            <span>ÖSYM TUS Duyuruları</span>
+            <ExternalLink className="w-3 h-3" />
+          </a>
+        </div>
+      </div>
     </div>
   );
 };

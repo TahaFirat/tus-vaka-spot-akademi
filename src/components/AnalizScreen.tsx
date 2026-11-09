@@ -2,11 +2,13 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Award,
   BarChart3,
+  Bell,
   Calendar,
   Clock,
   Download,
   Flame,
   RotateCcw,
+  Share2,
   Target,
   Trash2,
   Upload,
@@ -16,7 +18,12 @@ import {
   TUS_SPOT_CARDS,
   TUS_VAKA_QUESTIONS,
 } from '../data/tusMedicalRepository';
-import { triggerHaptic } from '../services/nativeBridge';
+import {
+  cancelDailyTusReminder,
+  scheduleDailyTusReminder,
+  shareClinicalSummary,
+  triggerHaptic,
+} from '../services/nativeBridge';
 import {
   calculateEstimatedTusScore,
   calculateOsymNet,
@@ -48,6 +55,26 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
   const [importMessage, setImportMessage] = useState<string | null>(null);
   const [confirmReset, setConfirmReset] = useState(false);
   const [nowMs, setNowMs] = useState<number>(() => Date.now());
+  const [reminderHour, setReminderHour] = useState<number>(20);
+  const [reminderStatusMsg, setReminderStatusMsg] = useState<string | null>(
+    null
+  );
+
+  useEffect(() => {
+    const onRemStatus = (e: Event) => {
+      const detail = (e as CustomEvent).detail || {};
+      if (detail.message) {
+        setReminderStatusMsg(String(detail.message));
+      }
+    };
+    window.addEventListener('tus:reminderStatus', onRemStatus as EventListener);
+    return () => {
+      window.removeEventListener(
+        'tus:reminderStatus',
+        onRemStatus as EventListener
+      );
+    };
+  }, []);
 
   // Live 1-second timer for active TUS countdown
   useEffect(() => {
@@ -584,6 +611,86 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
                 </div>
               </div>
             ))}
+          </div>
+        )}
+      </div>
+
+      {/* Native iOS Daily TUS Study Reminder & Scorecard Share */}
+      <div className={`rounded-2xl border p-3.5 space-y-2.5 ${cardClass}`}>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5 text-xs font-extrabold">
+            <Bell className="w-4 h-4 text-emerald-500" />
+            <span>iOS Günlük TUS Etüt Bildirimi & Karne Paylaşımı</span>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              triggerHaptic('light');
+              shareClinicalSummary(
+                `TUS Vaka & Spot Akademi Karnem • Çözülen: ${stats.totalSolved} Soru • ÖSYM Netim: ${stats.overallNet} • Tahmini TUS Puanım: ${stats.estimatedScore} • TUS'a Kalan: ${countdown.days} Gün`
+              );
+            }}
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-emerald-600 text-white text-xs font-bold"
+          >
+            <Share2 className="w-3.5 h-3.5" />
+            <span>Karnemi Paylaş</span>
+          </button>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2 text-xs">
+          <select
+            value={reminderHour}
+            onChange={(e) => setReminderHour(Number(e.target.value))}
+            aria-label="Hatırlatıcı Saati"
+            className={`rounded-xl px-2.5 py-1.5 text-xs font-bold border outline-none ${
+              isLight
+                ? 'bg-slate-50 border-slate-200 text-slate-800'
+                : 'bg-[#071117] border-white/10 text-slate-100'
+            }`}
+          >
+            {[9, 12, 18, 19, 20, 21, 22].map((h) => (
+              <option key={h} value={h}>
+                Her Gün {String(h).padStart(2, '0')}:00
+              </option>
+            ))}
+          </select>
+
+          <button
+            type="button"
+            onClick={() => {
+              triggerHaptic('medium');
+              scheduleDailyTusReminder(
+                reminderHour,
+                0,
+                countdown.days,
+                studyState.dailyTarget
+              );
+            }}
+            className="px-3 py-1.5 rounded-xl bg-teal-600 text-white text-xs font-extrabold"
+          >
+            Hatırlatıcıyı Kur
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              triggerHaptic('light');
+              cancelDailyTusReminder();
+            }}
+            className={`px-2.5 py-1.5 rounded-xl border text-xs font-bold ${
+              isLight
+                ? 'bg-slate-100 border-slate-200 text-slate-600'
+                : 'bg-white/5 border-white/10 text-slate-300'
+            }`}
+          >
+            Kapat
+          </button>
+        </div>
+
+        {reminderStatusMsg && (
+          <div className="text-[11px] font-semibold text-emerald-500">
+            {reminderStatusMsg}
           </div>
         )}
       </div>

@@ -10,7 +10,6 @@ import {
   Home,
   Moon,
   Sparkles,
-  Stethoscope,
   Sun,
   X,
   Zap,
@@ -318,9 +317,11 @@ export const App: React.FC = () => {
             }}
             className="flex items-center gap-2 shrink-0 text-left"
           >
-            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-sm shrink-0">
-              <Stethoscope className="w-4 h-4 text-white" />
-            </div>
+            <img
+              src="/icon-192.png"
+              alt="TUS Akademi"
+              className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl shadow-sm shrink-0 object-cover"
+            />
             <h1
               className={`text-sm sm:text-base font-extrabold tracking-tight whitespace-nowrap shrink-0 ${
                 isLightMode ? 'text-slate-900' : 'text-white'

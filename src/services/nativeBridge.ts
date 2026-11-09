@@ -92,6 +92,86 @@ export function syncNativeTheme(theme: 'light' | 'dark'): void {
   }
 }
 
+export function scheduleDailyTusReminder(
+  hour: number,
+  minute: number,
+  daysLeft: number,
+  dailyTarget: number
+): void {
+  const handler = getNativeHandler();
+  if (handler) {
+    handler.postMessage({
+      action: 'scheduleReminder',
+      hour,
+      minute,
+      daysLeft,
+      dailyTarget,
+    });
+    return;
+  }
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(
+      new CustomEvent('tus:reminderStatus', {
+        detail: {
+          enabled: true,
+          hour,
+          minute,
+          message: `Her gün ${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')} için çalışma hatırlatıcısı kaydedildi.`,
+        },
+      })
+    );
+  }
+}
+
+export function cancelDailyTusReminder(): void {
+  const handler = getNativeHandler();
+  if (handler) {
+    handler.postMessage({
+      action: 'cancelReminder',
+    });
+    return;
+  }
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(
+      new CustomEvent('tus:reminderStatus', {
+        detail: {
+          enabled: false,
+          message: 'Günlük TUS çalışma hatırlatıcısı kapatıldı.',
+        },
+      })
+    );
+  }
+}
+
+export async function shareClinicalSummary(text: string): Promise<void> {
+  const handler = getNativeHandler();
+  if (handler) {
+    handler.postMessage({
+      action: 'shareClinicalText',
+      text,
+    });
+    return;
+  }
+  if (typeof navigator !== 'undefined' && navigator.share) {
+    try {
+      await navigator.share({
+        title: 'TUS Vaka & Spot Akademi',
+        text,
+      });
+      return;
+    } catch {
+      // Fallback to clipboard
+    }
+  }
+  if (typeof navigator !== 'undefined' && navigator.clipboard) {
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      // Ignore
+    }
+  }
+}
+
 export async function purchaseLifetimePro(): Promise<{
   success: boolean;
   cancelled?: boolean;
