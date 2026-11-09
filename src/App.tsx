@@ -7,6 +7,7 @@ import {
   Clock,
   Crown,
   Flame,
+  Home,
   Moon,
   Sparkles,
   Stethoscope,
@@ -36,16 +37,17 @@ import {
   TusExamAttempt,
   TusStudyState,
 } from './services/studyStorage';
+import { AnaSayfaScreen } from './components/AnaSayfaScreen';
 import { VakaTestScreen } from './components/VakaTestScreen';
 import { DogruYanlisScreen } from './components/DogruYanlisScreen';
 import { DenemeRehberScreen } from './components/DenemeRehberScreen';
 import { AnalizScreen } from './components/AnalizScreen';
 import { PaywallModal } from './components/PaywallModal';
 
-type MainTabId = 'vaka' | 'spot' | 'deneme' | 'analiz';
+type MainTabId = 'home' | 'vaka' | 'spot' | 'deneme' | 'analiz';
 
 export const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<MainTabId>('vaka');
+  const [activeTab, setActiveTab] = useState<MainTabId>('home');
   const [studyState, setStudyState] = useState<TusStudyState>(() =>
     loadStudyState()
   );
@@ -56,10 +58,13 @@ export const App: React.FC = () => {
   );
   const [proBannerVisible, setProBannerVisible] = useState<boolean>(false);
   const [vakaBasketJump, setVakaBasketJump] = useState<
-    'all' | 'unsolved' | 'wrong' | 'correct' | 'bookmarked'
+    'all' | 'osym_twin' | 'unsolved' | 'wrong' | 'correct' | 'bookmarked'
   >('all');
+  const [vakaBranchJump, setVakaBranchJump] = useState<'ALL' | TusBranchId>(
+    'ALL'
+  );
   const [spotBasketJump, setSpotBasketJump] = useState<
-    'all' | 'unsolved' | 'wrong' | 'correct' | 'bookmarked'
+    'all' | 'osym_twin' | 'unsolved' | 'wrong' | 'correct' | 'bookmarked'
   >('all');
 
   // Persist studyState on changes
@@ -223,6 +228,22 @@ export const App: React.FC = () => {
     });
   };
 
+  const handleNavigateFromHome = (
+    tab: 'vaka' | 'spot' | 'deneme' | 'analiz',
+    options?: {
+      basket?: 'all' | 'osym_twin' | 'unsolved' | 'wrong' | 'correct' | 'bookmarked';
+      branchId?: 'ALL' | TusBranchId;
+    }
+  ) => {
+    if (tab === 'vaka') {
+      if (options?.basket) setVakaBasketJump(options.basket);
+      if (options?.branchId) setVakaBranchJump(options.branchId);
+    } else if (tab === 'spot') {
+      if (options?.basket) setSpotBasketJump(options.basket);
+    }
+    setActiveTab(tab);
+  };
+
   const isLightMode = studyState.theme === 'light';
 
   const navTabs: Array<{
@@ -232,15 +253,21 @@ export const App: React.FC = () => {
     icon: React.ReactNode;
   }> = [
     {
+      id: 'home',
+      shortLabel: 'Ana Sayfa',
+      fullLabel: 'Ana Sayfa',
+      icon: <Home className="w-4 h-4" />,
+    },
+    {
       id: 'vaka',
-      shortLabel: 'Vaka & Test',
-      fullLabel: 'Vaka & Test Çöz',
+      shortLabel: 'Vaka',
+      fullLabel: 'Vaka & Test',
       icon: <CheckSquare className="w-4 h-4" />,
     },
     {
       id: 'spot',
       shortLabel: 'D/Y Spot',
-      fullLabel: 'D/Y Spot Öğretici',
+      fullLabel: 'D/Y Spot',
       icon: <Zap className="w-4 h-4" />,
     },
     {
@@ -273,9 +300,16 @@ export const App: React.FC = () => {
             : 'ios-glass-header-dark border-white/10'
         }`}
       >
-        <div className="max-w-4xl mx-auto px-3 sm:px-4 h-12 flex items-center justify-between gap-2">
-          {/* Left: Brand Logo & Non-Truncating Title */}
-          <div className="flex items-center gap-2 shrink-0">
+        <div className="max-w-4xl mx-auto px-3 sm:px-4 h-12 flex items-center justify-between gap-1.5">
+          {/* Left: Brand Logo & Non-Truncating Title (Tap to go Home) */}
+          <button
+            type="button"
+            onClick={() => {
+              triggerHaptic('light');
+              setActiveTab('home');
+            }}
+            className="flex items-center gap-2 shrink-0 text-left"
+          >
             <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-sm shrink-0">
               <Stethoscope className="w-4 h-4 text-white" />
             </div>
@@ -286,7 +320,7 @@ export const App: React.FC = () => {
             >
               TUS Akademi
             </h1>
-          </div>
+          </button>
 
           {/* Center-Right Desktop Tabs (Tablet Landscape & Desktop) */}
           <div className="hidden md:flex items-center gap-1">
@@ -316,7 +350,7 @@ export const App: React.FC = () => {
           </div>
 
           {/* Right Status Controls (Compact & Harmonious Across All Screen Sizes) */}
-          <div className="flex items-center gap-1.5 shrink-0">
+          <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
             {/* Live TUS Countdown Pill */}
             <button
               type="button"
@@ -338,7 +372,7 @@ export const App: React.FC = () => {
             {/* Streak */}
             <div
               title="Günlük Çalışma Serisi"
-              className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg border text-[11px] font-bold ${
+              className={`inline-flex items-center gap-1 px-1.5 sm:px-2 py-1 rounded-lg border text-[11px] font-bold ${
                 isLightMode
                   ? 'bg-amber-50 border-amber-200 text-amber-700'
                   : 'bg-amber-500/10 border-amber-400/25 text-amber-300'
@@ -380,7 +414,7 @@ export const App: React.FC = () => {
                   triggerHaptic('light');
                   setProBannerVisible((v) => !v);
                 }}
-                className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border text-[11px] font-extrabold whitespace-nowrap transition ${
+                className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg border text-[11px] font-extrabold whitespace-nowrap transition ${
                   isLightMode
                     ? 'bg-emerald-50 border-emerald-300 text-emerald-700'
                     : 'bg-emerald-500/20 border-emerald-400/40 text-emerald-300'
@@ -396,10 +430,10 @@ export const App: React.FC = () => {
                   triggerHaptic('medium');
                   handleOpenPaywall();
                 }}
-                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-[11px] font-extrabold whitespace-nowrap shadow-sm"
+                className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-[11px] font-extrabold whitespace-nowrap shadow-sm"
               >
                 <Crown className="w-3 h-3" />
-                <span>PRO'ya Geç</span>
+                <span>PRO</span>
               </button>
             )}
           </div>
@@ -438,6 +472,17 @@ export const App: React.FC = () => {
           </div>
         )}
 
+        {activeTab === 'home' && (
+          <AnaSayfaScreen
+            studyState={studyState}
+            isPro={isPro}
+            isLight={isLightMode}
+            totalSolvedCount={summaryStats.totalSolved}
+            onNavigateTab={handleNavigateFromHome}
+            onOpenPaywall={handleOpenPaywall}
+          />
+        )}
+
         {activeTab === 'vaka' && (
           <VakaTestScreen
             isPro={isPro}
@@ -449,6 +494,7 @@ export const App: React.FC = () => {
             onToggleBookmarkVaka={handleToggleBookmarkVaka}
             onOpenPaywall={handleOpenPaywall}
             initialBasket={vakaBasketJump}
+            initialBranch={vakaBranchJump}
           />
         )}
 
@@ -498,7 +544,7 @@ export const App: React.FC = () => {
             isLightMode ? 'ios-glass-dock-light' : 'ios-glass-dock-dark'
           }`}
         >
-          <div className="grid grid-cols-4 gap-1">
+          <div className="grid grid-cols-5 gap-1">
             {navTabs.map((tab) => {
               const active = activeTab === tab.id;
               return (

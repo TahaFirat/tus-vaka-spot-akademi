@@ -17,6 +17,14 @@ final class TUSStoreKitManager {
         set { UserDefaults.standard.set(newValue, forKey: storageKey) }
     }
 
+    private var isSandboxEnvironment: Bool {
+        #if DEBUG
+        return true
+        #else
+        return Bundle.main.appStoreReceiptURL?.lastPathComponent == "sandboxReceipt"
+        #endif
+    }
+
     func startObservingTransactions(bridge: TUSBridgeViewController?) {
         updatesTask?.cancel()
         updatesTask = Task {
@@ -77,7 +85,15 @@ final class TUSStoreKitManager {
                                 message: "Tebrikler! TUS Vaka & Spot Akademi Ömür Boyu Tam Erişim (Pro) başarıyla açıldı."
                             )
                         case .unverified:
-                            self.presentSandboxFallbackSheet(bridge: bridge)
+                            if self.isSandboxEnvironment {
+                                self.presentSandboxFallbackSheet(bridge: bridge)
+                            } else {
+                                bridge?.notifyProStatus(
+                                    isPro: self.isProUnlocked,
+                                    cancelled: false,
+                                    message: "Apple StoreKit ödeme doğrulaması tamamlanamadı. Lütfen tekrar deneyin."
+                                )
+                            }
                         }
                     case .userCancelled:
                         bridge?.notifyProStatus(
@@ -95,11 +111,27 @@ final class TUSStoreKitManager {
                         break
                     }
                 } else {
-                    // StoreKit sunucusunda sözleşme/yayılım Processing aşamasındayken TestFlight & App Review için yerel iOS onay penceresi
-                    self.presentSandboxFallbackSheet(bridge: bridge)
+                    if self.isSandboxEnvironment {
+                        // TestFlight / App Review Sandbox ortamında ürün henüz CDN yayılımındaysa yerel onay penceresi
+                        self.presentSandboxFallbackSheet(bridge: bridge)
+                    } else {
+                        bridge?.notifyProStatus(
+                            isPro: self.isProUnlocked,
+                            cancelled: false,
+                            message: "Apple App Store ödeme servisine şu an ulaşılamıyor. Lütfen internet bağlantınızı kontrol edip tekrar deneyin."
+                        )
+                    }
                 }
             } catch {
-                self.presentSandboxFallbackSheet(bridge: bridge)
+                if self.isSandboxEnvironment {
+                    self.presentSandboxFallbackSheet(bridge: bridge)
+                } else {
+                    bridge?.notifyProStatus(
+                        isPro: self.isProUnlocked,
+                        cancelled: false,
+                        message: "Apple StoreKit işlemi sırasında bir hata oluştu. Lütfen tekrar deneyin."
+                    )
+                }
             }
         }
     }

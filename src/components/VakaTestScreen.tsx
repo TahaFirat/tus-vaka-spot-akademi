@@ -45,7 +45,8 @@ interface VakaTestScreenProps {
   ) => void;
   onToggleBookmarkVaka: (questionId: string) => void;
   onOpenPaywall: (reason?: string) => void;
-  initialBasket?: 'all' | 'unsolved' | 'wrong' | 'correct' | 'bookmarked';
+  initialBasket?: 'all' | 'osym_twin' | 'unsolved' | 'wrong' | 'correct' | 'bookmarked';
+  initialBranch?: 'ALL' | TusBranchId;
 }
 
 export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
@@ -58,9 +59,10 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
   onToggleBookmarkVaka,
   onOpenPaywall,
   initialBasket = 'all',
+  initialBranch = 'ALL',
 }) => {
   const [sessionFilter, setSessionFilter] = useState<'ALL' | TusSessionType>('ALL');
-  const [branchFilter, setBranchFilter] = useState<'ALL' | TusBranchId>('ALL');
+  const [branchFilter, setBranchFilter] = useState<'ALL' | TusBranchId>(initialBranch);
   const [basketFilter, setBasketFilter] = useState<
     'all' | 'osym_twin' | 'unsolved' | 'wrong' | 'correct' | 'bookmarked'
   >(initialBasket);
@@ -77,8 +79,9 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
 
   useEffect(() => {
     setBasketFilter(initialBasket);
+    setBranchFilter(initialBranch);
     setPinnedQuestionId(null);
-  }, [initialBasket]);
+  }, [initialBasket, initialBranch]);
 
   // Branch question counts
   const branchQuestionCounts = useMemo(() => {
@@ -902,9 +905,9 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
             </button>
 
             {isPro ? (
-              <div className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600">
-                <Crown className="w-3.5 h-3.5 text-emerald-500" />
-                <span>PRO • {allMatchedQuestions.length} Soru Açık</span>
+              <div className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-500 whitespace-nowrap">
+                <Crown className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                <span>PRO • {allMatchedQuestions.length} Soru</span>
               </div>
             ) : (
               <button
@@ -914,11 +917,11 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
                     `PRO pakete geçerek ${TUS_VAKA_QUESTIONS.length}+ vaka sorusunun tamamını sınırsız açabilirsiniz.`
                   )
                 }
-                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-600 text-[11px] font-extrabold hover:bg-amber-500/25 transition"
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-500 text-[11px] font-extrabold hover:bg-amber-500/25 transition whitespace-nowrap"
               >
-                <Lock className="w-3 h-3" />
+                <Lock className="w-3 h-3 shrink-0" />
                 <span>
-                  +{TUS_VAKA_QUESTIONS.length - FREE_QUESTION_LIMIT} PRO Soruyu Aç
+                  +{TUS_VAKA_QUESTIONS.length - FREE_QUESTION_LIMIT} PRO Soru
                 </span>
               </button>
             )}

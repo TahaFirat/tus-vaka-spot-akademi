@@ -41,7 +41,7 @@ interface DogruYanlisScreenProps {
   ) => void;
   onToggleBookmarkSpot: (spotId: string) => void;
   onOpenPaywall: (reason?: string) => void;
-  initialBasket?: 'all' | 'unsolved' | 'wrong' | 'correct' | 'bookmarked';
+  initialBasket?: 'all' | 'osym_twin' | 'unsolved' | 'wrong' | 'correct' | 'bookmarked';
 }
 
 export const DogruYanlisScreen: React.FC<DogruYanlisScreenProps> = ({
@@ -760,9 +760,9 @@ export const DogruYanlisScreen: React.FC<DogruYanlisScreenProps> = ({
             </button>
 
             {isPro ? (
-              <div className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600">
-                <Crown className="w-3.5 h-3.5 text-emerald-500" />
-                <span>PRO • {allMatchedSpots.length} Spot Açık</span>
+              <div className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-500 whitespace-nowrap">
+                <Crown className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                <span>PRO • {allMatchedSpots.length} Spot</span>
               </div>
             ) : (
               <button
@@ -772,10 +772,10 @@ export const DogruYanlisScreen: React.FC<DogruYanlisScreenProps> = ({
                     `PRO pakete geçerek ${TUS_SPOT_CARDS.length}+ D/Y spot kartının tamamını sınırsız açabilirsiniz.`
                   )
                 }
-                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-600 text-[11px] font-extrabold hover:bg-amber-500/25 transition"
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-500 text-[11px] font-extrabold hover:bg-amber-500/25 transition whitespace-nowrap"
               >
-                <Lock className="w-3 h-3" />
-                <span>+{TUS_SPOT_CARDS.length - FREE_QUESTION_LIMIT} PRO Spotu Aç</span>
+                <Lock className="w-3 h-3 shrink-0" />
+                <span>+{TUS_SPOT_CARDS.length - FREE_QUESTION_LIMIT} PRO Spot</span>
               </button>
             )}
 

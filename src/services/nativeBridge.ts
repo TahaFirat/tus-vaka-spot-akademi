@@ -83,11 +83,10 @@ export async function purchaseLifetimePro(): Promise<{
         if (settled) return;
         settled = true;
         window.removeEventListener('tus:proStatus', onProEvent as EventListener);
-        await savePersistedProStatus(true);
-        await triggerHaptic('success');
         resolve({
-          success: true,
-          message: 'TUS Vaka & Spot Akademi Ömür Boyu Tam Erişim (Pro) başarıyla aktif edildi!',
+          success: false,
+          cancelled: true,
+          message: 'Apple StoreKit yanıt süresi aşıldı. Lütfen tekrar deneyin.',
         });
       }, 28000);
 
