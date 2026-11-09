@@ -251,17 +251,24 @@ final class TUSNativeHapticsEngine {
     }
 }
 
-// MARK: - Custom TUS Bridge View Controller (StoreKit 2 + iPad Keyboard Shortcuts + WKScriptMessageHandler)
+// MARK: - Custom TUS Bridge View Controller (StoreKit 2 + Theme Sync + WKScriptMessageHandler)
 class TUSBridgeViewController: CAPBridgeViewController, WKScriptMessageHandler {
+    private var isLightTheme: Bool = false
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = UIColor(red: 9.0/255.0, green: 20.0/255.0, blue: 26.0/255.0, alpha: 1.0)
+        let darkBg = UIColor(red: 7.0/255.0, green: 17.0/255.0, blue: 23.0/255.0, alpha: 1.0)
+        view.backgroundColor = darkBg
         TUSNativeHapticsEngine.shared.prepareGenerators()
 
         if let webView = self.webView {
-            webView.backgroundColor = UIColor(red: 9.0/255.0, green: 20.0/255.0, blue: 26.0/255.0, alpha: 1.0)
-            webView.isOpaque = false
+            webView.backgroundColor = darkBg
+            webView.isOpaque = true
+            webView.scrollView.backgroundColor = darkBg
+            webView.scrollView.bounces = false
+            webView.scrollView.alwaysBounceVertical = false
+            webView.scrollView.alwaysBounceHorizontal = false
+            webView.scrollView.showsHorizontalScrollIndicator = false
             webView.configuration.userContentController.add(self, name: "tusNative")
         }
 
@@ -269,7 +276,23 @@ class TUSBridgeViewController: CAPBridgeViewController, WKScriptMessageHandler {
     }
 
     override var preferredStatusBarStyle: UIStatusBarStyle {
+        if #available(iOS 13.0, *) {
+            return isLightTheme ? .darkContent : .lightContent
+        }
         return .lightContent
+    }
+
+    func applyTheme(isLight: Bool) {
+        DispatchQueue.main.async {
+            self.isLightTheme = isLight
+            let bgColor = isLight
+                ? UIColor(red: 243.0/255.0, green: 247.0/255.0, blue: 249.0/255.0, alpha: 1.0)
+                : UIColor(red: 7.0/255.0, green: 17.0/255.0, blue: 23.0/255.0, alpha: 1.0)
+            self.view.backgroundColor = bgColor
+            self.webView?.backgroundColor = bgColor
+            self.webView?.scrollView.backgroundColor = bgColor
+            self.setNeedsStatusBarAppearanceUpdate()
+        }
     }
 
     func notifyProStatus(isPro: Bool, cancelled: Bool, message: String) {
@@ -313,6 +336,10 @@ class TUSBridgeViewController: CAPBridgeViewController, WKScriptMessageHandler {
             Task {
                 await TUSStoreKitManager.shared.refreshEntitlements(bridge: self)
             }
+
+        case "setTheme":
+            let theme = (body["theme"] as? String) ?? "dark"
+            applyTheme(isLight: theme == "light")
 
         default:
             break

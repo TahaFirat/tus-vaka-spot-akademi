@@ -26,6 +26,7 @@ import {
   loadPersistedProStatus,
   requestNativeEntitlementCheck,
   savePersistedProStatus,
+  syncNativeTheme,
   triggerHaptic,
 } from './services/nativeBridge';
 import {
@@ -44,7 +45,7 @@ import { DenemeRehberScreen } from './components/DenemeRehberScreen';
 import { AnalizScreen } from './components/AnalizScreen';
 import { PaywallModal } from './components/PaywallModal';
 
-type MainTabId = 'home' | 'vaka' | 'spot' | 'deneme' | 'analiz';
+type MainTabId = 'home' | 'vaka' | 'cikmis' | 'spot' | 'deneme' | 'analiz';
 
 export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<MainTabId>('home');
@@ -67,9 +68,10 @@ export const App: React.FC = () => {
     'all' | 'osym_twin' | 'unsolved' | 'wrong' | 'correct' | 'bookmarked'
   >('all');
 
-  // Persist studyState on changes
+  // Persist studyState on changes and sync native iOS background/status-bar theme
   useEffect(() => {
     saveStudyState(studyState);
+    syncNativeTheme(studyState.theme === 'light' ? 'light' : 'dark');
   }, [studyState]);
 
   // Initialize Pro status from storage + Native iOS StoreKit 2 entitlement check
@@ -229,13 +231,13 @@ export const App: React.FC = () => {
   };
 
   const handleNavigateFromHome = (
-    tab: 'vaka' | 'spot' | 'deneme' | 'analiz',
+    tab: 'vaka' | 'cikmis' | 'spot' | 'deneme' | 'analiz',
     options?: {
       basket?: 'all' | 'osym_twin' | 'unsolved' | 'wrong' | 'correct' | 'bookmarked';
       branchId?: 'ALL' | TusBranchId;
     }
   ) => {
-    if (tab === 'vaka') {
+    if (tab === 'vaka' || tab === 'cikmis') {
       if (options?.basket) setVakaBasketJump(options.basket);
       if (options?.branchId) setVakaBranchJump(options.branchId);
     } else if (tab === 'spot') {
@@ -265,8 +267,14 @@ export const App: React.FC = () => {
       icon: <CheckSquare className="w-4 h-4" />,
     },
     {
+      id: 'cikmis',
+      shortLabel: 'Çıkmış',
+      fullLabel: 'Çıkmış İkiz',
+      icon: <Sparkles className="w-4 h-4" />,
+    },
+    {
       id: 'spot',
-      shortLabel: 'D/Y Spot',
+      shortLabel: 'Spot',
       fullLabel: 'D/Y Spot',
       icon: <Zap className="w-4 h-4" />,
     },
@@ -332,6 +340,12 @@ export const App: React.FC = () => {
                   type="button"
                   onClick={() => {
                     triggerHaptic('light');
+                    if (tab.id === 'vaka') {
+                      setVakaBasketJump('all');
+                      setVakaBranchJump('ALL');
+                    } else if (tab.id === 'cikmis') {
+                      setVakaBranchJump('ALL');
+                    }
                     setActiveTab(tab.id);
                   }}
                   className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition ${
@@ -485,6 +499,8 @@ export const App: React.FC = () => {
 
         {activeTab === 'vaka' && (
           <VakaTestScreen
+            key="vaka-standard"
+            mode="standard"
             isPro={isPro}
             isLight={isLightMode}
             totalSolvedCount={summaryStats.totalSolved}
@@ -494,6 +510,23 @@ export const App: React.FC = () => {
             onToggleBookmarkVaka={handleToggleBookmarkVaka}
             onOpenPaywall={handleOpenPaywall}
             initialBasket={vakaBasketJump}
+            initialBranch={vakaBranchJump}
+          />
+        )}
+
+        {activeTab === 'cikmis' && (
+          <VakaTestScreen
+            key="vaka-osym-twin"
+            mode="osym_twin"
+            isPro={isPro}
+            isLight={isLightMode}
+            totalSolvedCount={summaryStats.totalSolved}
+            vakaAnswers={studyState.vakaAnswers}
+            bookmarkedVakaIds={studyState.bookmarkedVakaIds}
+            onRecordVakaAnswer={handleRecordVakaAnswer}
+            onToggleBookmarkVaka={handleToggleBookmarkVaka}
+            onOpenPaywall={handleOpenPaywall}
+            initialBasket="all"
             initialBranch={vakaBranchJump}
           />
         )}
@@ -537,14 +570,14 @@ export const App: React.FC = () => {
       </main>
 
       {/* Modern iOS Translucent Floating Glass Pill Dock */}
-      <div className="md:hidden fixed bottom-3 inset-x-3 z-30 pointer-events-none flex justify-center pb-safe">
+      <div className="md:hidden fixed bottom-3 inset-x-2.5 z-30 pointer-events-none flex justify-center pb-safe">
         <nav
           aria-label="Ana Navigasyon"
           className={`pointer-events-auto w-full max-w-md rounded-2xl p-1 transition-all duration-200 ${
             isLightMode ? 'ios-glass-dock-light' : 'ios-glass-dock-dark'
           }`}
         >
-          <div className="grid grid-cols-5 gap-1">
+          <div className="grid grid-cols-6 gap-0.5">
             {navTabs.map((tab) => {
               const active = activeTab === tab.id;
               return (
@@ -553,9 +586,15 @@ export const App: React.FC = () => {
                   type="button"
                   onClick={() => {
                     triggerHaptic('light');
+                    if (tab.id === 'vaka') {
+                      setVakaBasketJump('all');
+                      setVakaBranchJump('ALL');
+                    } else if (tab.id === 'cikmis') {
+                      setVakaBranchJump('ALL');
+                    }
                     setActiveTab(tab.id);
                   }}
-                  className={`py-1.5 px-1 rounded-xl flex flex-col items-center justify-center gap-0.5 transition-all duration-150 ${
+                  className={`py-1.5 px-0.5 rounded-xl flex flex-col items-center justify-center gap-0.5 transition-all duration-150 ${
                     active
                       ? isLightMode
                         ? 'bg-emerald-600 text-white font-bold shadow-sm'
@@ -566,7 +605,7 @@ export const App: React.FC = () => {
                   }`}
                 >
                   {tab.icon}
-                  <span className="text-[10px] leading-tight tracking-tight truncate max-w-full">
+                  <span className="text-[9.5px] leading-tight tracking-tight whitespace-nowrap max-w-full">
                     {tab.shortLabel}
                   </span>
                 </button>

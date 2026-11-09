@@ -219,9 +219,21 @@ function buildTusRepository(): {
     const clusterVakaList: TusVakaQuestion[] = [];
     const clusterSpotList: TusSpotCard[] = [];
     const maxAnglesForBranch = BRANCH_EXTRA_ANGLE_MAP[cluster.branchId] || 7;
+    const isOsymTwinCluster = cluster.subTopic.startsWith('ÖSYM İkizi');
 
     entities.forEach((entity, entityIdx) => {
       const shortTitle = cleanShortTitle(entity.entityName);
+      const yearMatch = entity.patientVignette.match(/^\[([^\]]+)\]/);
+      const osymYearTag = isOsymTwinCluster
+        ? yearMatch
+          ? yearMatch[1]
+          : '2024 TUS Konsept İkizi'
+        : undefined;
+      const prefixTwin = (rawStem: string) => {
+        if (!isOsymTwinCluster || !osymYearTag) return rawStem;
+        if (rawStem.startsWith('[')) return rawStem;
+        return `[${osymYearTag}] ${rawStem}`;
+      };
 
       // 8 distinct, zero-error question formats where options are concise and 100% matched to the question stem
       const allAngleDefinitions: Array<{
@@ -340,7 +352,7 @@ function buildTusRepository(): {
           subTopic: cluster.subTopic,
           difficulty: angle.difficulty,
           examFrequency: angle.freq,
-          stem: angle.buildStem(),
+          stem: prefixTwin(angle.buildStem()),
           clinicalClues: entity.clues,
           options,
           correctOption: correctOptObj.letter,
@@ -348,6 +360,8 @@ function buildTusRepository(): {
           differentialSummary,
           highYieldPearl: entity.pearl,
           firstLineVsGoldStandard: entity.firstVsGold,
+          isOsymTwin: isOsymTwinCluster,
+          osymYearTag,
         });
       });
 
@@ -413,6 +427,8 @@ function buildTusRepository(): {
           correctMedicalFact: entity.trueStatement,
           comparisonNote: entity.firstVsGold,
           highYieldPearl: entity.pearl,
+          isOsymTwin: isOsymTwinCluster,
+          osymYearTag,
         });
       });
     });
@@ -451,6 +467,8 @@ function buildTusRepository(): {
 const REPOSITORY = buildTusRepository();
 
 export const TUS_VAKA_QUESTIONS: TusVakaQuestion[] = REPOSITORY.vakaQuestions;
+export const TUS_OSYM_TWIN_QUESTIONS: TusVakaQuestion[] =
+  TUS_VAKA_QUESTIONS.filter((q) => Boolean(q.isOsymTwin));
 export const TUS_SPOT_CARDS: TusSpotCard[] = REPOSITORY.spotCards;
 
 export const TOTAL_INTERACTIVE_TUS_ITEMS =

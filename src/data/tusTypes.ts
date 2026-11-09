@@ -48,6 +48,8 @@ export interface TusVakaQuestion {
   differentialSummary: string;
   highYieldPearl: string;
   firstLineVsGoldStandard: string;
+  isOsymTwin?: boolean;
+  osymYearTag?: string;
 }
 
 export interface TusSpotCard {
@@ -62,6 +64,8 @@ export interface TusSpotCard {
   correctMedicalFact: string;
   comparisonNote: string;
   highYieldPearl: string;
+  isOsymTwin?: boolean;
+  osymYearTag?: string;
 }
 
 export type ClinicalGuideCategory =

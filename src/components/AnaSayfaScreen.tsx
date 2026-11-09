@@ -18,6 +18,7 @@ import {
 import {
   TOTAL_INTERACTIVE_TUS_ITEMS,
   TUS_BRANCHES,
+  TUS_OSYM_TWIN_QUESTIONS,
   TUS_SPOT_CARDS,
   TUS_VAKA_QUESTIONS,
   TusBranchId,
@@ -36,7 +37,7 @@ interface AnaSayfaScreenProps {
   isLight: boolean;
   totalSolvedCount: number;
   onNavigateTab: (
-    tab: 'vaka' | 'spot' | 'deneme' | 'analiz',
+    tab: 'vaka' | 'cikmis' | 'spot' | 'deneme' | 'analiz',
     options?: {
       basket?: 'all' | 'osym_twin' | 'unsolved' | 'wrong' | 'correct' | 'bookmarked';
       branchId?: 'ALL' | TusBranchId;
@@ -288,12 +289,12 @@ export const AnaSayfaScreen: React.FC<AnaSayfaScreenProps> = ({
           <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
         </button>
 
-        {/* Module 3: ÖSYM Çıkmış Soru İkizleri (2022–2025) */}
+        {/* Module 3: ÖSYM Çıkmış Soru İkizleri (Dedicated Tab) */}
         <button
           type="button"
           onClick={() => {
             triggerHaptic('light');
-            onNavigateTab('vaka', { basket: 'osym_twin', branchId: 'ALL' });
+            onNavigateTab('cikmis', { basket: 'all', branchId: 'ALL' });
           }}
           className={`text-left rounded-2xl border p-3.5 flex items-center justify-between gap-3 transition active:scale-[0.99] ${cardBg} ${
             isLight ? 'hover:border-amber-300' : 'hover:border-amber-500/40'
@@ -309,7 +310,7 @@ export const AnaSayfaScreen: React.FC<AnaSayfaScreenProps> = ({
                   ÖSYM Çıkmış Soru İkizleri
                 </span>
                 <span className="px-1.5 py-0.5 rounded text-[10px] font-extrabold bg-amber-500/15 text-amber-500 shrink-0">
-                  2022–2025
+                  {TUS_OSYM_TWIN_QUESTIONS.length} İkiz
                 </span>
               </div>
               <p
@@ -317,7 +318,7 @@ export const AnaSayfaScreen: React.FC<AnaSayfaScreenProps> = ({
                   isLight ? 'text-slate-500' : 'text-slate-400'
                 }`}
               >
-                Son TUS sınavlarında sorgulanan klinik konseptlerin özgün ikizleri
+                2021–2025 TUS sınavlarında sorgulanan konseptlerin özgün ikizleri
               </p>
             </div>
           </div>

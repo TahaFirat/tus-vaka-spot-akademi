@@ -21,6 +21,7 @@ import {
 import {
   OptionLetter,
   TUS_BRANCHES,
+  TUS_OSYM_TWIN_QUESTIONS,
   TUS_VAKA_QUESTIONS,
   TusBranchId,
   TusSessionType,
@@ -47,6 +48,7 @@ interface VakaTestScreenProps {
   onOpenPaywall: (reason?: string) => void;
   initialBasket?: 'all' | 'osym_twin' | 'unsolved' | 'wrong' | 'correct' | 'bookmarked';
   initialBranch?: 'ALL' | TusBranchId;
+  mode?: 'standard' | 'osym_twin';
 }
 
 export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
@@ -60,12 +62,18 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
   onOpenPaywall,
   initialBasket = 'all',
   initialBranch = 'ALL',
+  mode = 'standard',
 }) => {
+  const isDedicatedTwinTab = mode === 'osym_twin';
+  const sourcePool = isDedicatedTwinTab
+    ? TUS_OSYM_TWIN_QUESTIONS
+    : TUS_VAKA_QUESTIONS;
+
   const [sessionFilter, setSessionFilter] = useState<'ALL' | TusSessionType>('ALL');
   const [branchFilter, setBranchFilter] = useState<'ALL' | TusBranchId>(initialBranch);
   const [basketFilter, setBasketFilter] = useState<
     'all' | 'osym_twin' | 'unsolved' | 'wrong' | 'correct' | 'bookmarked'
-  >(initialBasket);
+  >(isDedicatedTwinTab ? 'all' : initialBasket);
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
   const [smartFocusMode, setSmartFocusMode] = useState(false);
@@ -78,22 +86,22 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
   >({});
 
   useEffect(() => {
-    setBasketFilter(initialBasket);
+    setBasketFilter(isDedicatedTwinTab ? 'all' : initialBasket);
     setBranchFilter(initialBranch);
     setPinnedQuestionId(null);
-  }, [initialBasket, initialBranch]);
+  }, [initialBasket, initialBranch, isDedicatedTwinTab]);
 
-  // Branch question counts
+  // Branch question counts (scoped to sourcePool so Çıkmış İkiz tab shows exact twin counts per branch)
   const branchQuestionCounts = useMemo(() => {
-    const counts: Record<string, number> = { ALL: TUS_VAKA_QUESTIONS.length };
+    const counts: Record<string, number> = { ALL: sourcePool.length };
     TUS_BRANCHES.forEach((b) => {
       counts[b.id] = 0;
     });
-    TUS_VAKA_QUESTIONS.forEach((q) => {
+    sourcePool.forEach((q) => {
       counts[q.branchId] = (counts[q.branchId] || 0) + 1;
     });
     return counts;
-  }, []);
+  }, [sourcePool]);
 
   // Calculate branch accuracy for Smart Focus Mode
   const branchWeaknessScore = useMemo(() => {
@@ -126,15 +134,13 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
   }, [sessionFilter]);
 
   const isOsymTwinQuestion = (q: (typeof TUS_VAKA_QUESTIONS)[number]) =>
-    q.subTopic.includes('ÖSYM İkizi') ||
-    q.stem.includes('TUS Konsept İkizi') ||
-    q.examFrequency === 'Her TUS Sorulur';
+    Boolean(q.isOsymTwin) || q.subTopic.startsWith('ÖSYM İkizi');
 
   // Full matched questions before Freemium slicing
   // Keeps pinnedQuestionId in the list so answering a question in "Yeni" or "Yanlışlar" never makes it vanish before clicking Sonraki!
   const allMatchedQuestions = useMemo(() => {
     const qLower = searchQuery.trim().toLowerCase();
-    const matched = TUS_VAKA_QUESTIONS.filter((q) => {
+    const matched = sourcePool.filter((q) => {
       if (sessionFilter !== 'ALL' && q.session !== sessionFilter) return false;
       if (branchFilter !== 'ALL' && q.branchId !== branchFilter) return false;
 
@@ -180,6 +186,7 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
       return scoreB - scoreA;
     });
   }, [
+    sourcePool,
     sessionFilter,
     branchFilter,
     basketFilter,
@@ -201,7 +208,7 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
     setPinnedQuestionId(null);
     setShowClues(false);
     setShowDiffDetails(false);
-  }, [sessionFilter, branchFilter, basketFilter, searchQuery, isPro, smartFocusMode]);
+  }, [sessionFilter, branchFilter, basketFilter, searchQuery, isPro, smartFocusMode, isDedicatedTwinTab]);
 
   const safeIndex =
     filteredQuestions.length > 0
@@ -224,8 +231,8 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
     let correct = 0;
     let osymTwin = 0;
     const basePool = isPro
-      ? TUS_VAKA_QUESTIONS
-      : TUS_VAKA_QUESTIONS.slice(0, FREE_QUESTION_LIMIT);
+      ? sourcePool
+      : sourcePool.slice(0, FREE_QUESTION_LIMIT);
 
     basePool.forEach((q) => {
       if (isOsymTwinQuestion(q)) osymTwin++;
@@ -240,9 +247,11 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
       unsolved,
       wrong,
       correct,
-      bookmarked: bookmarkedVakaIds.length,
+      bookmarked: bookmarkedVakaIds.filter((id) =>
+        sourcePool.some((q) => q.id === id)
+      ).length,
     };
-  }, [isPro, vakaAnswers, bookmarkedVakaIds]);
+  }, [isPro, sourcePool, vakaAnswers, bookmarkedVakaIds]);
 
   const handleSelectOption = async (letter: OptionLetter) => {
     if (!currentQuestion) return;
@@ -411,6 +420,38 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
 
   return (
     <div className="space-y-2">
+      {/* Dedicated ÖSYM Çıkmış İkizleri Header Banner when in Çıkmış İkiz Tab */}
+      {isDedicatedTwinTab && (
+        <div
+          className={`rounded-2xl border px-3.5 py-2.5 flex items-center justify-between gap-2 ${
+            isLight
+              ? 'bg-gradient-to-r from-amber-50 via-emerald-50 to-teal-50 border-amber-300/90 text-slate-900'
+              : 'bg-gradient-to-r from-amber-950/60 via-[#0C1B24] to-emerald-950/50 border-amber-500/35 text-slate-100'
+          }`}
+        >
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center shrink-0 text-amber-500">
+              <Sparkles className="w-4 h-4" />
+            </div>
+            <div className="min-w-0">
+              <div className="text-xs font-extrabold truncate flex items-center gap-1.5">
+                <span>ÖSYM Çıkmış TUS Konsept İkizleri</span>
+                <span className="px-1.5 py-0.5 rounded text-[10px] font-extrabold bg-amber-500/20 text-amber-500">
+                  2021–2025
+                </span>
+              </div>
+              <p
+                className={`text-[11px] truncate ${
+                  isLight ? 'text-slate-600' : 'text-slate-300'
+                }`}
+              >
+                Tüm 11 TUS branşında yalnızca çıkmış soruların özgün klinik ikizleri ({sourcePool.length} soru)
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Modern Top Control Panel (Responsive Across All Phones & Tablets) */}
       <div className={`rounded-2xl border p-2.5 space-y-2 ${cardBg}`}>
         {/* Row 1: Segmented Session Control + Smart Focus + Basket Selector + Search */}
@@ -472,7 +513,7 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
               <span className="hidden xs:inline">Akıllı Odak</span>
             </button>
 
-            {/* Basket Selector (Includes ÖSYM İkizleri!) */}
+            {/* Basket Selector */}
             <select
               value={basketFilter}
               onChange={(e) => {
@@ -488,12 +529,14 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
             >
               <option value="all">
                 {isPro
-                  ? `Tümü (${basketCounts.all})`
-                  : `Demo (${basketCounts.all}/${TUS_VAKA_QUESTIONS.length})`}
+                  ? `${isDedicatedTwinTab ? 'Tüm İkizler' : 'Tümü'} (${basketCounts.all})`
+                  : `Demo (${basketCounts.all}/${sourcePool.length})`}
               </option>
-              <option value="osym_twin">
-                ÖSYM İkizleri ({basketCounts.osymTwin})
-              </option>
+              {!isDedicatedTwinTab && (
+                <option value="osym_twin">
+                  ÖSYM İkizleri ({basketCounts.osymTwin})
+                </option>
+              )}
               <option value="unsolved">Yeni ({basketCounts.unsolved})</option>
               <option value="wrong">Yanlışlar ({basketCounts.wrong})</option>
               <option value="correct">Doğrular ({basketCounts.correct})</option>
@@ -540,8 +583,8 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
           >
             Tüm Branşlar •{' '}
             {isPro
-              ? TUS_VAKA_QUESTIONS.length
-              : `${FREE_QUESTION_LIMIT}/${TUS_VAKA_QUESTIONS.length}`}
+              ? sourcePool.length
+              : `${Math.min(FREE_QUESTION_LIMIT, sourcePool.length)}/${sourcePool.length}`}
           </button>
 
           {visibleBranches.map((b) => {
@@ -663,7 +706,7 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
 
               {isOsymTwinQuestion(currentQuestion) && (
                 <span
-                  className={`hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-extrabold shrink-0 border ${
+                  className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-extrabold shrink-0 border ${
                     isLight
                       ? 'bg-amber-50 border-amber-300 text-amber-800'
                       : 'bg-amber-500/15 border-amber-400/30 text-amber-300'

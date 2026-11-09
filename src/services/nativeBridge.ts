@@ -69,6 +69,29 @@ export function requestNativeEntitlementCheck(): void {
   }
 }
 
+export function syncNativeTheme(theme: 'light' | 'dark'): void {
+  try {
+    const bgColor = theme === 'light' ? '#F3F7F9' : '#071117';
+    if (typeof document !== 'undefined') {
+      document.documentElement.style.backgroundColor = bgColor;
+      document.body.style.backgroundColor = bgColor;
+      const metaTheme = document.querySelector('meta[name="theme-color"]');
+      if (metaTheme) {
+        metaTheme.setAttribute('content', bgColor);
+      }
+    }
+    const handler = getNativeHandler();
+    if (handler) {
+      handler.postMessage({
+        action: 'setTheme',
+        theme,
+      });
+    }
+  } catch {
+    // Ignore
+  }
+}
+
 export async function purchaseLifetimePro(): Promise<{
   success: boolean;
   cancelled?: boolean;
