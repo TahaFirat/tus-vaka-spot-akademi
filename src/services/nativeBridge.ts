@@ -1,7 +1,3 @@
-import { Capacitor } from '@capacitor/core';
-import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
-import { Preferences } from '@capacitor/preferences';
-
 export const FREE_QUESTION_LIMIT = 30;
 export const PRO_PRODUCT_ID = 'com.tus.akademi.lifetime.pro';
 export const PRO_PRICE_LABEL = '49,99 ₺';
@@ -34,21 +30,8 @@ export async function triggerHaptic(
       handler.postMessage({ action: 'haptic', style: type });
       return;
     }
-
-    if (Capacitor.isNativePlatform()) {
-      if (type === 'success') {
-        await Haptics.notification({ type: NotificationType.Success });
-      } else if (type === 'warning') {
-        await Haptics.notification({ type: NotificationType.Warning });
-      } else if (type === 'error') {
-        await Haptics.notification({ type: NotificationType.Error });
-      } else if (type === 'heavy') {
-        await Haptics.impact({ style: ImpactStyle.Heavy });
-      } else if (type === 'medium') {
-        await Haptics.impact({ style: ImpactStyle.Medium });
-      } else {
-        await Haptics.impact({ style: ImpactStyle.Light });
-      }
+    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+      navigator.vibrate(type === 'heavy' ? 18 : 8);
     }
   } catch {
     // Ignore haptic errors on desktop browsers
@@ -60,13 +43,8 @@ export async function loadPersistedProStatus(): Promise<boolean> {
     if (typeof window !== 'undefined' && localStorage.getItem(PRO_STORAGE_KEY) === 'true') {
       return true;
     }
-    const { value } = await Preferences.get({ key: PRO_STORAGE_KEY });
-    if (value === 'true') {
-      localStorage.setItem(PRO_STORAGE_KEY, 'true');
-      return true;
-    }
   } catch {
-    // Fallback to localStorage
+    // Fallback
   }
   return false;
 }
@@ -76,7 +54,6 @@ export async function savePersistedProStatus(unlocked: boolean): Promise<void> {
     if (typeof window !== 'undefined') {
       localStorage.setItem(PRO_STORAGE_KEY, unlocked ? 'true' : 'false');
     }
-    await Preferences.set({ key: PRO_STORAGE_KEY, value: unlocked ? 'true' : 'false' });
   } catch {
     // Ignore storage errors
   }
