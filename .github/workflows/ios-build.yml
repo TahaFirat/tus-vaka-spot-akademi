@@ -188,6 +188,9 @@ jobs:
       - name: 7. Build Xcode Project Archive
         run: |
           cd ios/App
+          for i in 1 2 3; do
+            xcodebuild -project App.xcodeproj -scheme App -resolvePackageDependencies && break || sleep 5
+          done
           if [ "$HAS_CERT" = "true" ] && [ -n "$PROFILE_NAME" ]; then
             echo "Building with official Apple Code Signing (Build #${{ github.run_number }})..."
             xcodebuild -project App.xcodeproj \
