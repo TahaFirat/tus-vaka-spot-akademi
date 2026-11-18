@@ -200,6 +200,23 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
           onUpdateStudyState((prev) => ({
             ...prev,
             ...parsed,
+            vakaAnswers:
+              parsed.vakaAnswers && typeof parsed.vakaAnswers === 'object'
+                ? parsed.vakaAnswers
+                : prev.vakaAnswers,
+            spotAnswers:
+              parsed.spotAnswers && typeof parsed.spotAnswers === 'object'
+                ? parsed.spotAnswers
+                : prev.spotAnswers,
+            bookmarkedVakaIds: Array.isArray(parsed.bookmarkedVakaIds)
+              ? parsed.bookmarkedVakaIds
+              : prev.bookmarkedVakaIds,
+            bookmarkedSpotIds: Array.isArray(parsed.bookmarkedSpotIds)
+              ? parsed.bookmarkedSpotIds
+              : prev.bookmarkedSpotIds,
+            examHistory: Array.isArray(parsed.examHistory)
+              ? parsed.examHistory
+              : prev.examHistory,
           }));
           triggerHaptic('success');
           setImportMessage('Verileriniz başarıyla geri yüklendi!');

@@ -1,6 +1,6 @@
 export const FREE_QUESTION_LIMIT = 30;
 export const PRO_PRODUCT_ID = 'com.tus.akademi.lifetime.pro';
-export const PRO_PRICE_LABEL = '49,99 ₺';
+export const PRO_PRICE_LABEL = '200,00 ₺';
 export const PRO_STORAGE_KEY = 'tus_akademi_pro_unlocked_v1';
 
 interface WebKitMessageHandler {

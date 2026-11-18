@@ -203,12 +203,75 @@ const BRANCH_EXTRA_ANGLE_MAP: Record<TusBranchId, number> = {
   histoloji: 5,
 };
 
+function escapeRegExp(str: string): string {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// Removes direct answer-name leaks from Angles 2, 6, 7 ("hangisidir?" stems)
+function redactTargetFromStem(rawText: string, entityName: string): string {
+  const shortTitle = cleanShortTitle(entityName);
+  const candidates = new Set<string>();
+
+  const pushVariants = (s: string) => {
+    const clean = s.trim();
+    if (clean.length >= 4) candidates.add(clean);
+    const noParen = clean.replace(/\([^)]*\)/g, '').trim();
+    if (noParen.length >= 4) {
+      candidates.add(noParen);
+      const strippedNoun = noParen
+        .replace(/\s+(?:hastalığı|sendromu|karsinomu|kanseri|tümörü|toksisitesi|eksikliği|anemisi)$/i, '')
+        .trim();
+      if (strippedNoun.length >= 4) candidates.add(strippedNoun);
+    }
+    const slashParts = noParen.split(/\s*\/\s*|\s+ve\s+|\s+vs\.?\s+/i);
+    slashParts.forEach((part) => {
+      const p = part.trim();
+      if (p.length >= 5) candidates.add(p);
+    });
+    const parenMatches = clean.matchAll(/\(([^)]+)\)/g);
+    for (const m of parenMatches) {
+      const inner = m[1].trim();
+      if (inner.length >= 4 && !/^\d+$/.test(inner)) {
+        candidates.add(inner);
+      }
+    }
+  };
+
+  pushVariants(shortTitle);
+  // Also include prefix before dash in full entityName
+  const preDash = entityName.split('—')[0].trim();
+  pushVariants(preDash);
+
+  // Sort longest first so multi-word phrases mask cleanly before shorter tokens
+  const sorted = [...candidates]
+    .filter((t) => t.length >= 4 && !['tümör', 'sendrom', 'hastalık', 'hastalığı', 'sendromu'].includes(t.toLowerCase()))
+    .sort((a, b) => b.length - a.length);
+
+  let result = rawText;
+  for (const token of sorted) {
+    const escaped = escapeRegExp(token);
+    const re = new RegExp(
+      `${escaped}(?:[’']?(?:da|de|ta|te|dan|den|tan|ten|ın|in|un|ün|nın|nin|nun|nün|yla|yle|la|le|ya|ye|a|e|ı|i|u|ü))?`,
+      'gi'
+    );
+    result = result.replace(re, 'ilgili antite');
+  }
+
+  return result
+    .replace(/ilgili antite(\s*\(\s*ilgili antite\s*\))+/gi, 'ilgili antite')
+    .replace(/\(ilgili antite\)/gi, '')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+}
+
 function buildTusRepository(): {
   vakaQuestions: TusVakaQuestion[];
   spotCards: TusSpotCard[];
 } {
   const perClusterVaka: TusVakaQuestion[][] = [];
   const perClusterSpots: TusSpotCard[][] = [];
+  const seenVakaStems = new Set<string>();
+  const seenSpotStatements = new Set<string>();
 
   let qCounter = 1;
   let sCounter = 1;
@@ -216,10 +279,11 @@ function buildTusRepository(): {
   ALL_CLUSTERS.forEach((cluster, clusterIdx) => {
     const branchMeta = getBranchMeta(cluster.branchId);
     const entities = cluster.entities;
-    const clusterVakaList: TusVakaQuestion[] = [];
-    const clusterSpotList: TusSpotCard[] = [];
+    const perEntityVaka: TusVakaQuestion[][] = [];
+    const perEntitySpots: TusSpotCard[][] = [];
     const maxAnglesForBranch = BRANCH_EXTRA_ANGLE_MAP[cluster.branchId] || 7;
     const isOsymTwinCluster = cluster.subTopic.startsWith('ÖSYM İkizi');
+    const shortSubTopic = cluster.subTopic.replace(/^ÖSYM İkizi\s*•\s*/i, '').trim();
 
     entities.forEach((entity, entityIdx) => {
       const shortTitle = cleanShortTitle(entity.entityName);
@@ -234,6 +298,14 @@ function buildTusRepository(): {
         if (rawStem.startsWith('[')) return rawStem;
         return `[${osymYearTag}] ${rawStem}`;
       };
+
+      const maskedNote = redactTargetFromStem(entity.whenCorrectNote, entity.entityName);
+      const maskedClues = redactTargetFromStem(entity.clues.join(', '), entity.entityName);
+      const maskedFirstGold = redactTargetFromStem(
+        entity.firstVsGold.split('•')[0].trim(),
+        entity.entityName
+      );
+      const maskedMechanism = redactTargetFromStem(entity.mechanism, entity.entityName);
 
       // 8 distinct, zero-error question formats where options are concise and 100% matched to the question stem
       const allAngleDefinitions: Array<{
@@ -255,7 +327,7 @@ function buildTusRepository(): {
           difficulty: 'İleri Ayırıcı Tanı',
           freq: 'Yüksek Verimli Vaka',
           buildStem: () =>
-            `Aşağıdaki klinik tablo veya yapılardan hangisi "${entity.whenCorrectNote}" özelliği ile karakterizedir?`,
+            `Aşağıdaki klinik tablo veya yapılardan hangisi "${maskedNote}" özelliği ile karakterizedir?`,
           buildOptionText: (e) => cleanShortTitle(e.entityName),
         },
         {
@@ -263,7 +335,7 @@ function buildTusRepository(): {
           difficulty: 'Temel Spot',
           freq: 'Altın Standart Spot',
           buildStem: () =>
-            `"${shortTitle}" tablosunda geçerli olan tanısal altın standart veya tedavi yaklaşımı aşağıdakilerden hangisidir?`,
+            `"${shortTitle}" tablosunda (${shortSubTopic}) geçerli olan tanısal altın standart veya tedavi yaklaşımı aşağıdakilerden hangisidir?`,
           buildOptionText: (e) => e.firstVsGold,
         },
         {
@@ -271,7 +343,7 @@ function buildTusRepository(): {
           difficulty: 'Klinik Vaka',
           freq: 'Yüksek Verimli Vaka',
           buildStem: () =>
-            `Klinikte "${shortTitle}" tanısı konulan bir hastada beklenen temel mekanizma ve klinik bulgu eşleşmesi hangisidir?`,
+            `Klinikte "${shortTitle}" tanısı konulan bir hastada (${shortSubTopic}) beklenen temel mekanizma ve klinik bulgu eşleşmesi hangisidir?`,
           buildOptionText: (e) => e.whenCorrectNote,
         },
         {
@@ -287,7 +359,7 @@ function buildTusRepository(): {
           difficulty: 'İleri Ayırıcı Tanı',
           freq: 'Altın Standart Spot',
           buildStem: () =>
-            `Bir hastada "${entity.clues.join(', ')}" bulguları saptandığında ve "${entity.firstVsGold.split('•')[0].trim()}" kuralı geçerli olduğunda en olası tanı/hedef hangisidir?`,
+            `Bir hastada "${maskedClues}" bulguları saptandığında ve "${maskedFirstGold}" kuralı geçerli olduğunda en olası tanı/hedef hangisidir?`,
           buildOptionText: (e) => cleanShortTitle(e.entityName),
         },
         {
@@ -295,7 +367,7 @@ function buildTusRepository(): {
           difficulty: 'İleri Ayırıcı Tanı',
           freq: 'Her TUS Sorulur',
           buildStem: () =>
-            `"${entity.mechanism}" mekanizması ile gelişen klinik tablo veya anatomik/farmakolojik antite aşağıdakilerden hangisidir?`,
+            `"${maskedMechanism}" mekanizması ile gelişen klinik tablo veya anatomik/farmakolojik antite aşağıdakilerden hangisidir?`,
           buildOptionText: (e) => cleanShortTitle(e.entityName),
         },
         {
@@ -315,7 +387,14 @@ function buildTusRepository(): {
           : Math.max(5, maxAnglesForBranch - 1);
       const angleDefinitions = allAngleDefinitions.slice(0, effectiveCount);
 
+      const entityVakaBucket: TusVakaQuestion[] = [];
       angleDefinitions.forEach((angle, angleIdx) => {
+        const stemText = prefixTwin(angle.buildStem());
+        if (seenVakaStems.has(stemText)) {
+          return;
+        }
+        seenVakaStems.add(stemText);
+
         const shift = (clusterIdx + entityIdx + angleIdx) % 5;
         const options: TusQuestionOption[] = OPTION_LETTERS.map((letter, optPos) => {
           const sourceIdx = (optPos + shift) % 5;
@@ -344,7 +423,7 @@ function buildTusRepository(): {
           })
           .join('\n');
 
-        clusterVakaList.push({
+        entityVakaBucket.push({
           id: `vaka-${qCounter++}`,
           session: branchMeta.session,
           branchId: cluster.branchId,
@@ -352,7 +431,7 @@ function buildTusRepository(): {
           subTopic: cluster.subTopic,
           difficulty: angle.difficulty,
           examFrequency: angle.freq,
-          stem: prefixTwin(angle.buildStem()),
+          stem: stemText,
           clinicalClues: entity.clues,
           options,
           correctOption: correctOptObj.letter,
@@ -364,6 +443,7 @@ function buildTusRepository(): {
           osymYearTag,
         });
       });
+      perEntityVaka.push(entityVakaBucket);
 
       // Spot Cards per entity
       const nextEntity = entities[(entityIdx + 1) % 5];
@@ -413,9 +493,12 @@ function buildTusRepository(): {
       ];
 
       const entitySpots = allEntitySpots.slice(0, effectiveCount);
+      const entitySpotBucket: TusSpotCard[] = [];
 
       entitySpots.forEach((spot) => {
-        clusterSpotList.push({
+        if (seenSpotStatements.has(spot.statement)) return;
+        seenSpotStatements.add(spot.statement);
+        entitySpotBucket.push({
           id: `spot-${sCounter++}`,
           session: branchMeta.session,
           branchId: cluster.branchId,
@@ -431,7 +514,29 @@ function buildTusRepository(): {
           osymYearTag,
         });
       });
+      perEntitySpots.push(entitySpotBucket);
     });
+
+    // Interleave angles & rotate starting entity per cluster so clinical vignettes & ALL years (2019–2025) lead cleanly!
+    const clusterVakaList: TusVakaQuestion[] = [];
+    const maxAngleLen = Math.max(...perEntityVaka.map((b) => b.length), 0);
+    for (let aIdx = 0; aIdx < maxAngleLen; aIdx++) {
+      for (let step = 0; step < entities.length; step++) {
+        const rotatedIdx = (clusterIdx + step) % entities.length;
+        const q = perEntityVaka[rotatedIdx]?.[aIdx];
+        if (q) clusterVakaList.push(q);
+      }
+    }
+
+    const clusterSpotList: TusSpotCard[] = [];
+    const maxSpotAngleLen = Math.max(...perEntitySpots.map((b) => b.length), 0);
+    for (let aIdx = 0; aIdx < maxSpotAngleLen; aIdx++) {
+      for (let step = 0; step < entities.length; step++) {
+        const rotatedIdx = (clusterIdx + step) % entities.length;
+        const s = perEntitySpots[rotatedIdx]?.[aIdx];
+        if (s) clusterSpotList.push(s);
+      }
+    }
 
     perClusterVaka.push(clusterVakaList);
     perClusterSpots.push(clusterSpotList);

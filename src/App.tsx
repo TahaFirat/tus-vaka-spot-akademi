@@ -22,6 +22,7 @@ import {
   TusBranchId,
 } from './data/tusMedicalRepository';
 import {
+  PRO_PRICE_LABEL,
   loadPersistedProStatus,
   requestNativeEntitlementCheck,
   savePersistedProStatus,
@@ -52,6 +53,7 @@ export const App: React.FC = () => {
     loadStudyState()
   );
   const [isPro, setIsPro] = useState<boolean>(false);
+  const [proPriceLabel, setProPriceLabel] = useState<string>(PRO_PRICE_LABEL);
   const [paywallOpen, setPaywallOpen] = useState<boolean>(false);
   const [paywallReason, setPaywallReason] = useState<string | undefined>(
     undefined
@@ -91,12 +93,24 @@ export const App: React.FC = () => {
       }
     };
 
+    const onNativeProPrice = (e: Event) => {
+      const detail = (e as CustomEvent).detail || {};
+      if (detail.displayPrice) {
+        setProPriceLabel(String(detail.displayPrice));
+      }
+    };
+
     window.addEventListener('tus:proStatus', onNativeProStatus as EventListener);
+    window.addEventListener('tus:proPrice', onNativeProPrice as EventListener);
     return () => {
       mounted = false;
       window.removeEventListener(
         'tus:proStatus',
         onNativeProStatus as EventListener
+      );
+      window.removeEventListener(
+        'tus:proPrice',
+        onNativeProPrice as EventListener
       );
     };
   }, []);
@@ -493,6 +507,7 @@ export const App: React.FC = () => {
             isPro={isPro}
             isLight={isLightMode}
             totalSolvedCount={summaryStats.totalSolved}
+            priceLabel={proPriceLabel}
             onNavigateTab={handleNavigateFromHome}
             onOpenPaywall={handleOpenPaywall}
           />
@@ -626,6 +641,7 @@ export const App: React.FC = () => {
         }}
         totalSolvedCount={summaryStats.totalSolved}
         reasonMessage={paywallReason}
+        priceLabel={proPriceLabel}
         isLight={isLightMode}
       />
     </div>

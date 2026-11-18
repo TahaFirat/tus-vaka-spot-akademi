@@ -23,7 +23,11 @@ import {
   TUS_VAKA_QUESTIONS,
   TusBranchId,
 } from '../data/tusMedicalRepository';
-import { FREE_QUESTION_LIMIT, triggerHaptic } from '../services/nativeBridge';
+import {
+  FREE_QUESTION_LIMIT,
+  PRO_PRICE_LABEL,
+  triggerHaptic,
+} from '../services/nativeBridge';
 import {
   calculateEstimatedTusScore,
   calculateOsymNet,
@@ -36,6 +40,7 @@ interface AnaSayfaScreenProps {
   isPro: boolean;
   isLight: boolean;
   totalSolvedCount: number;
+  priceLabel?: string;
   onNavigateTab: (
     tab: 'vaka' | 'cikmis' | 'spot' | 'deneme' | 'analiz',
     options?: {
@@ -51,6 +56,7 @@ export const AnaSayfaScreen: React.FC<AnaSayfaScreenProps> = ({
   isPro,
   isLight,
   totalSolvedCount,
+  priceLabel = PRO_PRICE_LABEL,
   onNavigateTab,
   onOpenPaywall,
 }) => {
@@ -318,7 +324,7 @@ export const AnaSayfaScreen: React.FC<AnaSayfaScreenProps> = ({
                   isLight ? 'text-slate-500' : 'text-slate-400'
                 }`}
               >
-                2021–2025 TUS sınavlarında sorgulanan konseptlerin özgün ikizleri
+                2019–2025 TUS sınavlarında sorgulanan konseptlerin özgün ikizleri
               </p>
             </div>
           </div>
@@ -433,7 +439,7 @@ export const AnaSayfaScreen: React.FC<AnaSayfaScreenProps> = ({
             </div>
             <div className="min-w-0">
               <div className="text-xs font-extrabold truncate">
-                Ömür Boyu Tam Erişim (PRO) • Tek Seferlik 49,99 ₺
+                Ömür Boyu Tam Erişim (PRO) • Tek Seferlik {priceLabel}
               </div>
               <div
                 className={`text-[11px] truncate ${

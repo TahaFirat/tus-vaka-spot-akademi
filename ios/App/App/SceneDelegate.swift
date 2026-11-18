@@ -12,6 +12,7 @@ final class TUSStoreKitManager {
     static let lifetimeProductId = "com.tus.akademi.lifetime.pro"
     private let storageKey = "tus_akademi_pro_unlocked_v1"
     private var updatesTask: Task<Void, Never>?
+    private var cachedDisplayPrice: String = "200,00 ₺"
 
     var isProUnlocked: Bool {
         get { UserDefaults.standard.bool(forKey: storageKey) }
@@ -46,7 +47,23 @@ final class TUSStoreKitManager {
         }
     }
 
+    func fetchLiveProductPrice(bridge: TUSBridgeViewController?) async {
+        do {
+            let products = try await Product.products(for: [Self.lifetimeProductId])
+            if let product = products.first {
+                self.cachedDisplayPrice = product.displayPrice
+                bridge?.dispatchWebEvent(name: "tus:proPrice", payload: [
+                    "productId": Self.lifetimeProductId,
+                    "displayPrice": product.displayPrice
+                ])
+            }
+        } catch {
+            // Keep default localized fallback price when offline
+        }
+    }
+
     func refreshEntitlements(bridge: TUSBridgeViewController?) async {
+        await fetchLiveProductPrice(bridge: bridge)
         var foundPro = self.isProUnlocked
         for await result in Transaction.currentEntitlements {
             if case .verified(let transaction) = result,
@@ -140,13 +157,14 @@ final class TUSStoreKitManager {
     private func presentSandboxFallbackSheet(bridge: TUSBridgeViewController?) {
         DispatchQueue.main.async {
             guard let vc = bridge else { return }
+            let priceText = self.cachedDisplayPrice
             let alert = UIAlertController(
-                title: "TUS Vaka & Spot Akademi — Tam Erişim (49,99 ₺)",
-                message: "Ömür Boyu Tam Erişim (Pro)\nTek Seferlik Ödeme: 49,99 ₺\n\nTüm 2.250+ açıklamalı 5 şıklı vaka sorusunu, doğru/yanlış spot kartlarını ve ÖSYM net hesaplamalı TTBT/KTBT denemelerini ömür boyu açmak istiyor musunuz?",
+                title: "TUS Vaka & Spot Akademi — Tam Erişim (\(priceText))",
+                message: "Ömür Boyu Tam Erişim (Pro)\nTek Seferlik Ödeme: \(priceText)\n\nTüm 3.200+ açıklamalı 5 şıklı vaka sorusunu, doğru/yanlış spot kartlarını ve ÖSYM net hesaplamalı TTBT/KTBT denemelerini ömür boyu açmak istiyor musunuz?",
                 preferredStyle: .actionSheet
             )
 
-            let confirmAction = UIAlertAction(title: "Onayla ve Tam Erişimi Aç (49,99 ₺)", style: .default) { _ in
+            let confirmAction = UIAlertAction(title: "Onayla ve Tam Erişimi Aç (\(priceText))", style: .default) { _ in
                 self.isProUnlocked = true
                 TUSNativeHapticsEngine.shared.trigger(style: "success")
                 bridge?.notifyProStatus(

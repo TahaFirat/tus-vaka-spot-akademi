@@ -226,7 +226,7 @@ export const ADDITIONAL_TUS_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           'Dudak ve oral mukozada melanotik hiperpigmente maküller ile ince bağırsakta çok sayıda polip saptanan 17 yaşında hastanın polip biyopsisinde dallanan ("arborizan / çam ağacı") düz kas lifleri içeren hamartomatöz polipler görülüyor.',
         clues: ['oral mukozada melanotik hiperpigmente maküller', 'arborizan / çam ağacı', 'hamartomatöz polipler'],
-        questionPrompt: 'STK11 (LKB1) gen mutasyonu ile otozomal dominant kalıtılan bu sendrom ile FAP (APC mutasyonu) arasındaki temel fark nedir?',
+        questionPrompt: 'STK11 (LKB1) gen mutasyonu ile otozomal dominant kalıtılan hamartomatöz polipozis ile APC mutasyonlu adenomatöz polipozisi ayıran klinik tablo ikilisi hangisidir?',
         mechanism:
           'Peutz-Jeghers sendromu STK11 (LKB1) mutasyonuyla kalıtılır: Mukokütanöz hiperpigmentasyon + en sık İNCE BAĞIRSAKTA yerleşen "arborizan (dallanan) düz kas" içeren HAMARTOMATÖZ polipler vardır (pankreas, meme, kolon, overde seks-kord tümör riski artar). FAP’ta ise 5q APC gen mutasyonu vardır, kolonda >100 ADENOMATÖZ polip bulunur ve kolektomi yapılmazsa %100 kolorektal kanser gelişir!',
         whenCorrectNote: 'Peutz-Jeghers = STK11, oral pigmentasyon + ince bağırsakta arborizan kaslı hamartomatöz polip; FAP = APC geni, >100 adenomatöz polip, %100 kanser.',
@@ -349,7 +349,7 @@ export const ADDITIONAL_TUS_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           'Karaciğer sirozu ve asiti olan 58 yaşında hastada ateş, karın ağrısı ve hepatik ensefalopati gelişiyor. Parasentezde SAAG ≥1.1 g/dL ve asit sıvısında polimorfonükleer lökosit (PMNL / nötrofil) sayısı 420/mm³ saptanıyor.',
         clues: ['Karaciğer sirozu ve asiti', 'PMNL / nötrofil sayısı 420/mm³'],
-        questionPrompt: 'Bu hastada tanı kriteri, en sık etken ve ampirik tedavide ilk tercih antibiyotik aşağıdakilerden hangisidir?',
+        questionPrompt: 'Asit sıvısında PMNL ≥250/mm³ olmasıyla tanı konulan, en sık E. coli etkenli olan ve ampirik tedavisinde 3. kuşak sefalosporin + albümin verilen tablo hangisidir?',
         mechanism:
           'Spontan Bakteriyel Peritonit (SBP) tanısı parasentez sıvısında kültür sonucunu beklemeden PMNL (Nötrofil) sayısının ≥250/mm³ olmasıyla konur! En sık etken E. coli’dir (monomikrobiyaldir; polimikrobiyal ise sekonder peritonit/perforasyon düşünülür!). Ampirik tedavide ilk tercih 3. Kuşak Sefalosporin (Sefotaksim veya Seftriakson) + Hepatorenal sendromu önlemek için İV Albümin; profilakside ise Norfloksasin/Siprofloksasin kullanılır.',
         whenCorrectNote: 'Asit PMNL ≥250/mm³, en sık etken E. coli, ilk tercih tedavi Sefotaksim/Seftriakson + İV Albümin.',
@@ -364,7 +364,7 @@ export const ADDITIONAL_TUS_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           '48 yaşında kadın hastada kaşıntı, halsizlik, ksantelazma, Alkalen Fosfataz (ALP) ve GGT yüksekliği ile serum IgM artışı saptanıyor. Serolojide Anti-Mitokondriyal Antikor (AMA-M2) %95 pozitif ve biyopside orta/küçük intrahepatik safra kanallarında "florid kanal lezyonu" (granülomatöz yıkım) görülüyor.',
         clues: ['48 yaşında kadın', 'kaşıntı', 'ALP ve GGT yüksekliği', 'Anti-Mitokondriyal Antikor (AMA-M2)', 'florid kanal lezyonu'],
-        questionPrompt: 'İlk tercih tedavisi Ursodeoksikolik asit (UDKA) olan bu hastalık ile Primer Sklerozan Kolanjit arasındaki temel fark nedir?',
+        questionPrompt: 'Anti-mitokondriyal antikor (AMA) pozitifliği ve intrahepatik küçük safra kanallarının granülomatöz yıkımıyla seyreden, UDKA ile tedavi edilen hastalık hangisidir?',
         mechanism:
           '1. Primer Biliyer Kolanjit (PBK): Orta yaş KADIN, yalnız İNTRAHEPATİK küçük safra kanallarını tutar, AMA (%95+) ve IgM yüksekliği vardır, Sjögren/Hashimoto eşlik eder, ilk tedavi Ursodeoksikolik Asittir.\n2. Primer Sklerozan Kolanjit (PSK): Genç ERKEK, hem İNTRA hem EKSTRAHEPATİK safra yollarını tutar, MRCP/ERCP’de "tespih tanesi (beading)" görünümü ve biyopside "soğan zarı" periduktal fibrozis vardır, %80 ÜLSERATİF KOLİT ve p-ANCA ile ilişkilidir, Kolanjiyokarsinom riski çok yüksektir!',
         whenCorrectNote: 'PBK = Kadın, AMA+, İntrahepatik, Florid kanal lezyonu, UDKA tedavisi; PSK = Erkek, Ülseratif kolit, p-ANCA+, İntra+Ekstrahepatik tespih tanesi.',
@@ -379,7 +379,7 @@ export const ADDITIONAL_TUS_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           '19 yaşında hastada akut karaciğer yetmezliği, dizartri/tremor (bazal gangliyon - putamen tutulumu), Coombs negatif akut intravasküler hemolitik anemi ve kornea Desçemet membranında Kayser-Fleischer halkası saptanıyor; serum Seruloplazmin düzeyi düşük ve 24 saatlik idrar bakırı yüksek bulunuyor.',
         clues: ['putamen tutulumu', 'Coombs negatif akut intravasküler hemolitik anemi', 'Kayser-Fleischer halkası', 'Seruloplazmin düzeyi düşük'],
-        questionPrompt: '13. kromozomdaki ATP7B gen mutasyonuyla gelişen bu hastalıkta kesin tanı (altın standart) ve tedavi yaklaşımı hangisidir?',
+        questionPrompt: '13. kromozomdaki ATP7B gen mutasyonuyla gelişen ve kesin tanısı karaciğer biyopsisinde kuru bakır ölçümüyle konulan bu hastalık hangisidir?',
         mechanism:
           'Wilson hastalığında hepatositlerden bakırın safraya atılımını ve seruloplazmine bağlanmasını sağlayan ATP7B proteini bozuktur. Karaciğer, beyin (bazal gangliyon / putamen), kornea (Desçemet membranında Kayser-Fleischer halkası) ve eritrositlerde (Coombs negatif hemolitik anemi!) bakır birikir. Akut Wilson yetmezliğinde Alkalen Fosfataz (ALP) çok DÜŞÜKTÜR (ALP/Bilirubin oranı <4). Kesin tanı (Altın Standart): Karaciğer biyopsisinde kuru ağırlıkta bakır >250 mcg/g olmasıdır. Tedavide bakır şelatörleri (D-Penisilamin, Trientin) ve bağırsaktan bakır emilimini metalotiyonein ile engelleyen ÇİNKO kullanılır.',
         whenCorrectNote: 'ATP7B mutasyonu, düşük seruloplazmin, yüksek idrar bakırı, Kayser-Fleischer halkası, Coombs (-) hemoliz, altın standart KC biyopsisi, tedavi Trientin/D-penisilamin + Çinko.',
@@ -409,7 +409,7 @@ export const ADDITIONAL_TUS_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           '64 yaşında hastada yüksek ateş, baş ağrısı, ense sertliği ve Kernig/Brudzinski pozitifliği saptanıyor. Lomber ponksiyonda BOS basıncı yüksek, görünüm bulanık, PMNL hakimiyeti (1.800/mm³), BOS proteini yüksek (190 mg/dL) ve BOS glukozu çok düşük (14 mg/dL) bulunuyor.',
         clues: ['ense sertliği', 'PMNL hakimiyeti', 'BOS proteini yüksek', 'BOS glukozu çok düşük'],
-        questionPrompt: '50 yaş üstü, yenidoğan veya immünsüprese hastada Listeria monocytogenes’i kapsamak için ampirik tedaviye (Seftriakson + Vankomisin) mutlaka eklenmesi gereken antibiyotik hangisidir?',
+        questionPrompt: '50 yaş üstü, yenidoğan veya immünsüprese hastalarda Listeria kapsama amacıyla ampirik tedaviye mutlaka Ampisilin eklenmesini gerektiren santral sinir sistemi enfeksiyonu hangisidir?',
         mechanism:
           'Akut bakteriyel menenjitte BOS’ta PMNL (nötrofil) artışı, yüksek protein ve DÜŞÜK GLUKOZ (eş zamanlı kan şekerinin <1/2’si) görülür. Erişkinde en sık etken Streptococcus pneumoniae’dir (nörolojik sekeli ve mortalitesi en yüksek!). Yenidoğanda (<1 ay), >50 yaş üzerinde, gebelerde ve hücresel immün yetmezlikte Listeria monocytogenes etkendir; Sefalosporinler Listeria’ya ETKİSİZDİR, bu nedenle ampirik tedaviye mutlaka AMPİSİLİN eklenir!',
         whenCorrectNote: 'Bakteriyel menenjit = PMNL artışı + Düşük glukoz + Yüksek protein; >50 yaş/Yenidoğanda Listeria için tedaviye Ampisilin eklenir.',

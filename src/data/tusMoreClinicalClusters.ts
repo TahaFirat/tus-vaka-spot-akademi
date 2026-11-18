@@ -11,9 +11,9 @@ export const MORE_TUS_CLUSTERS: DifferentialClusterSeed[] = [
       {
         entityName: 'Sinus Cavernosus — İçinden A. carotis interna ve N. abducens (CN VI) Geçer',
         patientVignette:
-          'Yüzün tehlike üçgenindeki enfeksiyon sonrası kavernöz sinüs trombozu gelişen hastada ilk olarak gözde dışa bakış kısıtlılığı (lateral rektus felci) ortaya çıkıyor.',
-        clues: ['kavernöz sinüs trombozu', 'dışa bakış kısıtlılığı (lateral rektus felci)'],
-        questionPrompt: 'Sinus cavernosus’un dış duvarında değil doğrudan lümeni (trabekülleri) içinden geçen kraniyal sinir ve arter hangisidir?',
+          'Yüzün tehlike üçgenindeki enfeksiyon sonrası septik dural venöz sinüs trombozu gelişen hastada ilk olarak gözde dışa bakış kısıtlılığı (lateral rektus felci) ortaya çıkıyor.',
+        clues: ['dural venöz sinüs trombozu', 'dışa bakış kısıtlılığı (lateral rektus felci)'],
+        questionPrompt: 'Dış yan duvarında CN III, IV, V1, V2 seyrederken doğrudan lümeni (trabekülleri) içinden N. abducens (CN VI) ve A. carotis interna’nın geçtiği dural venöz yapı hangisidir?',
         mechanism:
           'Sinus cavernosus’un dış yan duvarında yukarıdan aşağıya CN III (N. oculomotorius), CN IV (N. trochlearis), CN V1 (N. ophthalmicus) ve CN V2 (N. maxillaris) seyrederken; doğrudan SİNÜSÜN İÇİNDEN A. carotis interna ve N. abducens (CN VI) geçer. Bu nedenle kavernöz sinüs patolojilerinde İLK etkilenen sinir N. abducens’tir.',
         whenCorrectNote: 'Sinus cavernosus içinden A. carotis interna + N. abducens (CN VI) geçer ve ilk etkilenen sinir CN VI’dır.',
@@ -58,7 +58,7 @@ export const MORE_TUS_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           'Uyluk ön-iç yüzünde m. vastus medialis, m. sartorius ve m. adductor longus/magnus arasında uzanan tünelde sıkışma sendromu gelişen hastada bacağın iç yüzünde ve medial malleol çevresinde duyu kaybı saptanıyor.',
         clues: ['m. vastus medialis, m. sartorius ve m. adductor', 'bacağın iç yüzünde ve medial malleol çevresinde duyu kaybı'],
-        questionPrompt: 'Canalis adductorius’a (Hunter kanalı) girip hiatus adductorius’tan fossa poplitea’ya GEÇMEYEREK kanal duvarını delip yüzeyelleşen sinir hangisidir?',
+        questionPrompt: 'İçine A./V. femoralis ile birlikte N. saphenus’un girdiği ancak N. saphenus’un alt açıklıktan geçmeyip duvarını delerek yüzeyelleştiği anatomik kanal hangisidir?',
         mechanism:
           'Hunter kanalında (Canalis adductorius) A. femoralis, V. femoralis ve N. femoralis’in en uzun deri dalı olan N. saphenus bulunur. A. ve V. femoralis hiatus adductorius’tan geçerek fossa poplitea’ya ulaşır; ancak N. saphenus hiatus’tan GEÇMEZ, membrana vastoadductoria’yı delerek bacak iç yüzünü duyulandırır.',
         whenCorrectNote: 'Hunter kanalında A./V. femoralis ile birlikte bulunan ancak hiatus adductorius’tan geçmeyen N. saphenus.',
@@ -112,7 +112,7 @@ export const MORE_TUS_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           'Hiperkalemi ve Anjiyotensin II uyarısıyla adrenal korteksin zona glomerulosa tabakasından salgılanan mineralokortikoid hormonun böbrekteki hedef hücresi ve iyon kanalı inceleniyor.',
         clues: ['Hiperkalemi ve Anjiyotensin II', 'zona glomerulosa', 'mineralokortikoid'],
-        questionPrompt: 'Aldosteronun böbrekte etki ettiği temel nefron segmenti, hedef hücresi ve sentezini artırdığı kanal hangisidir?',
+        questionPrompt: 'Böbrek kortikal toplayıcı kanal esas (principal) hücrelerinde ENaC kanal sentezini artırarak sodyum tutulumu ve potasyum atılımı sağlayan bu hormon hangisidir?',
         mechanism:
           'Aldosteronun en güçlü uyaranları HİPERKALEMİ ve ANJİYOTENSİN II’dir (ACTH birincil uyaran değildir!). Böbrekte geç distal tübül ve Kortikal Toplayıcı Kanaldaki ESAS (Principal) hücrelerde epitelyal sodyum kanallarını (ENaC) ve Na+/K+-ATPaz pompasını artırarak Na+ ve su tutar, K+ atar; Alfa-İnterkale hücrelerden ise H+ sekresyonunu artırır (hiperaldosteronizmde hipokalemik metabolik alkaloz olur).',
         whenCorrectNote: 'Zona glomerulosa, Esas (Principal) hücrede ENaC artışı (Na emilimi, K atılımı), Alfa-interkale hücreden H+ atılımı.',
@@ -127,7 +127,7 @@ export const MORE_TUS_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           'Hipokalsemiye yanıt olarak paratiroid bezindeki esas hücrelerden (CaSR aracılığıyla) salgılanan hormonun kemik, böbrek ve D vitamini üzerindeki etkileri değerlendiriliyor.',
         clues: ['Hipokalsemiye yanıt olarak', 'esas hücrelerden', 'CaSR'],
-        questionPrompt: 'Parathormonun böbrek tübülleri üzerindeki iyon ve enzim etkileri aşağıdakilerden hangisidir?',
+        questionPrompt: 'Distal tübülde kalsiyum geri emilimini, proksimal tübülde ise fosfat atılımını ve 1-alfa hidroksilaz aktivitesini artıran bu hormon hangisidir?',
         mechanism:
           'Parathormon (PTH) serum Kalsiyumunu ARTIRIR, Fosfatı ise DÜŞÜRÜR: 1. Böbrek Distal Tübülünden Kalsiyum geri emilimini artırır, 2. Proksimal Tübülde Na-Fosfat kotransportunu inhibe ederek FOSFATÜRİ (fosfat atılımı) ve idrarda cAMP artışı yapar, 3. Proksimal tübülde 1-alfa hidroksilaz enzimini aktive ederek aktif D vitamini (1,25-(OH)2-D3 / Kalsitriol) sentezini artırır. Kemikte PTH reseptörü osteoklastta DEĞİL, OSTEOBLAST üzerinde bulunur (RANKL aracılığıyla osteoklastı uyarır)!',
         whenCorrectNote: 'Distal tübülde Ca emilimi, proksimal tübülde fosfatüri ve 1-alfa hidroksilaz aktivasyonu; kemikte reseptörü osteoblasttadır.',
@@ -280,7 +280,7 @@ export const MORE_TUS_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           '28 yaşında hastada diş eti kanaması, yaygın ekimozlar, pansitopeni, D-dimer yüksekliği ve hipofibrinojenemi (Dissemine İntravasküler Koagülasyon - DİK) saptanıyor. Periferik yayma ve kemik iliğinde demetler halinde çok sayıda Auer cisimciği içeren ("fagot hücresi") atipik promiyelositler ve t(15;17) PML-RARA füzyonu gösteriliyor.',
         clues: ['Dissemine İntravasküler Koagülasyon - DİK', 'Auer cisimciği', 'fagot hücresi', 't(15;17) PML-RARA'],
-        questionPrompt: 'Lösemik hücrelerin olgunlaşmasını (diferansiyasyonunu) sağlayarak remisyon oluşturan spesifik hedef tedavi hangisidir?',
+        questionPrompt: 'Sık DİK yapabilen ve ATRA + Arsenik Trioksit ile hücre olgunlaşması (diferansiyasyon) sağlanarak remisyon oluşturulan hematolojik malignite hangisidir?',
         mechanism:
           'AML-M3 (Akut Promiyelositik Lösemi), t(15;17) PML-RARA translokasyonu ile karakterizedir. Sitoplazmada demetler halinde Auer cisimcikleri içeren Fagot hücreleri görülür ve prokoagülan granüllerin salınımıyla çok sık DİK (yaygın damar içi pıhtılaşma) yapar. Tedavide tüm-trans retinoik asit (ATRA / Tretinoin) + Arsenik Trioksit (ATO) promyelositlerin olgun nötrofillere farklılaşmasını sağlar. En önemli yan etkisi "ATRA (Diferansiyasyon) Sendromu" olup tedavisinde İV Deksametazon verilir.',
         whenCorrectNote: 'AML-M3 = t(15;17) PML-RARA, Fagot hücresi (Auer cisimcikleri), DİK riski en yüksek, tedavide ATRA + Arsenik trioksit.',
@@ -295,7 +295,7 @@ export const MORE_TUS_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           '66 yaşında erkek hasta bel ağrısı ve halsizlik ile başvuruyor. Laboratuvarda Hb: 8.9 g/dL, kreatinin: 2.6 mg/dL, kalsiyum: 12.1 mg/dL, sedimantasyon: 115 mm/saat, periferik yaymada Rulo (Rouleaux) formasyonu, kafa grafisinde zımba deliği (punched-out) litik lezyonlar saptanırken Alkalen Fosfataz (ALP) düzeyi tamamen NORMAL bulunuyor.',
         clues: ['kreatinin: 2.6', 'kalsiyum: 12.1', 'Rulo (Rouleaux) formasyonu', 'zımba deliği (punched-out)', 'Alkalen Fosfataz (ALP) düzeyi tamamen NORMAL'],
-        questionPrompt: 'Kemik iliğinde ≥%10 klonal plazma hücresi ve serumda M-proteini saptanan bu hastalıkta prognozu belirleyen en önemli biyokimyasal belirteç hangisidir?',
+        questionPrompt: 'Beta-2 mikroglobulin düzeyinin en önemli prognostik belirteç olduğu ve litik lezyonlara rağmen normal ALP ile seyreden plazma hücre neoplazisi hangisidir?',
         mechanism:
           'Multipl Miyelomda CRAB bulguları (Calcium yüksekliği, Renal yetmezlik - Bence-Jones silendir nefropatisi, Anemi, Bone litik kemik lezyonları) görülür. Miyelom hücreleri osteoklastları aktive ederken osteoblastları İNHİBE ettiği için litik kemik lezyonlarına rağmen Alkalen Fosfataz (ALP) NORMALDİR ve kemik sintigrafisi genellikle negatiftir! En sık IgG, ikinci sık IgA tipi görülür. Uluslararası Evreleme Sisteminde (R-ISS) en önemli biyokimyasal prognoz göstergesi Serum Beta-2 Mikroglobulin (ve Albümin + LDH) düzeyidir.',
         whenCorrectNote: 'CRAB bulguları, Rulo formasyonu, ALP normal (osteoblast inhibisyonu), en önemli prognostik belirteç Beta-2 mikroglobulin.',
@@ -325,7 +325,7 @@ export const MORE_TUS_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           'Küçük hücreli akciğer kanseri tanılı 60 yaşında hastada konfüzyon saptanıyor. Fizik muayenede ödem veya dehidratasyon bulgusu yok (övolemik). Serum Na: 118 mEq/L, plazma ozmolaritesi: 245 mOsm/kg (hipotonik), idrar ozmolaritesi: 480 mOsm/kg, idrar sodyumu: 65 mEq/L, serum ürik asit ve BUN düzeyleri düşük bulunuyor.',
         clues: ['Küçük hücreli akciğer kanseri', 'övolemik', 'Serum Na: 118', 'idrar ozmolaritesi: 480', 'idrar sodyumu: 65', 'ürik asit ve BUN düzeyleri düşük'],
-        questionPrompt: 'Bu hastada en olası tanı ve hızlı sodyum düzeltilmesi halinde gelişebilecek nörolojik komplikasyon aşağıdakilerden hangisidir?',
+        questionPrompt: 'Övolemik hiponatremi ile seyreden ve sodyumu hızlı düzeltildiğinde santral pontin miyelinolizis gelişebilen paraneoplastik tablo hangisidir?',
         mechanism:
           'SIADH (Uygunsuz ADH Sendromu) en sık paraneoplastik olarak Küçük Hücreli Akciğer Kanserinde görülür. Su tutulumuna bağlı ÖVOLEMİK HİPONATREMİ, düşük plazma ozmolaritesi (<275), uygunsuz konsantre idrar (>100 mOsm/kg), natriürez (idrar Na >40 mEq/L) ve hipoürisemi (ürik asit <4 mg/dL) karakteristiktir. Tedavide sıvı kısıtlaması, semptomatikse %3 hipertonik NaCl ve V2 reseptör antagonisti Tolvaptan kullanılır. Sodyum 24 saatte 8-10 mEq/L’den hızlı yükseltilirse Santral Pontin Miyelinolizis (Osmotik Demiyelinizasyon) gelişir!',
         whenCorrectNote: 'Övolemik hiponatremi, idrar Na >40, idrar ozmolaritesi >100, hipoürisemi; hızlı düzeltilirse Santral Pontin Miyelinolizis.',
@@ -433,7 +433,7 @@ export const MORE_TUS_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           '68 yaşında çok doğum yapmış kadın hasta sağ kasıkta inguinal ligamentin hemen altında ve tuberculum pubicum’un inferolateralinde ağrılı, redükte edilemeyen şişlik ve mekanik bağırsak tıkanıklığı bulgularıyla acil servise başvuruyor.',
         clues: ['kadın hasta', 'inguinal ligamentin hemen altında', 'redükte edilemeyen şişlik'],
-        questionPrompt: 'Hem erkeklerde hem kadınlarda EN SIK görülen kasık fıtığı ile strangülasyon (boğulma) riski EN YÜKSEK olan kasık fıtığı sırasıyla hangisidir?',
+        questionPrompt: 'En sık görülen indirekt inguinal fıtığa karşılık dar boynu nedeniyle strangülasyon riski en yüksek olan fıtığı tanımlayan ayrım hangisidir?',
         mechanism:
           'Hem erkeklerde hem de kadınlarda EN SIK görülen kasık fıtığı İNDİREKT İNGUİNAL HERNİDİR (inferior epigastrik damarların lateralinden, processus vaginalis kalıntısından çıkar). Ancak kadınlarda erkeklere göre daha sık görülen, inguinal ligamentin (Poupart) altından femoral kanaldan çıkan ve dar boynu nedeniyle İNKARSERASYON / STRANGÜLASYON riski EN YÜKSEK olan fıtık FEMORAL HERNİDİR (McVay yöntemi ile onarılır).',
         whenCorrectNote: 'En sık fıtık (erkek ve kadında): İndirekt inguinal herni; Strangülasyon riski en yüksek fıtık: Femoral herni (onarımı McVay).',
@@ -463,7 +463,7 @@ export const MORE_TUS_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           '38 yaşında kadın hasta yıllardır hem katı hem de sıvı gıdalara karşı olan yutma güçlüğü (paradoksal disfaji), sindirilmemiş gıda regürjitasyonu ve kilo kaybı ile başvuruyor. Baryumlu özofagus grafisinde distal özofagusta "kuş gagası (bird-beak)" daralması ve proksimalde genişleme izleniyor.',
         clues: ['hem katı hem de sıvı gıdalara karşı', 'kuş gagası (bird-beak)'],
-        questionPrompt: 'Alt özofagus sfinkterinin (AÖS) yutma sırasında gevşeyemediği bu motilite bozukluğunda kesin tanı için altın standart yöntem hangisidir?',
+        questionPrompt: 'Alt özofagus sfinkterinin (AÖS) yutma sırasında gevşeyemediği ve kesin tanısının yüksek çözünürlüklü manometri ile konulduğu motilite bozukluğu hangisidir?',
         mechanism:
           'Akalazyada Auerbach (miyenterik) pleksustaki inhibitör (VIP ve Nitrik Oksit salgılayan) gangliyon hücreleri kaybolur: Alt özofagus sfinkteri (AÖS) istirahat basıncı artar, yutma ile AÖS gevşeyemez ve özofagus gövdesinde peristaltizm kaybolur (aperistaltizm). Maligniteyi (psödoakalazya) dışlamak için endoskopi şarttır; ancak kesin tanı için ALTIN STANDART yöntem Özofagus Manometrisidir. En etkili cerrahi tedavi Laparoskopik Heller Miyotomidir (+ Dor/Toupet parsiyel fundoplikasyon).',
         whenCorrectNote: 'Hem katı hem sıvıya disfaji, kuş gagası grafisi, NO/VIP nöron kaybı, altın standart tanı Özofagus Manometrisi, cerrahi Heller miyotomi.',
@@ -476,9 +476,9 @@ export const MORE_TUS_CLUSTERS: DifferentialClusterSeed[] = [
       {
         entityName: 'Meme Kanseri — En Sık İnvaziv Duktal Karsinom, İLK Metastaz Aksiller Lenf Nodu ve En Önemli Prognoz Kriteri',
         patientVignette:
-          '54 yaşında kadın hastada sağ meme üst-dış kadranda sert, fikse, ağrısız kitle ve mamografide pleomorfik mikrokalsifikasyon kümesi saptanıyor. Tru-cut biyopsi sonucu invaziv meme karsinomu olarak raporlanıyor.',
+          '54 yaşında kadın hastada sağ organ üst-dış kadranda sert, fikse, ağrısız kitle ve mamografide pleomorfik mikrokalsifikasyon kümesi saptanıyor. Tru-cut biyopsi sonucu invaziv duktal adenokarsinom olarak raporlanıyor.',
         clues: ['üst-dış kadranda', 'pleomorfik mikrokalsifikasyon', 'Tru-cut biyopsi'],
-        questionPrompt: 'Meme kanserinde uzak metastaz bulunmayan hastalarda prognozu belirleyen EN ÖNEMLİ faktör aşağıdakilerden hangisidir?',
+        questionPrompt: 'Uzak metastazı olmayan hastalarda aksiller lenf nodu durumunun prognozu belirleyen EN ÖNEMLİ faktör olduğu kadın malignitesi hangisidir?',
         mechanism:
           'Meme kanseri en sık Üst-Dış kadrana yerleşir ve en sık histolojik tipi İnvaziv Duktal Karsinomdur. Klinikte aksillası negatif (N0) olan erken evre meme kanserinde aksiller evreleme için altın standart Sentinel Lenf Nodu Biyopsisidir (SLNB). Uzak metastazı olmayan meme kanserinde prognozu ve sağkalımı belirleyen EN ÖNEMLİ faktör AKSİLLER LENF NODU DURUMUDUR (tutulan lenf nodu sayısı). En sık uzak metastaz yeri ise Kemiktir.',
         whenCorrectNote: 'En sık üst-dış kadran, en sık İnvaziv duktal Ca, tanı Tru-cut (kor) biyopsi, en önemli prognostik faktör Aksiller lenf nodu tutulumu.',
@@ -493,7 +493,7 @@ export const MORE_TUS_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           '24 yaşında hastada önce göbek çevresinde (periumbilikal) başlayan visseral ağrı, iştahsızlık (anoreksi) ve bulantı, 8 saat sonra sağ alt kadrana (McBurney noktasına) yerleşen keskin somatik ağrıya dönüşüyor.',
         clues: ['önce göbek çevresinde', 'iştahsızlık (anoreksi)', 'McBurney noktasına'],
-        questionPrompt: 'Erişkinde akut apandisitin en sık lümen tıkanıklığı nedeni ve gebelikteki klinik önemi aşağıdakilerden hangisidir?',
+        questionPrompt: 'Erişkinde en sık fekalite bağlı gelişen ve gebelikte en sık görülen obstetrik dışı cerrahi acil olan tablo hangisidir?',
         mechanism:
           'Akut apandisitte lümen tıkanıklığının çocuklarda en sık nedeni Lenfoid Hiperplazi, erişkinlerde ise en sık nedeni FEKALİT (Taşlaşmış gaita) tir. Klasik semptom sırası: 1. İştahsızlık (Anoreksi - neredeyse her zaman vardır!), 2. Periumbilikal ağrı, 3. Bulantı-kusma, 4. Sağ alt kadrana ağrı göçü, 5. Ateştir. Gebelikte en sık görülen obstetrik dışı cerrahi acil Akut Apandisittir (gebelik ilerledikçe apendiks yukarı-sağa yer değiştirir, lökositoz gebelikte fizyolojik olabilir!).',
         whenCorrectNote: 'Çocukta en sık lenfoid hiperplazi, erişkinde en sık fekalit; ilk semptom iştahsızlık; gebede en sık non-obstetrik cerrahi acil.',
@@ -517,7 +517,7 @@ export const MORE_TUS_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           '61 yaşında obez, hipertansif, diyabetik ve nullipar kadın hasta postmenopozal vajinal kanama ile başvuruyor. Transvajinal USG’de endometrium kalınlığı 14 mm (normalde ≤4 mm) ölçülüyor.',
         clues: ['obez, hipertansif, diyabetik ve nullipar', 'postmenopozal vajinal kanama', 'endometrium kalınlığı 14 mm'],
-        questionPrompt: 'En sık görülen jinekolojik kanser olan bu tabloda kesin tanı yöntemi ve Tip 1 tümörde en sık saptanan genetik mutasyon hangisidir?',
+        questionPrompt: 'En sık görülen jinekolojik kanser olan ve Tip 1 formunda en sık PTEN mutasyonu saptanan malignite hangisidir?',
         mechanism:
           'Postmenopozal vajinal kanamanın EN SIK nedeni Endometrial Atrofidir; ancak ekarte edilmesi gereken en önemli neden Endometrium Kanseridir! Postmenopozal kanamada TV-USG’de endometrium >4 mm ise kesin tanı için Endometrial Biyopsi (Pipelle veya Fraksiyone Küretaj / Histeroskopik biyopsi) yapılır. En sık tipi karşılanmamış östrojenle ilişkili Tip 1 (Endometrioid adenokarsinom) olup en sık PTEN tümör süpresör gen mutasyonu görülür (Tip 2 Seröz tipte ise p53 mutasyonu vardır ve prognozu kötüdür).',
         whenCorrectNote: 'En sık jinekolojik kanser, karşılanmamış östrojen + obezite + PKOS, Tip 1’de PTEN mutasyonu, tanı Pipelle/Endometrial biyopsi.',
@@ -547,7 +547,7 @@ export const MORE_TUS_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           '25 yaşında kadın hasta oligomenore (yılda 4 kez adet görme), hirsutizm (Ferriman-Gallwey skoru 12), akne, obezite ve infertilite ile başvuruyor. Laboratuvarda LH/FSH oranı >2, serbest testosteron yüksek ve akantozis nigrikans (insülin direnci) saptanıyor.',
         clues: ['oligomenore', 'hirsutizm', 'LH/FSH oranı >2', 'akantozis nigrikans (insülin direnci)'],
-        questionPrompt: 'Anovulatuvar infertilitenin en sık nedeni olan PKOS’ta gebelik isteyen hastada ovulasyon indüksiyonu için günümüzde İLK TERCİH ajan hangisidir?',
+        questionPrompt: 'Gebelik isteyen hastalarda ovulasyon indüksiyonu için günümüzde ilk tercih olarak Letrozol kullanılan endokrin jinekolojik sendrom hangisidir?',
         mechanism:
           'PKOS tanısı Rotterdam kriterlerinden (1. Oligo/Anovulasyon, 2. Klinik veya biyokimyasal hiperandrojenizm, 3. USG’de polikistik over görünümü) en az 2’sinin varlığı ve diğer nedenlerin (KAH, prolaktinoma, Cushing) dışlanmasıyla konur. İnsülin direnci teka hücrelerinden androjen sentezini artırır ve SHBG’yi düşürür. Çocuk istemeyen hastada ilk tercih Kombine Oral Kontraseptif (KOK); çocuk isteyen hastada ise ovulasyon indüksiyonunda kilo verme sonrası İLK TERCİH medikal ajan Aromataz İnhibitörü olan LETROZOL’dür (Klomifen sitrattan daha yüksek canlı doğum oranı sağlar!).',
         whenCorrectNote: 'Rotterdam kriterleri (3’ten 2’si), LH artışı, insülin direnci, endometrium Ca riski artışı, ovulasyon indüksiyonunda ilk tercih Letrozol.',
@@ -562,7 +562,7 @@ export const MORE_TUS_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           'İri bebek (4.400 g) doğumu sonrası plasenta ayrılmasına rağmen şiddetli vajinal kanama gelişen hastanın fizik muayenesinde uterus göbek üstünde, büyük ve gevşek (yumuşak) palpe ediliyor.',
         clues: ['İri bebek', 'uterus göbek üstünde, büyük ve gevşek (yumuşak)'],
-        questionPrompt: 'Anne ölümlerinin ve postpartum kanamanın en sık nedeni olan bu tabloda ilk tercih uterotonik ilaç ve kontrendikasyon kuralları hangisidir?',
+        questionPrompt: 'En sık uterus atonisine bağlı gelişen ve ilk medikal tedavisinde Oksitosin kullanılan (astımda Karboprost’un kontrendike olduğu) obstetrik acil hangisidir?',
         mechanism:
           'Postpartum kanamanın (PPK) EN SIK (%70-80) nedeni Uterus Atonisidir. İlk yapılacak işlem bimanuel uterus masajı ve İLK TERCİH uterotonik ilaç İV OKSİTOSİN infüzyonudur. Diğer uterotoniklerin kritik kontrendikasyonları TUS’ta çok sık sorulur: Metilergonovin (Ergot alkaloidi) -> HİPERTANSİYON / Preeklampside kontrendikedir! Karboprost (PGF2-alfa) -> bronkospazm yaptığı için ASTIMDA kontrendikedir!',
         whenCorrectNote: 'PPK en sık neden: Uterus atonisi; İlk tercih ilaç: Oksitosin; Metilergonovin hipertansiyonda, Karboprost (PGF2a) astımda kontrendike.',

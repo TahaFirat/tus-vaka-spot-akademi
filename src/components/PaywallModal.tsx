@@ -28,6 +28,7 @@ interface PaywallModalProps {
   onUnlocked: () => void;
   totalSolvedCount: number;
   reasonMessage?: string;
+  priceLabel?: string;
   isLight?: boolean;
 }
 
@@ -37,6 +38,7 @@ export const PaywallModal: React.FC<PaywallModalProps> = ({
   onUnlocked,
   totalSolvedCount,
   reasonMessage,
+  priceLabel = PRO_PRICE_LABEL,
   isLight = false,
 }) => {
   const [loading, setLoading] = useState<'purchase' | 'restore' | null>(null);
@@ -211,7 +213,7 @@ export const PaywallModal: React.FC<PaywallModalProps> = ({
                 isLight ? 'text-slate-900' : 'text-white'
               }`}
             >
-              {PRO_PRICE_LABEL}
+              {priceLabel}
             </div>
             <div
               className={`text-[10px] font-semibold whitespace-nowrap ${
@@ -247,7 +249,7 @@ export const PaywallModal: React.FC<PaywallModalProps> = ({
           <span className="whitespace-nowrap">
             {loading === 'purchase'
               ? 'Apple StoreKit Onaylanıyor...'
-              : `Ömür Boyu Tam Erişimi Aç • ${PRO_PRICE_LABEL}`}
+              : `Ömür Boyu Tam Erişimi Aç • ${priceLabel}`}
           </span>
         </button>
 

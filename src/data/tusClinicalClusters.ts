@@ -75,7 +75,7 @@ export const KTBT_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           'Kalça protezi ameliyatından 6 gün sonra ani başlayan nefes darlığı, plöritik göğüs ağrısı, taşikardi ve hipoksemi gelişen 67 yaşında hastada Wells skoru yüksek saptanıyor. EKG’de sinüs taşikardisi ve S1Q3T3 paterni mevcut, kan basıncı 76/45 mmHg (hipotansif/şok) ve EKO’da sağ ventrikül disfonksiyonu görülüyor.',
         clues: ['Kalça protezi ameliyatından 6 gün sonra', 'S1Q3T3', '76/45 mmHg', 'sağ ventrikül disfonksiyonu'],
-        questionPrompt: 'Hemodinamik olarak instabil (yüksek riskli / masif) pulmoner embolide hayat kurtarıcı ilk tedavi hangisidir?',
+        questionPrompt: 'Tanıda ilk tercih BT Pulmoner Anjiyografi kullanılan ve hemodinamik instabilitede trombolitik (tPA) gerektiren bu tablo hangisidir?',
         mechanism:
           'Pulmoner embolide en sık semptom dispne, en sık fizik muayene bulgusu takipne, en sık EKG bulgusu sinüs taşikardisidir. Yüksek olasılıklı hastada tanı için ilk tercih BT Pulmoner Anjiyografidir. Hipotansiyon/şok (SKB <90 mmHg) varsa "Yüksek Riskli (Masif) PE" kabul edilir ve acil sistemik Trombolitik (tPA / Alteplaz) verilir.',
         whenCorrectNote: 'Hipotansiyon/şok eşlik eden masif pulmoner embolide acil sistemik trombolitik (tPA) tedavisi.',
@@ -101,7 +101,7 @@ export const KTBT_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           '3 yaşında erkek çocuk 6 gündür düşmeyen ateş, eksüdasız bilateral konjonktivit, çilek dili ve dudaklarda çatlama, el-ayak sırtında ödem/soyulma, polimorf döküntü ve tek taraflı >1.5 cm servikal lenfadenopati ile getiriliyor.',
         clues: ['6 gündür düşmeyen ateş', 'eksüdasız bilateral konjonktivit', 'çilek dili', 'el-ayak sırtında ödem/soyulma'],
-        questionPrompt: 'Tedavi edilmediğinde en sık koroner arter anevrizmasına yol açan bu vaskülitte temel tedavi hangisidir?',
+        questionPrompt: 'Tedavi edilmediğinde koroner arter anevrizmasına yol açan ve ilk 10 günde IVIG + Aspirin ile tedavi edilen çocukluk çağı vasküliti hangisidir?',
         mechanism:
           'Kawasaki hastalığı çocukluk çağında orta çaplı arterleri (özellikle koroner arterleri) tutan mukokütanöz lenf nodu sendromudur (PAN’ın çocukluk eşdeğeri). Tanı için ≥5 gün ateş + 5 ana kriterden en az 4’ü gerekir. Tedavide Koroner Arter Anevrizmasını önlemek için ilk 10 günde yüksek doz İntravenöz İmmünglobulin (IVIG) + Aspirin verilir.',
         whenCorrectNote: '≥5 gün ateş + KREMA kriterleri, koroner arter anevrizması riski, tedavide IVIG + Aspirin.',
@@ -247,7 +247,7 @@ export const KTBT_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           'Geçirilmiş apendektomi öyküsü olan 42 yaşında hastada kolik karın ağrısı, kusma, gaz-gaita çıkaramama ve ayakta direkt batın grafisinde merdiven basamağı şeklinde hava-sıvı seviyeleri saptanıyor.',
         clues: ['Geçirilmiş apendektomi öyküsü', 'gaz-gaita çıkaramama', 'hava-sıvı seviyeleri'],
-        questionPrompt: 'Erişkinlerde mekanik İnce Bağırsak ve Kalın Bağırsak obstrüksiyonlarının (ileus) en sık nedenleri sırasıyla hangisidir?',
+        questionPrompt: 'Erişkinlerde mekanik tıkanıklığa en sık sırasıyla postoperatif adhezyon ve kolorektal kanserin yol açtığı anatomik ayrım hangisidir?',
         mechanism:
           'Mekanik İnce Bağırsak Obstrüksiyonunun (İBO) en sık nedeni: 1. Postoperatif Adhezyon (Yapışıklık / Brid), 2. İnkarsere Herni (Fıtık), 3. Tümördür. Mekanik Kalın Bağırsak (Kolon) Obstrüksiyonunun en sık nedeni ise: 1. Kolorektal Kanser (özellikle sol kolon), 2. Volvulus (en sık sigmoid), 3. Divertikülittir.',
         whenCorrectNote: 'İnce bağırsak obstrüksiyonu en sık: Postoperatif adhezyon (yapışıklık); Kalın bağırsak obstrüksiyonu en sık: Kolorektal kanser.',
@@ -273,7 +273,7 @@ export const KTBT_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           '32 haftalık gebe gece uykudan uyandıran, ağrısız, parlak kırmızı renkli vajinal kanama ile acil servise başvuruyor. Uterus tonusu yumuşak ve fetal kalp atımları olağan saptanıyor.',
         clues: ['32 haftalık gebe', 'ağrısız, parlak kırmızı renkli vajinal kanama', 'Uterus tonusu yumuşak'],
-        questionPrompt: 'Bu hastada kesinlikle kontrendike olan işlem ve tanı koymak için altın standart yöntem hangisidir?',
+        questionPrompt: 'Dijital vajinal muayenenin kesinlikle kontrendike olduğu ve transvajinal USG ile tanısı doğrulanan 3. trimester kanama ayrımı hangisidir?',
         mechanism:
           'İkinci yarı gebelikte ağrısız, parlak kırmızı vajinal kanama ve yumuşak uterus Plasenta Previa için tipiktir (Ablasyo plasentada ise ağrılı, koyu renkli kanama ve tahta/hipertonik uterus vardır). Plasenta previa şüphesinde masif kanamayı tetikleyeceği için Dijital Vajinal Tuşe KESİNLİKLE KONTRENDİKEDİR! Tanıda altın standart Transvajinal Ultrasonografidir (güvenlidir).',
         whenCorrectNote: 'Ağrısız parlak kırmızı kanama = Plasenta previa; vajinal dijital tuşe kesinlikle kontrendikedir, tanı Transvajinal USG ile konur.',
@@ -303,7 +303,7 @@ export const KTBT_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           'Son adet tarihine göre 6 haftalık gebe olan 27 yaşında hasta lekelenme tarzında vajinal kanama ve tek taraflı pelvik ağrı ile başvuruyor. Serum Beta-hCG düzeyi 2.800 mIU/mL olmasına rağmen transvajinal USG’de intrauterin gebelik kesesi izlenmiyor ve sağ tubada 3 cm’lik rüptüre olmamış adneksiyal kitle saptanıyor.',
         clues: ['Beta-hCG düzeyi 2.800 mIU/mL', 'intrauterin gebelik kesesi izlenmiyor', 'sağ tubada 3 cm’lik'],
-        questionPrompt: 'Ektopik gebeliğin en sık yerleşim yeri ve medikal (Metotreksat) tedavi için mutlak kontrendikasyon aşağıdakilerden hangisidir?',
+        questionPrompt: 'En sık tuba uterinanın ampulla bölgesine yerleşen ve rüptür/instabilite durumunda Metotreksat’ın kesin kontrendike olduğu obstetrik tablo hangisidir?',
         mechanism:
           'Ektopik gebelik en sık Tuba uterina’nın AMPULLA bölgesine yerleşir; en geç rüptüre olan ise İstmus (veya interstisyel) bölgesidir. Hemodinamik olarak stabil, rüptüre olmamış, kitle çapı <3.5-4 cm ve fetal kalp atımı negatif hastalarda sistemik Metotreksat (folik asit antagonisti) verilir. Hemodinamik instabilite ve tüp rüptürü Metotreksat için mutlak kontrendikasyon olup acil cerrahi (salpingektomi/salpingostomi) gerektirir.',
         whenCorrectNote: 'En sık yerleşim Ampulla; rüptür veya hemodinamik instabilite varsa Metotreksat kontrendikedir, cerrahi yapılır.',
@@ -331,9 +331,9 @@ export const KTBT_CLUSTERS: DifferentialClusterSeed[] = [
       {
         entityName: 'Over Tümörleri — Patognomonik Cisimcikler (Call-Exner, Schiller-Duval ve Meigs Sendromu)',
         patientVignette:
-          'Pelvik kitle nedeniyle opere edilen üç farklı hastanın patoloji raporlarında; 1. hastada östrojen salgılayan tümörde "Call-Exner cisimcikleri ve kahve çekirdeği nükleus", 2. hastada AFP yüksekliği ile giden tümörde "Schiller-Duval cisimcikleri", 3. hastada ise benign over tümörüne eşlik eden "asit ve sağ plevral efüzyon" raporlanıyor.',
+          'Pelvik kitle nedeniyle opere edilen üç farklı hastanın patoloji raporlarında; 1. hastada östrojen salgılayan tümörde "Call-Exner cisimcikleri ve kahve çekirdeği nükleus", 2. hastada AFP yüksekliği ile giden tümörde "Schiller-Duval cisimcikleri", 3. hastada ise benign bir adneksiyal kitleye eşlik eden "asit ve sağ plevral efüzyon" raporlanıyor.',
         clues: ['Call-Exner cisimcikleri', 'Schiller-Duval cisimcikleri', 'asit ve sağ plevral efüzyon'],
-        questionPrompt: 'Bu üç histopatolojik/klinik tablonun karşılık geldiği over tümörleri sırasıyla hangisidir?',
+        questionPrompt: 'Granüloza hücreli, Yolk sac ve Fibrom (Meigs sendromu) eşleştirmelerini kapsayan bu patognomonik cisimcik grubu hangi organ neoplazmlarına aittir?',
         mechanism:
           '1. Granüloza Hücreli Tümör: Sex-kord stromal tümördür, östrojen (ve inhibin) salgılar, puberte prekoks ve endometrial hiperplazi/kanser yapar; Call-Exner cisimcikleri ve kahve çekirdeği nükleus tipiktir.\n2. Yolk Sac (Endodermal Sinüs) Tümörü: Çocuk/adölesanda en malign germ hücreli tümördür; AFP yükselir ve glomerül benzeri Schiller-Duval cisimcikleri patognomoniktir.\n3. Meigs Sendromu: Over Fibromu (benign stromal tümör) + Asit + Hidrotoraks (Plevral efüzyon) triyadıdır; tümör çıkarılınca sıvılar kaybolur.',
         whenCorrectNote: 'Call-Exner = Granüloza hücreli tümör; Schiller-Duval + AFP = Yolk sac tümörü; Over fibromu + Asit + Hidrotoraks = Meigs sendromu.',

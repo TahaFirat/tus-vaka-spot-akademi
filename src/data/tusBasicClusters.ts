@@ -15,7 +15,7 @@ export const TTBT_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           '32 yaşında erkek hasta masif splenomegali, trombositopeni ve femur distalinde "Erlenmeyer şişesi" deformitesi ile başvuruyor. Kemik iliği aspirasyonunda buruşuk kağıt (crinkled paper) görünümlü sitoplazmaya sahip makrofajlar saptanıyor.',
         clues: ['masif splenomegali', 'Erlenmeyer şişesi deformitesi', 'buruşuk kağıt (crinkled paper)'],
-        questionPrompt: 'Bu hastada en olası tanı ve eksik olan lizozomal enzim aşağıdakilerden hangisidir?',
+        questionPrompt: 'Tip 1 formunda nörolojik tutulum beklenmeyen ve beta-glukoserebrozidaz eksikliğiyle seyreden en sık lizozomal depo hastalığı hangisidir?',
         mechanism:
           'Beta-glukoserebrozidaz (glukozilseramidaz) eksikliğinde retiküloendotelyal sistem makrofajlarında glukoserebrozid birikir. En sık görülen lizozomal depo hastalığıdır; Tip 1 formunda nöropati görülmez.',
         whenCorrectNote: 'Buruşuk kağıt görünümlü Gaucher hücresi, masif splenomegali, Erlenmeyer femur deformitesi ve nöropatisiz erişkin klinik.',
@@ -30,7 +30,7 @@ export const TTBT_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           '8 aylık bebek ağır hepatosplenomegali, gelişme geriliği ve nöromotor gerileme ile getiriliyor. Göz dibi muayenesinde makulada "kiraz kırmızısı leke (cherry-red spot)" ve kemik iliğinde köpük (foam) hücreleri ile zebra cisimcikleri saptanıyor.',
         clues: ['hepatosplenomegali', 'kiraz kırmızısı leke (cherry-red spot)', 'köpük (foam) hücreleri'],
-        questionPrompt: 'Bu bebekte en olası tanı ve eksik olan enzim aşağıdakilerden hangisidir?',
+        questionPrompt: 'Tay-Sachs’tan organomegali varlığıyla ayrılan ve sfingomiyelinaz eksikliğine bağlı gelişen depo hastalığı hangisidir?',
         mechanism:
           'Sfingomiyelinaz eksikliğinde dokularda sfingomiyelin birikir. Hem hepatosplenomegali hem de makulada kiraz kırmızısı leke (cherry-red spot) birlikteliği Tay-Sachs’tan ayıran en kritik klinik anahtardır.',
         whenCorrectNote: 'Hepatosplenomegali + makulada kiraz kırmızısı leke + köpüksü (lipid yüklü) makrofajlar.',
@@ -45,7 +45,7 @@ export const TTBT_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           '6 aylık bebek sese karşı aşırı irkilme (hiperakuzi), hipotoni, makrosefali ve motor becerilerde kayıp ile getiriliyor. Fizik muayenede karaciğer ve dalak normal boyutta olup fundoskopide makulada kiraz kırmızısı leke ve EM’de soğan zarı cisimcikleri izleniyor.',
         clues: ['hiperakuzi', 'karaciğer ve dalak normal boyutta', 'kiraz kırmızısı leke', 'soğan zarı cisimcikleri'],
-        questionPrompt: 'Bu hastada en olası tanı ve eksik enzim aşağıdakilerden hangisidir?',
+        questionPrompt: 'Hepatosplenomegalinin görülmediği, heksozaminidaz A eksikliğiyle giden bu depo hastalığı hangisidir?',
         mechanism:
           'Heksozaminidaz A eksikliği sonucu nöronlarda GM2 gangliozid birikir. Niemann-Pick’ten farklı olarak hepatosplenomegali YOKTUR; hiperakuzi ve soğan zarı (onion-skin) lizozomlar tipiktir.',
         whenCorrectNote: 'Hepatosplenomegali OLMADAN makulada kiraz kırmızısı leke, hiperakuzi ve GM2 gangliozid birikimi.',
@@ -75,7 +75,7 @@ export const TTBT_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           '4 aylık bebekte spastisite, optik atrofi, periferik nöropati ve hızlı ilerleyen demiyelinizasyon saptanıyor. Beyin biyopsisinde beyaz cevherde çok çekirdekli "globoid hücreler" ve oligodendrosit kaybı gösteriliyor.',
         clues: ['optik atrofi', 'demiyelinizasyon', 'globoid hücreler'],
-        questionPrompt: 'Bu hastada en olası tanı ve eksik enzim aşağıdakilerden hangisidir?',
+        questionPrompt: 'Galaktoserebrozidaz eksikliğine bağlı beyaz cevherde globoid hücre birikimiyle giden bu lökodistrofi hangisidir?',
         mechanism:
           'Beta-galaktoserebrozidaz eksikliğinde miyelin yıkım ürünü olan galaktoserebrozid ve sitotoksik psikozin birikir; oligodendrosit apoptozu ve beyaz cevherde globoid hücreler oluşur.',
         whenCorrectNote: 'Beyaz cevherde çok çekirdekli globoid hücreler, optik atrofi ve ağır demiyelinizasyon.',

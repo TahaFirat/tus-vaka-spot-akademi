@@ -1,22 +1,22 @@
 import { DifferentialClusterSeed } from './tusTypes';
 
 /**
- * %100 Telifsiz, Özgün Kurgulanmış "ÖSYM Çıkmış Soru İkizleri" (2020–2025/2026 TUS Konseptleri).
- * Birebir ÖSYM metinlerini kopyalamadan, son yıllardaki TUS oturumlarında (TTBT & KTBT)
+ * %100 Telifsiz, Özgün Kurgulanmış "ÖSYM Çıkmış Soru İkizleri" (2019–2025 TUS Konseptleri).
+ * Birebir ÖSYM metinlerini kopyalamadan, geçmiş ve son yıllardaki TUS oturumlarında (TTBT & KTBT)
  * sorgulanmış gerçek klinik mekanizma, patognomonik bulgu ve ilaç/enzim hedeflerini öğretir.
  */
 export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
-  // 1. BİYOKİMYA (Son Yıllar TUS İkizi: Elektron Transport Zinciri, Kolajen ve Vitamin Kofaktörleri)
+  // 1. BİYOKİMYA (ÖSYM TUS İkizi: Elektron Transport Zinciri, Kolajen ve Vitamin Kofaktörleri)
   {
     branchId: 'biyokimya',
-    subTopic: 'ÖSYM İkizi • Kollajen Sentezi, ETZ İnhibitörleri ve Vitamin Kofaktörleri (2023–2025 TUS)',
+    subTopic: 'ÖSYM İkizi • Kollajen Sentezi, ETZ İnhibitörleri ve Vitamin Kofaktörleri (2019–2025 TUS)',
     difficulty: 'Klinik Vaka',
     examFrequency: 'Her TUS Sorulur',
     entities: [
       {
         entityName: 'Lizil Oksidaz (Bakır Bağımlı — Kollajen Çapraz Bağlanması ve Menkes Sendromu)',
         patientVignette:
-          '[2024 TUS Konsept İkizi] Saçlarında kırılgan fırça görünümü (kinky hair), hipotoni, gelişme geriliği ve aort anevrizması saptanan erkek bebekte ATP7A gen mutasyonuna bağlı bakır eksikliği düşünülüyor. Bağ dokusunda tropokollajen moleküllerinin kovalent çapraz bağlanmasında bozukluk saptanıyor.',
+          '[2025 TUS Konsept İkizi] Saçlarında kırılgan fırça görünümü (kinky hair), hipotoni, gelişme geriliği ve aort anevrizması saptanan erkek bebekte ATP7A gen mutasyonuna bağlı bakır eksikliği düşünülüyor. Bağ dokusunda tropokollajen moleküllerinin kovalent çapraz bağlanmasında bozukluk saptanıyor.',
         clues: ['ATP7A gen mutasyonu (Menkes)', 'bakır eksikliği', 'tropokollajen kovalent çapraz bağlanma kusuru'],
         questionPrompt: 'Kollajen ve elastin liflerinin hücre dışı alanda çapraz bağlanmasını sağlayan bakır bağımlı bu enzim hangisidir?',
         mechanism:
@@ -31,7 +31,7 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
       {
         entityName: 'Prolil ve Lizil Hidroksilaz (C Vitamini / Askorbat ve Fe+2 Bağımlı — Üçlü Sarmal Stabilizasyonu)',
         patientVignette:
-          '[2023 TUS Konsept İkizi] Uzun süre taze sebze-meyve tüketmeyen yaşlı bir hastada diş eti kanamaları, perifoliküler peteşiler, ekimozlar ve yara iyileşmesinde gecikme saptanıyor. Kollajenin endoplazmik retikulum içinde üçlü sarmal (triple heliks) yapısının stabilize edilemediği görülüyor.',
+          '[2021 TUS Konsept İkizi] Uzun süre taze sebze-meyve tüketmeyen yaşlı bir hastada diş eti kanamaları, perifoliküler peteşiler, ekimozlar ve yara iyileşmesinde gecikme saptanıyor. Kollajenin endoplazmik retikulum içinde üçlü sarmal (triple heliks) yapısının stabilize edilemediği görülüyor.',
         clues: ['diş eti kanaması ve perifoliküler peteşi (Skorbüt)', 'üçlü sarmal (triple heliks) stabilizasyon kusuru', 'C vitamini eksikliği'],
         questionPrompt: 'Endoplazmik retikulumda kollajen öncülündeki prolin ve lizin kalıntılarını hidroksilleyen enzim ikilisi hangisidir?',
         mechanism:
@@ -46,7 +46,7 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
       {
         entityName: 'Kompleks IV (Sitokrom c Oksidaz — Siyanür, Karbonmonoksit ve H2S İnhibisyonu, Bakır İçeren Tek ETZ Kompleksi)',
         patientVignette:
-          '[2024 TUS Konsept İkizi] Yangın dumanına ve plastik yanıklarına maruz kalan hastada acil serviste ağır laktik asidoz, venöz kanda parlak kırmızı görünüm (arteriyolizasyon) ve hücresel hipoksi saptanıyor. Siyanür zehirlenmesi tanısıyla hidroksikobalamin başlanıyor.',
+          '[2020 TUS Konsept İkizi] Yangın dumanına ve plastik yanıklarına maruz kalan hastada acil serviste ağır laktik asidoz, venöz kanda parlak kırmızı görünüm (arteriyolizasyon) ve hücresel hipoksi saptanıyor. Siyanür zehirlenmesi tanısıyla hidroksikobalamin başlanıyor.',
         clues: ['yangın dumanı / siyanür zehirlenmesi', 'venöz kanda parlak kırmızı görünüm', 'bakır içeren elektron transport kompleksi'],
         questionPrompt: 'Siyanür ve karbonmonoksit tarafından inhibe edilen ve yapısında hem a/a3 ile Bakır (CuA/CuB) bulunduran ETZ kompleksi hangisidir?',
         mechanism:
@@ -76,7 +76,7 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
       {
         entityName: 'Biyotin (Vitamin B7 — Pirüvat Karboksilaz, Asetil-KoA Karboksilaz, Propionil-KoA Karboksilaz ve Çiğ Yumurta Akı / Avidin)',
         patientVignette:
-          '[2023 TUS Konsept İkizi] Uzun süre çok miktarda çiğ yumurta akı tüketen bir sporcuda alopesi (saç dökülmesi), ağız çevresinde eritematöz egzamatöz dermatit, konjonktivit ve laktik asidoz gelişiyor.',
+          '[2019 TUS Konsept İkizi] Uzun süre çok miktarda çiğ yumurta akı tüketen bir sporcuda alopesi (saç dökülmesi), ağız çevresinde eritematöz egzamatöz dermatit, konjonktivit ve laktik asidoz gelişiyor.',
         clues: ['çiğ yumurta akı (avidin)', 'alopesi ve dermatit', 'ATP-bağımlı karboksilasyon reaksiyonları'],
         questionPrompt: 'Çiğ yumurta akındaki avidin proteinine bağlanarak emilimi engellenen ve karboksilaz enzimlerinin kofaktörü olan bu vitamin hangisidir?',
         mechanism:
@@ -93,16 +93,16 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
   // 2. DAHİLİYE & PEDİATRİ (Son Yıllar TUS İkizi: Onkolojik ve Hematolojik Aciller, Elektrolit Bozuklukları)
   {
     branchId: 'dahiliye',
-    subTopic: 'ÖSYM İkizi • Tümör Lizis Sendromu, Hiperkalsemi ve Nefrolojik Aciller (2023–2025 TUS)',
+    subTopic: 'ÖSYM İkizi • Tümör Lizis Sendromu, Hiperkalsemi ve Nefrolojik Aciller (2019–2025 TUS)',
     difficulty: 'Klinik Vaka',
     examFrequency: 'Her TUS Sorulur',
     entities: [
       {
         entityName: 'Tümör Lizis Sendromu (Hiperürisemi, Hiperkalemi, Hiperfosfatemi, Hipokalsemi ve Rasburikaz)',
         patientVignette:
-          '[2024 TUS Konsept İkizi] Burkitt lenfoma tanısıyla kemoterapi başlanan hastada 24. saatte oligüri, kardiyak aritmi ve tetani gelişiyor. Biyokimyada ürik asit 15 mg/dL, potasyum 6.8 mEq/L, fosfor 7.9 mg/dL ve kalsiyum 6.4 mg/dL saptanıyor.',
+          '[2021 TUS Konsept İkizi] Burkitt lenfoma tanısıyla kemoterapi başlanan hastada 24. saatte oligüri, kardiyak aritmi ve tetani gelişiyor. Biyokimyada ürik asit 15 mg/dL, potasyum 6.8 mEq/L, fosfor 7.9 mg/dL ve kalsiyum 6.4 mg/dL saptanıyor.',
         clues: ['Burkitt lenfoma kemoterapisi sonrası', 'hiperürisemi, hiperkalemi, hiperfosfatemi', 'sekonder hipokalsemi'],
-        questionPrompt: 'Bu hastada gelişen onkolojik acil tablo ve mevcut ürik asidi hızla allantoin’e yıkan rekombinant enzim hangisidir?',
+        questionPrompt: 'Ürik asidi hızla allantoin’e yıkan rekombinant rasburikaz enziminin de kullanılabildiği bu onkolojik acil tablo hangisidir?',
         mechanism:
           'Hızlı çoğalan tümörlerin (Burkitt lenfoma, ALL) yıkımıyla hücre içi K+, PO4-3 ve pürin nükleik asitleri (ürik asit) kana karışır; yükselen fosfat kalsiyumu bağlayarak sekonder HİPOKALSEMİ yapar. Rasburikaz (rekombinant ürat oksidaz) oluşmuş ürik asidi çözünür allantoine çevirir (G6PD eksikliğinde kontrendikedir!).',
         whenCorrectNote: 'Hiperürisemi + Hiperkalemi + Hiperfosfatemi + Hipokalsemi dörtlüsü (Tedavide hidrasyon + Allopürinol / Rasburikaz).',
@@ -115,9 +115,9 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
       {
         entityName: 'Hiperkalemi Acil Tedavisi (İlk Yapılacak: İV Kalsiyum Glukonat — Membran Stabilizasyonu)',
         patientVignette:
-          '[2023 TUS Konsept İkizi] Kronik böbrek yetmezliği olan hasta acil servise kas güçsüzlüğü ile getiriliyor. Serum potasyum düzeyi 7.4 mEq/L ölçülüyor; EKG’de sivri T dalgaları, PR uzaması, P dalgası silinmesi ve QRS genişlemesi saptanıyor.',
+          '[2025 TUS Konsept İkizi] Kronik böbrek yetmezliği olan hasta acil servise kas güçsüzlüğü ile getiriliyor. Serum potasyum düzeyi 7.4 mEq/L ölçülüyor; EKG’de sivri T dalgaları, PR uzaması, P dalgası silinmesi ve QRS genişlemesi saptanıyor.',
         clues: ['potasyum 7.4 mEq/L', 'EKG’de sivri T dalgaları ve QRS genişlemesi', 'ilk uygulanacak ajan'],
-        questionPrompt: 'EKG değişikliği olan bu ağır hiperkalemi hastasında ventriküler fibrilasyonu önlemek için İLK uygulanması gereken ajan hangisidir?',
+        questionPrompt: 'EKG değişikliği olan bu ağır elektrolit acilinde miyokard membranını stabilize etmek için İLK uygulanması gereken tedavi yaklaşımı hangisidir?',
         mechanism:
           'EKG bulgusu olan hiperkalemide İLK adım potasyumu düşürmek değil, miyokard hücre membranının eşik potansiyelini yükselterek kalbi aritmiden korumaktır; bunun için İV Kalsiyum glukonat verilir. Ardından K+’u hücre içine sokmak için İnsülin + Dekstroz ve Nebülize Salbutamol verilir.',
         whenCorrectNote: 'EKG bulgulu hiperkalemide İLK tercih: İV Kalsiyum glukonat (Potasyumu düşürmez, miyokard membranını stabilize eder).',
@@ -145,7 +145,7 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
       {
         entityName: 'Vena Kava Süperior Sendromu (En Sık Neden Küçük Hücreli Akciğer Kanseri ve Pemberton Belirtisi)',
         patientVignette:
-          '[2023 TUS Konsept İkizi] 62 yaşında 45 paket-yıl sigara öyküsü olan erkek hasta sabahları belirginleşen yüz ve boyun ödemi (pelerin tarzı ödem), dispne, göğüs ön duvarında venöz kollateraller ve kollarını başının üzerine kaldırdığında yüzde siyanoz/pletor (Pemberton belirtisi) ile başvuruyor.',
+          '[2020 TUS Konsept İkizi] 62 yaşında 45 paket-yıl sigara öyküsü olan erkek hasta sabahları belirginleşen yüz ve boyun ödemi (pelerin tarzı ödem), dispne, göğüs ön duvarında venöz kollateraller ve kollarını başının üzerine kaldırdığında yüzde siyanoz/pletor (Pemberton belirtisi) ile başvuruyor.',
         clues: ['yüz ve boyunda pelerin tarzı ödem', 'göğüs ön duvarında venöz kollateraller', 'Pemberton belirtisi (+)'],
         questionPrompt: 'Erişkinde en sık küçük hücreli akciğer karsinomu ve sağ üst lob tümörlerine bağlı gelişen bu onkolojik tablo hangisidir?',
         mechanism:
@@ -160,9 +160,9 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
       {
         entityName: 'Akut Perikardit (Öne Eğilmekle Azalan Göğüs Ağrısı, Yaygın konkav ST Yüksekliği ve PR Çökmesi)',
         patientVignette:
-          '[2024 TUS Konsept İkizi] 34 yaşında erkek hasta viral üst solunum yolu enfeksiyonundan 1 hafta sonra başlayan, sırtüstü yatmakla ve derin nefes almakla artıp öne doğru eğilmekle azalan keskin retrosternal göğüs ağrısı ile başvuruyor. EKG’de aVR ve V1 dışındaki tüm derivasyonlarda açıklığı yukarı bakan (konkav) ST yüksekliği ve PR segment çökmesi saptanıyor.',
+          '[2019 TUS Konsept İkizi] 34 yaşında erkek hasta viral üst solunum yolu enfeksiyonundan 1 hafta sonra başlayan, sırtüstü yatmakla ve derin nefes almakla artıp öne doğru eğilmekle azalan keskin retrosternal göğüs ağrısı ile başvuruyor. EKG’de aVR ve V1 dışındaki tüm derivasyonlarda açıklığı yukarı bakan (konkav) ST yüksekliği ve PR segment çökmesi saptanıyor.',
         clues: ['öne doğru eğilmekle azalan göğüs ağrısı', 'yaygın konkav ST yüksekliği', 'PR segment çökmesi (aVR’de PR yüksekliği)'],
-        questionPrompt: 'Bu hastada en olası tanı ve nüksleri önlemek için NSAİİ tedavisine eklenmesi gereken birinci basamak ajan hangisidir?',
+        questionPrompt: 'Nükslerini önlemek için NSAİİ tedavisine mutlaka Kolşisin eklenmesi gereken bu kardiyolojik tablo hangisidir?',
         mechanism:
           'Akut viral/idiyopatik perikarditte perikardiyal sürtünme sesi (frotman), yaygın konkav ST elevasyonu ve spesifik olarak PR segment depresyonu (aVR’de PR elevasyonu) görülür. İlk basamak tedavide Yüksek doz NSAİİ (veya Aspirin) + Kolşisin kombinasyonu kullanılır.',
         whenCorrectNote: 'Öne eğilmekle azalan plöritik göğüs ağrısı + frotman + yaygın konkav ST yüksekliği ve PR çökmesi (Tedavi: NSAİİ + Kolşisin).',
@@ -177,14 +177,14 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
   // 3. MİKROBİYOLOJİ (Son Yıllar TUS İkizi: Ekzotoksinler, Fırsatçı Mikozlar ve Onkojenik Virüsler)
   {
     branchId: 'mikrobiyoloji',
-    subTopic: 'ÖSYM İkizi • Bakteriyel Toksinler, Fırsatçı Mikozlar ve Onkojenik Virüsler (2022–2025 TUS)',
+    subTopic: 'ÖSYM İkizi • Bakteriyel Toksinler, Fırsatçı Mikozlar ve Onkojenik Virüsler (2019–2025 TUS)',
     difficulty: 'Klinik Vaka',
     examFrequency: 'Her TUS Sorulur',
     entities: [
       {
         entityName: 'Cryptococcus neoformans (Çini Mürekkebi, Polisakkarit Kapsül ve Lateks Aglütinasyon)',
         patientVignette:
-          '[2024 TUS Konsept İkizi] CD4+ T lenfosit sayısı 40/mm³ olan HIV pozitif bir hasta 2 haftadır süren baş ağrısı, ateş ve ense sertliği ile başvuruyor. BOS incelemesinde Çini mürekkebi (India ink) boyamasında geniş şeffaf kapsüllü tomurcuklanan maya hücreleri görülüyor.',
+          '[2021 TUS Konsept İkizi] CD4+ T lenfosit sayısı 40/mm³ olan HIV pozitif bir hasta 2 haftadır süren baş ağrısı, ateş ve ense sertliği ile başvuruyor. BOS incelemesinde Çini mürekkebi (India ink) boyamasında geniş şeffaf kapsüllü tomurcuklanan maya hücreleri görülüyor.',
         clues: ['HIV pozitif hastada menenjit', 'Çini mürekkebi (India ink) ile geniş kapsüllü maya', 'güvercin gübresi bulaşı'],
         questionPrompt: 'Üreaz pozitif, fenol oksidaz (melanin) üreten ve BOS’ta kriptokokal antijen testi ile tanı konulan bu etken hangisidir?',
         mechanism:
@@ -199,9 +199,9 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
       {
         entityName: 'Aspergillus fumigatus (45 Derece Dar Açılı Septalı Hif, Galaktomannan ve Vorikonazol)',
         patientVignette:
-          '[2023 TUS Konsept İkizi] Akut miyeloid lösemi nedeniyle kemoterapi alan ve ağır nötropenisi 14 gündür devam eden hastada antibiyoterapiye dirençli ateş, plöritik göğüs ağrısı ve hemoptizi gelişiyor. Toraks BT’de nodül çevresinde buzlu cam görünümü (Halo belirtisi) ve serumda Galaktomannan antijeni pozitifliği saptanıyor.',
+          '[2025 TUS Konsept İkizi] Akut miyeloid lösemi nedeniyle kemoterapi alan ve ağır nötropenisi 14 gündür devam eden hastada antibiyoterapiye dirençli ateş, plöritik göğüs ağrısı ve hemoptizi gelişiyor. Toraks BT’de nodül çevresinde buzlu cam görünümü (Halo belirtisi) ve serumda Galaktomannan antijeni pozitifliği saptanıyor.',
         clues: ['uzamış ağır nötropeni', 'Toraks BT’de Halo belirtisi', 'serum Galaktomannan antijeni (+)'],
-        questionPrompt: 'Dokuda 45 derece dar açıyla (dikotom) dallanan septalı hifler oluşturan bu invaziv küf enfeksiyonu ve ilk tercih ilacı hangisidir?',
+        questionPrompt: 'Dokuda 45 derece dar açıyla (dikotom) dallanan septalı hifler oluşturan ve invaziv formunda ilk tercih tedavisi Vorikonazol olan fırsatçı mantar etkeni hangisidir?',
         mechanism:
           'Aspergillus fumigatus dokuda 45° dar açıyla dallanan bölmeli (septalı) hifler oluşturur. Nötropenik hastalarda anjiyoinvazyon yaparak Halo belirtisine, kavite içinde ise fungus topuna (Aspergilloma) yol açar; invaziv aspergillozda ilk tercih Vorikonazol’dür.',
         whenCorrectNote: '45° dar açılı septalı hif + Nötropenide Halo belirtisi + Galaktomannan / Beta-D-glukan (+) + Tedavide Vorikonazol.',
@@ -214,9 +214,9 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
       {
         entityName: 'Mucor / Rhizopus — Mukormikoz (90 Derece Dik Açılı Septasız Hif ve Diyabetik Ketoasidoz)',
         patientVignette:
-          '[2024 TUS Konsept İkizi] Diyabetik ketoasidoz tablosuyla acil servise getirilen hastada yüz ve periorbital bölgede şişlik, proptozis, oftalmopleji ve burun mukozası ile sert damakta siyah nekrotik eskar plakları saptanıyor. Biyopside damar duvarını invaze eden geniş, şerit benzeri, septasız (bölmesiz) ve 90 derece dik açıyla dallanan hifler görülüyor.',
+          '[2020 TUS Konsept İkizi] Diyabetik ketoasidoz tablosuyla acil servise getirilen hastada yüz ve periorbital bölgede şişlik, proptozis, oftalmopleji ve burun mukozası ile sert damakta siyah nekrotik eskar plakları saptanıyor. Biyopside damar duvarını invaze eden geniş, şerit benzeri, septasız (bölmesiz) ve 90 derece dik açıyla dallanan hifler görülüyor.',
         clues: ['diyabetik ketoasidoz (DKA)', 'burun ve damakta siyah nekrotik eskar', '90 derece dik açılı septasız (bölmesiz) geniş hifler'],
-        questionPrompt: 'Rinoserebral tutulum yapan bu fırsatçı küf enfeksiyonu ve cerrahi debridmanla birlikte verilmesi gereken ilk tercih ilaç hangisidir?',
+        questionPrompt: 'Rinoserebral siyah nekrotik eskar yapan, Vorikonazol’e dirençli olan ve acil cerrahi debridman ile Lipozomal Amfoterisin B gerektiren bu fırsatçı küf etkeni hangisidir?',
         mechanism:
           'Zygomycetes (Mucor, Rhizopus, Lichtheimia) ketoasidoz ve deferoksamin kullanan hastalarda serbest demiri kullanarak hızla çoğalır. 90° dik açılı, geniş ve septasız (koenositik) hifler yapar; Vorikonazol’e DİRENÇLİDİR, tedavide Lipozomal Amfoterisin B + Acil cerrahi debridman uygulanır.',
         whenCorrectNote: 'DKA + siyah nazal/palatal nekrotik eskar + 90° dik açılı septasız geniş hif + Lipozomal Amfoterisin B (Vorikonazole dirençli!).',
@@ -229,9 +229,9 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
       {
         entityName: 'Pseudomonas aeruginosa Ekzotoksin A ve Difteri Toksini (EF-2 ADP-Ribozilasyonu)',
         patientVignette:
-          '[2022 TUS Konsept İkizi] Geniş yanık alanı olan bir hastada mavi-yeşil renkli ve üzüm kokulu yara akıntısı ile sepsis gelişiyor. İzole edilen oksidaz pozitif, non-fermentatif gram negatif basilin salgıladığı ana ekzotoksinin konak hücrede protein sentezini durdurduğu saptanıyor.',
+          '[2019 TUS Konsept İkizi] Geniş yanık alanı olan bir hastada mavi-yeşil renkli ve üzüm kokulu yara akıntısı ile sepsis gelişiyor. İzole edilen oksidaz pozitif, non-fermentatif gram negatif basilin salgıladığı ana ekzotoksinin konak hücrede protein sentezini durdurduğu saptanıyor.',
         clues: ['yanık hastasında mavi-yeşil (piyosiyanin) ve üzüm kokulu enfeksiyon', 'oksidaz (+) non-fermentatif basil', 'Elongasyon Faktörü-2 (EF-2) inhibisyonu'],
-        questionPrompt: 'Corynebacterium diphtheriae toksini ile aynı mekanizmaya sahip olan bu toksinin hedef molekülü ve etki mekanizması hangisidir?',
+        questionPrompt: 'Ökaryotik Elongasyon Faktörü-2’yi (EF-2) ADP-ribozilasyonla inaktive ederek konak hücre protein sentezini durduran ortak toksin/etken ikilisi hangisidir?',
         mechanism:
           'Hem Pseudomonas aeruginosa Ekzotoksin A hem de Corynebacterium diphtheriae toksini, ökaryotik Elongasyon Faktörü-2’yi (EF-2) ADP-ribozilasyona uğratarak inaktive eder ve hücrede protein sentezini durdurarak hücre ölümüne yol açar.',
         whenCorrectNote: 'EF-2’nin ADP-ribozilasyonu ile protein sentez inhibisyonu (Difteri toksini ve Pseudomonas Ekzotoksin A ortak mekanizması).',
@@ -261,14 +261,14 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
   // 4. PATOLOJİ (Son Yıllar TUS İkizi: Patognomonik Cisimcikler, Hücre Ölümü ve Tümör Belirteçleri)
   {
     branchId: 'patoloji',
-    subTopic: 'ÖSYM İkizi • Patognomonik Cisimcikler, Histiyositozlar ve Tümör Patolojisi (2022–2025 TUS)',
+    subTopic: 'ÖSYM İkizi • Patognomonik Cisimcikler, Histiyositozlar ve Tümör Patolojisi (2019–2025 TUS)',
     difficulty: 'Klinik Vaka',
     examFrequency: 'Her TUS Sorulur',
     entities: [
       {
         entityName: 'Langerhans Hücreli Histiyositoz (Birbeck Granülleri / Tenis Raketi, CD1a, Langerin / CD207 ve S-100)',
         patientVignette:
-          '[2024 TUS Konsept İkizi] 3 yaşında erkek çocukta kafatası kemiklerinde zımba ile delinmiş gibi litik lezyonlar, ekzoftalmi ve santral diabetes insipidus (Hand-Schüller-Christian triyadı) saptanıyor. Lezyon biyopsisinde eozinofillerle karışık oluklu (kahve çekirdeği) nükleuslu hücreler ve elektron mikroskobisinde tenis raketi şeklinde sitoplazmik granüller görülüyor.',
+          '[2021 TUS Konsept İkizi] 3 yaşında erkek çocukta kafatası kemiklerinde zımba ile delinmiş gibi litik lezyonlar, ekzoftalmi ve santral diabetes insipidus (Hand-Schüller-Christian triyadı) saptanıyor. Lezyon biyopsisinde eozinofillerle karışık oluklu (kahve çekirdeği) nükleuslu hücreler ve elektron mikroskobisinde tenis raketi şeklinde sitoplazmik granüller görülüyor.',
         clues: ['litik kalvaryum lezyonu + ekzoftalmi + diabetes insipidus', 'elektron mikroskobisinde tenis raketi (Birbeck granülleri)', 'CD1a (+), Langerin (CD207) (+) ve S-100 (+)'],
         questionPrompt: 'Elektron mikroskobisinde Birbeck granülleri içeren ve immünohistokimyada CD1a, Langerin (CD207) ve S-100 pozitif olan bu hastalık hangisidir?',
         mechanism:
@@ -313,7 +313,7 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
       {
         entityName: 'Councilman Cisimciği (Akut Viral Hepatitte Hepatosit Apoptozu) vs. Mallory-Denk Cisimciği (Alkolik Hepatit)',
         patientVignette:
-          '[2024 TUS Konsept İkizi] Akut Hepatit B enfeksiyonu geçiren bir hastanın karaciğer biyopsisinde lobül içinde tek tek büzüşmüş, yoğun eozinofilik sitoplazmalı ve piknotik/parçalanmış nükleuslu apoptotik hepatositler izleniyor.',
+          '[2025 TUS Konsept İkizi] Akut Hepatit B enfeksiyonu geçiren bir hastanın karaciğer biyopsisinde lobül içinde tek tek büzüşmüş, yoğun eozinofilik sitoplazmalı ve piknotik/parçalanmış nükleuslu apoptotik hepatositler izleniyor.',
         clues: ['akut viral hepatit biyopsisi', 'yoğun eozinofilik büzüşmüş hepatosit', 'programlı hücre ölümü (apoptoz)'],
         questionPrompt: 'Akut viral hepatit ve sarı hummada hepatosit apoptozu sonucu oluşan bu eozinofilik cisimcik hangisidir?',
         mechanism:
@@ -328,9 +328,9 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
       {
         entityName: 'Nöroblastom (Homer-Wright Psödorozetleri, N-MYC Amplifikasyonu ve İdrarda VMA/HVA Artışı)',
         patientVignette:
-          '[2023 TUS Konsept İkizi] 18 aylık erkek bebekte karında orta hattı geçen düzensiz sert kitle, periorbital ekimoz (rakun gözü) ve opsoklonus-miyoklonus sendromu saptanıyor. İdrarda vanilmandelik asit (VMA) ve homovanilik asit (HVA) düzeyleri yüksek bulunuyor; biyopside ortasında nöropil bulunan Homer-Wright psödorozetleri görülüyor.',
+          '[2020 TUS Konsept İkizi] 18 aylık erkek bebekte karında orta hattı geçen düzensiz sert kitle, periorbital ekimoz (rakun gözü) ve opsoklonus-miyoklonus sendromu saptanıyor. İdrarda vanilmandelik asit (VMA) ve homovanilik asit (HVA) düzeyleri yüksek bulunuyor; biyopside ortasında nöropil bulunan Homer-Wright psödorozetleri görülüyor.',
         clues: ['orta hattı geçen batın kitlesi (adrenal medulla)', 'idrarda VMA ve HVA artışı + Homer-Wright psödorozetleri', 'N-MYC gen amplifikasyonu (en önemli kötü prognoz)'],
-        questionPrompt: 'Çocukluk çağının bu en sık ekstrakraniyal solid tümöründe EN ÖNEMLİ kötü prognoz göstergesi olan genetik değişiklik hangisidir?',
+        questionPrompt: 'N-MYC gen amplifikasyonunun en önemli kötü prognoz göstergesi olduğu, çocukluk çağının bu en sık ekstrakraniyal solid tümörü hangisidir?',
         mechanism:
           'Nöral krest kökenli sempatoadrenal öncüllerden gelişen Nöroblastomda küçük yuvarlak mavi hücreler ve ortasında fibriler nöropil içeren Homer-Wright psödorozetleri görülür. En önemli bağımsız KÖTÜ prognoz faktörü N-MYC onkogen amplifikasyonudur (<1 yaş ve hiperdiploidi ise iyi prognozdur).',
         whenCorrectNote: 'Orta hattı geçen adrenal medulla kitlesi + VMA/HVA artışı + Homer-Wright psödorozeti + En önemli kötü prognoz: N-MYC amplifikasyonu.',
@@ -345,14 +345,14 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
   // 5. FARMAKOLOJİ (Son Yıllar TUS İkizi: Yeni Kuşak Antikoagülan Antidotları, Kalp Yetmezliği ve Onkoloji İlaçları)
   {
     branchId: 'farmakoloji',
-    subTopic: 'ÖSYM İkizi • Spesifik Antidotlar, Biyolojik Ajanlar ve Kardiyovasküler Farmakoloji (2022–2025 TUS)',
+    subTopic: 'ÖSYM İkizi • Spesifik Antidotlar, Biyolojik Ajanlar ve Kardiyovasküler Farmakoloji (2019–2025 TUS)',
     difficulty: 'Klinik Vaka',
     examFrequency: 'Her TUS Sorulur',
     entities: [
       {
         entityName: 'İdarusizumab (Direkt Trombin / Faktör IIa İnhibitörü Dabigatran’ın Spesifik Monoklonal Antikor Antidotu)',
         patientVignette:
-          '[2024 TUS Konsept İkizi] Non-valvüler atriyal fibrilasyon nedeniyle oral direkt trombin (Faktör IIa) inhibitörü Dabigatran eteksilat kullanan 74 yaşındaki hasta acil servise hayatı tehdit eden üst GİS kanaması ile getiriliyor.',
+          '[2025 TUS Konsept İkizi] Non-valvüler atriyal fibrilasyon nedeniyle oral direkt trombin (Faktör IIa) inhibitörü Dabigatran eteksilat kullanan 74 yaşındaki hasta acil servise hayatı tehdit eden üst GİS kanaması ile getiriliyor.',
         clues: ['direkt trombin (Faktör IIa) inhibitörü Dabigatran kullanımı', 'hayatı tehdit eden kanama', 'spesifik monoklonal antikor fragmanı antidot'],
         questionPrompt: 'Dabigatran’ın antikoagülan etkisini dakikalar içinde geri çeviren spesifik hümanize monoklonal antikor fragmanı (Fab) antidot hangisidir?',
         mechanism:
@@ -367,9 +367,9 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
       {
         entityName: 'Sakubitril + Valsartan (ARNI — Neprilisin İnhibisyonu + AT1 Reseptör Blokajı ve ACE İnhibitörleriyle Kontrendikasyon)',
         patientVignette:
-          '[2023 TUS Konsept İkizi] Ejeksiyon fraksiyonu %28 olan düşük EF’li kalp yetmezliği (HFrEF) hastasında mortaliteyi azaltmak amacıyla Ramipril kesilerek Sakubitril + Valsartan (ARNI) tedavisine geçilmesi planlanıyor.',
-        clues: ['düşük EF’li kalp yetmezliği (HFrEF)', 'neprilisin inhibitörü (Sakubitril) + ARB (Valsartan)', 'anjiyoödem riskini önlemek için 36 saat ara'],
-        questionPrompt: 'Sakubitril’in inhibe ettiği enzim ve ağır anjiyoödem riski nedeniyle birlikte kullanılması KESİNLİKLE kontrendike olan ilaç grubu hangisidir?',
+          '[2021 TUS Konsept İkizi] Ejeksiyon fraksiyonu %28 olan düşük EF’li kalp yetmezliği (HFrEF) hastasında mortaliteyi azaltmak amacıyla Ramipril kesilerek neprilisin enzimini ve AT1 reseptörünü ikili olarak inhibe eden yeni kuşak kombine tedaviye geçilmesi planlanıyor; anjiyoödem riskini önlemek için geçişte en az 36 saat ara veriliyor.',
+        clues: ['düşük EF’li kalp yetmezliği (HFrEF)', 'neprilisin inhibisyonu + AT1 reseptör blokajı', 'anjiyoödem riskini önlemek için 36 saat ara'],
+        questionPrompt: 'Mortaliteyi azaltan ve ACE inhibitörleriyle birlikte kullanımı kesin kontrendike olan bu kombine ilaç grubu hangisidir?',
         mechanism:
           'Sakubitril, natriüretik peptidleri (ANP, BNP, CNP) ve bradikinini yıkan Neprilisin enzimini inhibe eder. Hem ACE inhibitörleri hem de Sakubitril bradikinin yıkımını azalttığı için birlikte kullanımları ağır ANJİYOÖDEM yapar; ACEi kesildikten sonra en az 36 saat beklenmelidir.',
         whenCorrectNote: 'Sakubitril: Neprilisin inhibitörü (ANP/BNP yıkımını önler) • ACE inhibitörleriyle birlikte kullanımı ağır anjiyoödem nedeniyle kontrendikedir (36 saat kuralı).',
@@ -382,9 +382,9 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
       {
         entityName: 'Digoksin Toksisitesi (Na+/K+-ATPaz İnhibisyonu, Hipokalemi ile Artan Toksisite ve Digoksin Spesifik Fab)',
         patientVignette:
-          '[2022 TUS Konsept İkizi] Kalp yetmezliği nedeniyle Digoksin ve Furosemid kullanan yaşlı bir hasta bulantı, iştahsızlık, nesnelerin çevresinde sarı-yeşil haleler görme (ksantopsi) ve EKG’de ventriküler bigemine ekstrasistol ile başvuruyor.',
+          '[2020 TUS Konsept İkizi] Kalp yetmezliği nedeniyle Digoksin ve Furosemid kullanan yaşlı bir hasta bulantı, iştahsızlık, nesnelerin çevresinde sarı-yeşil haleler görme (ksantopsi) ve EKG’de ventriküler bigemine ekstrasistol ile başvuruyor.',
         clues: ['furosemide bağlı hipokalemi', 'sarı-yeşil görme (ksantopsi)', 'Na+/K+-ATPaz inhibisyonu'],
-        questionPrompt: 'Digoksinin kalp kasında bağlandığı hedef pompa ve bu hastada toksisiteyi en sık tetikleyen elektrolit bozukluğu hangisidir?',
+        questionPrompt: 'Na+/K+-ATPaz pompasını inhibe eden ajana bağlı gelişen, hipokalemiyle tetiklenen ve tedavisinde spesifik Fab fragmanı kullanılan klinik tablo hangisidir?',
         mechanism:
           'Digoksin kardiyomiyosit membranındaki Na+/K+-ATPaz pompasının potasyum bağlanma bölgesine yarışmalı bağlanarak pompayı inhibe eder. Hipokalemi (örn. loop/tiyazid diüretik kullanımı) digoksinin pompaya bağlanmasını artırarak toksisiteyi tetikler (Akut masif zehirlenmede ise pompa blokajına bağlı hiperkalemi görülür).',
         whenCorrectNote: 'Hedef: Na+/K+-ATPaz pompası • Toksisiteyi Artıranlar: Hipokalemi, Hipomagnezemi, Hiperkalsemi, Kinidin/Verapamil/Amiodaron • Antidot: Digoksin-spesifik Fab.',
@@ -412,9 +412,9 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
       {
         entityName: 'Metotreksat Toksisitesi (Dihidrofolat Redüktaz İnhibisyonu, Folinik Asit / Lökovorin Kurtarma ve Glukarpidaz)',
         patientVignette:
-          '[2023 TUS Konsept İkizi] Osteosarkom nedeniyle yüksek doz İV Metotreksat infüzyonu alan hastada akut böbrek hasarı, ağır mukozit ve pansitopeni gelişiyor. Normal hücreleri folat eksikliğinden korumak için kurtarma (rescue) tedavisi başlanıyor.',
+          '[2019 TUS Konsept İkizi] Osteosarkom nedeniyle yüksek doz İV dihidrofolat redüktaz (DHFR) inhibitörü infüzyonu alan hastada akut böbrek hasarı, ağır mukozit ve pansitopeni gelişiyor. Normal hücreleri folat eksikliğinden korumak için folinik asit (lökovorin) ile kurtarma tedavisi başlanıyor.',
         clues: ['dihidrofolat redüktaz (DHFR) inhibisyonu', 'mukozit ve miyelosüpresyon', 'normal hücreleri kurtaran aktif indirgenmiş folat türevi'],
-        questionPrompt: 'Metotreksatın kemik iliği ve mukoza toksisitesini önlemek için verilen "kurtarma (rescue)" ajanı ve böbrek yetmezliğinde metotreksatı parçalayan rekombinant enzim hangisidir?',
+        questionPrompt: 'Folinik asit (Lökovorin) ile hücresel kurtarma ve böbrek yetmezliğinde Glukarpidaz gerektiren bu antimetabolit ilaç toksisitesi hangisidir?',
         mechanism:
           'Metotreksat dihidrofolat redüktazı (DHFR) inhibe eder. Folinik asit (Lökovorin / N5-formil-THF) DHFR basamağını bypass ederek normal hücreleri kurtarır. Böbrek yetmezliği olan hastada aşırı yüksek plazma metotreksat düzeyini hızla yıkmak için ise rekombinant karboksipeptidaz G2 enzimi olan Glukarpidaz kullanılır.',
         whenCorrectNote: 'Hücresel Kurtarma (Rescue) Ajanı: Folinik asit (Lökovorin) • Böbrek Yetmezliğinde Plazma Metotreksatını Yıkan Enzim: Glukarpidaz.',
@@ -429,14 +429,14 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
   // 6. ANATOMİ (Son Yıllar TUS İkizi: Brakiyal ve Lumbosakral Pleksus Sinir Yaralanmaları)
   {
     branchId: 'anatomi',
-    subTopic: 'ÖSYM İkizi • Periferik Sinir Yaralanmaları, Kırık Komşulukları ve Özel Testler (2022–2025 TUS)',
+    subTopic: 'ÖSYM İkizi • Periferik Sinir Yaralanmaları, Kırık Komşulukları ve Özel Testler (2019–2025 TUS)',
     difficulty: 'Klinik Vaka',
     examFrequency: 'Her TUS Sorulur',
     entities: [
       {
         entityName: 'N. Thoracicus Longus Yaralanması (M. Serratus Anterior Felci, Kanat Skapula / Winged Scapula ve Kolun 90° Üzerine Abduksiyon Kaybı)',
         patientVignette:
-          '[2024 TUS Konsept İkizi] Meme kanseri nedeniyle radikal mastektomi ve aksiller lenf nodu diseksiyonu yapılan 48 yaşındaki kadın hastada postoperatif dönemde elini duvara dayayıp ittiğinde sağ skapulanın medial kenarının arkaya doğru belirginleştiği (Kanat skapula) ve kolunu 90 derecenin üzerine kaldıramadığı saptanıyor.',
+          '[2021 TUS Konsept İkizi] Meme kanseri nedeniyle radikal mastektomi ve aksiller lenf nodu diseksiyonu yapılan 48 yaşındaki kadın hastada postoperatif dönemde elini duvara dayayıp ittiğinde sağ skapulanın medial kenarının arkaya doğru belirginleştiği (Kanat skapula) ve kolunu 90 derecenin üzerine kaldıramadığı saptanıyor.',
         clues: ['aksiller lenf nodu diseksiyonu sonrası', 'duvarı iterken kanat skapula (winged scapula)', 'kolun 90° üzerine abduksiyon (hiperabduksiyon) kaybı'],
         questionPrompt: 'Bu hastada yaralanan sinir ve felç olan kas eşleşmesi aşağıdakilerden hangisidir?',
         mechanism:
@@ -481,7 +481,7 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
       {
         entityName: 'N. Peroneus Communis (N. Fibularis Communis — Caput Fibulae Kırığı, Düşük Ayak / Stepaj Yürüyüşü ve Ayağın Eversiyon/Dorsifleksiyon Kaybı)',
         patientVignette:
-          '[2024 TUS Konsept İkizi] Futbol maçında bacağın dış yanına (fibula başı / collum fibulae) darbe alan sporcuda ayağını yukarı kaldıramama (dorsifleksiyon kaybı), ayağı dışa çevirememe (eversiyon kaybı), yürürken ayağını sürüklememek için dizini yükseğe kaldırarak yürüme (stepaj yürüyüşü) ve ayak sırtında duyu kaybı saptanıyor.',
+          '[2025 TUS Konsept İkizi] Futbol maçında bacağın dış yanına (fibula başı / collum fibulae) darbe alan sporcuda ayağını yukarı kaldıramama (dorsifleksiyon kaybı), ayağı dışa çevirememe (eversiyon kaybı), yürürken ayağını sürüklememek için dizini yükseğe kaldırarak yürüme (stepaj yürüyüşü) ve ayak sırtında duyu kaybı saptanıyor.',
         clues: ['fibula başı/boynu (caput/collum fibulae) kırığı', 'ayak dorsifleksiyon ve eversiyon kaybı', 'düşük ayak (foot drop) ve stepaj yürüyüşü'],
         questionPrompt: 'Alt ekstremitede en sık yaralanan ve hasarında hem dorsifleksiyon (derin dal) hem eversiyon (yüzeyel dal) kaybı gelişen bu sinir hangisidir?',
         mechanism:
@@ -496,7 +496,7 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
       {
         entityName: 'N. Gluteus Superior Yaralanması (M. Gluteus Medius / Minimus Felci ve Karşı Tarafa Pelvis Düşmesi — Trendelenburg Belirtisi)',
         patientVignette:
-          '[2023 TUS Konsept İkizi] Kalçanın üst-iç kadranına hatalı intramüsküler enjeksiyon yapılan hastada yürüme sırasında sağ ayağı üzerinde tek ayakla durduğunda pelvisin desteklenmeyen SOL (karşı) tarafa doğru düştüğü (pozitif Trendelenburg belirtisi) ve ördekvari yürüyüş geliştiği görülüyor.',
+          '[2019 TUS Konsept İkizi] Kalçanın üst-iç kadranına hatalı intramüsküler enjeksiyon yapılan hastada yürüme sırasında sağ ayağı üzerinde tek ayakla durduğunda pelvisin desteklenmeyen SOL (karşı) tarafa doğru düştüğü (pozitif Trendelenburg belirtisi) ve ördekvari yürüyüş geliştiği görülüyor.',
         clues: ['hatalı gluteal İM enjeksiyon', 'sağ ayak üzerinde dururken pelvisin SOL (karşı) tarafa düşmesi', 'Trendelenburg belirtisi (+)'],
         questionPrompt: 'Foramen suprapiriforme’den geçen ve yaralanmasında karşı tarafa pelvis düşmesine (Trendelenburg) yol açan bu sinir ve kas ikilisi hangisidir?',
         mechanism:
@@ -513,16 +513,16 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
   // 7. FİZYOLOJİ (Son Yıllar TUS İkizi: Nefron Segmentleri, Tubulopatiler ve Reseptör Fizyolojisi)
   {
     branchId: 'fizyoloji',
-    subTopic: 'ÖSYM İkizi • Nefron Segmentleri, Taşıyıcı Proteinler ve Tubulopati Sendromları (2022–2025 TUS)',
+    subTopic: 'ÖSYM İkizi • Nefron Segmentleri, Taşıyıcı Proteinler ve Tubulopati Sendromları (2019–2025 TUS)',
     difficulty: 'Klinik Vaka',
     examFrequency: 'Her TUS Sorulur',
     entities: [
       {
         entityName: 'Henle Kulpunun Çıkan Kalın Kolu (NKCC2 Taşıyıcısı, Suya Geçirimsiz "Dilüsyon Segmenti", Furosemid Hedefi ve Bartter Sendromu)',
         patientVignette:
-          '[2024 TUS Konsept İkizi] Büyüme geriliği, poliüri, polidipsi, hipokalemik metabolik alkaloz, hiperkalsiüri ve nefrokalsinozis saptanan normotansif bir çocukta Henle kulpunun çıkan kalın kolundaki apikal Na+-K+-2Cl- (NKCC2) kotransportöründe fonksiyon kaybı mutasyonu tespit ediliyor.',
-        clues: ['Henle çıkan kalın kol NKCC2 mutasyonu', 'hipokalemik metabolik alkaloz + hiperkalsiüri (Bartter)', 'suya geçirimsiz dilüsyon segmenti'],
-        questionPrompt: 'Suya geçirimsiz olduğu için tübül sıvısını hipoozmotik hale getiren bu nefron segmenti, hedef diüretiği ve genetik sendromu hangisidir?',
+          '[2020 TUS Konsept İkizi] Büyüme geriliği, poliüri, polidipsi, hipokalemik metabolik alkaloz, hiperkalsiüri ve nefrokalsinozis saptanan normotansif bir çocukta apikal Na+-K+-2Cl- (NKCC2) kotransportöründe fonksiyon kaybı mutasyonu (Bartter sendromu) tespit ediliyor.',
+        clues: ['NKCC2 kotransportör mutasyonu (Bartter)', 'hipokalemik metabolik alkaloz + hiperkalsiüri', 'suya geçirimsiz dilüsyon segmenti'],
+        questionPrompt: 'Suya geçirimsiz olduğu için tübül sıvısını hipoozmotik hale getiren ve furosemidin hedefi olan nefron segmenti hangisidir?',
         mechanism:
           'Henle kulpunun çıkan kalın kolu suya geçirimsizdir (Dilüsyon segmenti); apikal NKCC2 pompası Na+, K+ ve 2Cl- emer, lümende oluşan pozitif potansiyel ise paraselüler yoldan Mg+2 ve Ca+2 geri emilimini sağlar. Furosemid burayı bloke eder; kalıtsal defekti Bartter sendromudur (Hiperkalsiüri vardır).',
         whenCorrectNote: 'Henle çıkan kalın kol: NKCC2 + Suya geçirimsiz (Dilüsyon segmenti) + Paraselüler Mg+2/Ca+2 emilimi + Furosemid hedefi + Bartter sendromu (Hiperkalsiüri).',
@@ -535,9 +535,9 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
       {
         entityName: 'Distal Kıvrımlı Tübül Erken Kısmı (Na+-Cl- / NCC Kotransportörü, Tiyazid Hedefi, PTH ile Kalsiyum Emilimi ve Gitelman Sendromu)',
         patientVignette:
-          '[2023 TUS Konsept İkizi] Kas krampları ve halsizlik ile başvuran genç erişkin hastada normotansiyon, hipokalemik metabolik alkaloz, belirgin hipomagnezemi ve idrarda kalsiyum atılımında azalma (hipokalsiüri) saptanıyor.',
-        clues: ['hipokalemik metabolik alkaloz + ağır hipomagnezemi', 'idrarda kalsiyum azlığı (hipokalsiüri)', 'distal tübül Na+-Cl- (NCC) kotransportör defekti'],
-        questionPrompt: 'Tiyazid grubu diüretiklerin etkisini taklit eden, hipokalsiüri ile Bartter sendromundan ayrılan bu tablo ve etkilenen taşıyıcı hangisidir?',
+          '[2025 TUS Konsept İkizi] Kas krampları ve halsizlik ile başvuran genç erişkin hastada normotansiyon, hipokalemik metabolik alkaloz, belirgin hipomagnezemi ve idrarda kalsiyum atılımında azalma (hipokalsiüri) saptanıyor.',
+        clues: ['hipokalemik metabolik alkaloz + ağır hipomagnezemi', 'idrarda kalsiyum azlığı (hipokalsiüri)', 'tiyazid duyarlı Na+-Cl- (NCC) kotransportör defekti'],
+        questionPrompt: 'Tiyazid grubu diüretiklerin hedefi olan Na+-Cl- (NCC) taşıyıcısını içeren ve PTH etkisiyle kalsiyum geri emilimini artıran nefron segmenti hangisidir?',
         mechanism:
           'Distal kıvrımlı tübülde apikal Na+-Cl- (NCC) kotransportörü bulunur. Tiyazidler NCC’yi inhibe ettiğinde hücre içi Na+ düşer, bazolateral Na+/Ca+2 değiş-tokuşçusu hızlanır ve apikal TRPV5 kanalından (PTH etkisiyle) Ca+2 geri emilimi ARTAR (Hipokalsiüri). Genetik NCC defekti Gitelman sendromudur.',
         whenCorrectNote: 'Distal tübül: Na+-Cl- (NCC) + PTH bağımlı Ca+2 geri emilimi + Tiyazid hedefi + Gitelman sendromu (Hipokalsiüri + Ağır hipomagnezemi).',
@@ -550,9 +550,9 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
       {
         entityName: 'Toplayıcı Kanallar Esas (Principal) Hücre (ENaC Kanalı, Aldosteron Etkisi, Amilorid ve Liddle Sendromu)',
         patientVignette:
-          '[2022 TUS Konsept İkizi] 16 yaşında bir hastada ağır hipertansiyon, hipokalemi ve metabolik alkaloz saptanıyor; ancak plazma renin aktivitesi ve plazma aldosteron düzeylerinin her ikisinin de ileri derecede BASKILANMIŞ (düşük) olduğu görülüyor. Amilorid tedavisine dramatik yanıt alınıyor.',
-        clues: ['hipertansiyon + hipokalemi + metabolik alkaloz', 'renin DÜŞÜK ve aldosteron DÜŞÜK (Psödohiperaldosteronizm)', 'toplayıcı kanal ENaC gain-of-function mutasyonu'],
-        questionPrompt: 'Toplayıcı kanal esas (principal) hücrelerindeki epiteliyal sodyum kanalının (ENaC) aşırı aktivasyonuyla gelişen bu sendrom hangisidir?',
+          '[2021 TUS Konsept İkizi] 16 yaşında bir hastada ağır hipertansiyon, hipokalemi ve metabolik alkaloz saptanıyor; ancak plazma renin aktivitesi ve plazma aldosteron düzeylerinin her ikisinin de ileri derecede BASKILANMIŞ (düşük) olduğu görülüyor. Amilorid tedavisine dramatik yanıt alınıyor.',
+        clues: ['hipertansiyon + hipokalemi + metabolik alkaloz', 'renin DÜŞÜK ve aldosteron DÜŞÜK (Psödohiperaldosteronizm)', 'epiteliyal sodyum kanalı (ENaC) gain-of-function mutasyonu'],
+        questionPrompt: 'ENaC kanalının aşırı aktivasyonuyla Liddle sendromuna yol açan ve aldosteron ile ADH reseptörlerini barındıran nefron hücresi hangisidir?',
         mechanism:
           'Kortikal toplayıcı tübüldeki Esas (Principal) hücreler apikal ENaC kanalından Na+ emer ve ROMK kanalından K+ sekrete eder (Aldosteron her ikisini de artırır). ENaC kanalının yıkılamadığı aktivasyon mutasyonunda Liddle sendromu (Psödohiperaldosteronizm) gelişir; Spironolakton etkisizdir, tedavide ENaC blokörü Amilorid/Triamteren verilir.',
         whenCorrectNote: 'Esas (Principal) hücre: ENaC ile Na+ emilimi, K+ sekresyonu + Aldosteron ve ADH (AQP-2) hedefi + Liddle sendromunda ENaC aşırı aktiftir (Amilorid ile tedavi).',
@@ -580,9 +580,9 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
       {
         entityName: 'Toplayıcı Kanallar Alfa (Tip A) İnterkale Hücre (H+-ATPaz / H+-K+-ATPaz ile Asit Sekresyonu ve Tip 1 Distal RTA)',
         patientVignette:
-          '[2023 TUS Konsept İkizi] Sjögren sendromu olan 38 yaşındaki kadın hastada hipokalemi, hiperkloremik (normal anyon açıklı) metabolik asidoz ve tekrarlayan kalsiyum fosfat böbrek taşları saptanıyor. Ağır metabolik asidoza rağmen idrar pH’sının 5.5’in altına düşürülemediği (idrar pH: 6.4) görülüyor.',
-        clues: ['ağır asidoza rağmen idrar pH > 5.5', 'hipokalemi + nefrokalsinozis / kalsiyum fosfat taşı', 'alfa-interkale hücre H+-ATPaz sekresyon kusuru'],
-        questionPrompt: 'Toplayıcı kanallardaki Alfa (Tip A) interkale hücrelerin lümene H+ sekrete edememesi sonucu gelişen bu tablo hangisidir?',
+          '[2019 TUS Konsept İkizi] Sjögren sendromu olan 38 yaşındaki kadın hastada hipokalemi, hiperkloremik (normal anyon açıklı) metabolik asidoz ve tekrarlayan kalsiyum fosfat böbrek taşları saptanıyor. Ağır metabolik asidoza rağmen idrar pH’sının 5.5’in altına düşürülemediği (idrar pH: 6.4) görülüyor.',
+        clues: ['ağır asidoza rağmen idrar pH > 5.5', 'hipokalemi + nefrokalsinozis / kalsiyum fosfat taşı', 'H+-ATPaz sekresyon kusuru (Tip 1 Distal RTA)'],
+        questionPrompt: 'Lümene H+ sekrete ederek idrarı asidifiye eden ve disfonksiyonunda Tip 1 (Distal) RTA gelişen böbrek hücresi hangisidir?',
         mechanism:
           'Toplayıcı kanaldaki Alfa (Tip A) interkale hücreler apikal H+-ATPaz ve H+/K+-ATPaz pompalarıyla idrara H+ (asit) salgılar ve K+ geri emer. Bu pompaların bozukluğunda (Sjögren, Amfoterisin B) Tip 1 (Distal) Renal Tübüler Asidoz gelişir; idrar asidifiye edilemez (idrar pH > 5.5) ve hipokalemi ile böbrek taşı görülür.',
         whenCorrectNote: 'Alfa (Tip A) interkale hücre: Apikal H+-ATPaz ve H+/K+-ATPaz ile H+ sekresyonu + Bozukluğunda Tip 1 (Distal) RTA (İdrar pH > 5.5, hipokalemi, taş).',
@@ -597,14 +597,14 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
   // 8. HİSTOLOJİ & EMBRİYOLOJİ (Son Yıllar TUS İkizi: Farengeal Keseler, Nöral Krest ve Kan-Doku Bariyerleri)
   {
     branchId: 'histoloji',
-    subTopic: 'ÖSYM İkizi • Farengeal Arkus/Kese Türevleri, Nöral Krest ve Sertoli Hücresi (2022–2025 TUS)',
+    subTopic: 'ÖSYM İkizi • Farengeal Arkus/Kese Türevleri, Nöral Krest ve Sertoli Hücresi (2019–2025 TUS)',
     difficulty: 'Klinik Vaka',
     examFrequency: 'Her TUS Sorulur',
     entities: [
       {
         entityName: '3. ve 4. Farengeal Keseler (Timus + İnferior/Süperior Paratiroidler ve DiGeorge Sendromu — 22q11.2 Delesyonu)',
         patientVignette:
-          '[2024 TUS Konsept İkizi] Yenidoğan bir bebekte hipokalsemik tetani, akciğer grafisinde timus gölgesinin yokluğu (T hücre yetmezliği), yarık damak ve trunkus arteriyozus saptanıyor. Genetik incelemede 22q11.2 mikrodelesyonu ve nöral krest göç kusuru tespit ediliyor.',
+          '[2025 TUS Konsept İkizi] Yenidoğan bir bebekte hipokalsemik tetani, akciğer grafisinde timus gölgesinin yokluğu (T hücre yetmezliği), yarık damak ve trunkus arteriyozus saptanıyor. Genetik incelemede 22q11.2 mikrodelesyonu ve nöral krest göç kusuru tespit ediliyor.',
         clues: ['timus aplazisi + paratiroid agenezisi (hipokalsemi)', 'konotrunkal kalp anomalisi (Trunkus arteriyozus / Fallot)', '3. ve 4. farengeal kese gelişim kusuru (DiGeorge)'],
         questionPrompt: 'Normal embriyolojide Timus ile İnferior Paratiroid bezlerinin köken aldığı farengeal kese hangisidir?',
         mechanism:
@@ -619,7 +619,7 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
       {
         entityName: 'Sertoli Hücresi (Zonula Occludens ile Kan-Testis Bariyeri, Anti-Müllerian Hormon / AMH, İnhibin-B ve Androjen Bağlayıcı Protein)',
         patientVignette:
-          '[2023 TUS Konsept İkizi] Seminifer tübül bazal membranına oturan, komşu hücrelerle sıkı bağlantılar (zonula occludens) kurarak bazal ve adluminal kompartmanları ayıran ve haploid germ hücrelerini otoimmün saldırıdan koruyan destek hücresi inceleniyor.',
+          '[2020 TUS Konsept İkizi] Seminifer tübül bazal membranına oturan, komşu hücrelerle sıkı bağlantılar (zonula occludens) kurarak bazal ve adluminal kompartmanları ayıran ve haploid germ hücrelerini otoimmün saldırıdan koruyan destek hücresi inceleniyor.',
         clues: ['zonula occludens ile kan-testis bariyeri', 'FSH reseptörü taşıyan tübül içi hücre', 'Anti-Müllerian Hormon (AMH), İnhibin-B ve ABP sentezi'],
         questionPrompt: 'Erkek fetüste Müller kanalının gerilemesini sağlayan AMH’yi salgılayan ve kan-testis bariyerini oluşturan bu hücre hangisidir?',
         mechanism:
@@ -634,7 +634,7 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
       {
         entityName: 'Nöral Krest (Krista) Türevleri (Adrenal Medulla, Parafolliküler C Hücresi, Melanosit, Schwann Hücresi ve Auerbach/Meissner Pleksusu)',
         patientVignette:
-          '[2022 TUS Konsept İkizi] Yenidoğan bir bebekte mekonyum çıkışında gecikme, batın distansiyonu ve safralı kusma saptanıyor. Rektal biyopside submukoza (Meissner) ve muskularis propriadaki (Auerbach) parasempatik gangliyon hücrelerinin yokluğu (Agangliyonik megakolon / Hirschsprung hastalığı) görülüyor.',
+          '[2021 TUS Konsept İkizi] Yenidoğan bir bebekte mekonyum çıkışında gecikme, batın distansiyonu ve safralı kusma saptanıyor. Rektal biyopside submukoza (Meissner) ve muskularis propriadaki (Auerbach) parasempatik gangliyon hücrelerinin yokluğu (Agangliyonik megakolon / Hirschsprung hastalığı) görülüyor.',
         clues: ['Auerbach ve Meissner pleksuslarında gangliyon yokluğu (Hirschsprung)', 'RET proto-onkogen mutasyonu', 'embriyonik nöroektodermal hücre göç kusuru'],
         questionPrompt: 'Hirschsprung hastalığında bağırsak duvarına göçü bozulan; ayrıca melanosit, Schwann hücresi, adrenal medulla ve tiroid C hücrelerini oluşturan embriyonik yapı hangisidir?',
         mechanism:
@@ -664,7 +664,7 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
       {
         entityName: 'İnce Bağırsak Paneth Hücresi (Lieberkühn Kript Tabanı, Eozinofilik Granüller, Lizozim / Alfa-Defensin ve Çinko)',
         patientVignette:
-          '[2023 TUS Konsept İkizi] İnce bağırsak histolojik kesitinde Lieberkühn kriptlerinin en tabanında yerleşmiş, apikal sitoplazmasında büyük asidofilik (eozinofilik) zimojen-benzeri granüller içeren piramidal hücreler görülüyor.',
+          '[2019 TUS Konsept İkizi] İnce bağırsak histolojik kesitinde Lieberkühn kriptlerinin en tabanında yerleşmiş, apikal sitoplazmasında büyük asidofilik (eozinofilik) zimojen-benzeri granüller içeren piramidal hücreler görülüyor.',
         clues: ['Lieberkühn kriptlerinin tabanında yerleşim', 'apikal büyük eozinofilik granüller', 'lizozim, alfa-defensin (kriptidin) ve TNF-alfa salgısı'],
         questionPrompt: 'Bağırsak florasını düzenleyen antimikrobiyal peptidleri salgılayan ve kök hücre nişini koruyan bu uzun ömürlü hücre hangisidir?',
         mechanism:
@@ -681,16 +681,16 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
   // 9. PEDİATRİ (Son Yıllar TUS İkizi: Yenidoğan Solunum Acilleri, Vaskülitler ve Kardiyoloji)
   {
     branchId: 'pediatri',
-    subTopic: 'ÖSYM İkizi • Kawasaki, HSP, Yenidoğan Solunum Acilleri ve Pediatrik Sendromlar (2022–2025 TUS)',
+    subTopic: 'ÖSYM İkizi • Kawasaki, HSP, Yenidoğan Solunum Acilleri ve Pediatrik Sendromlar (2019–2025 TUS)',
     difficulty: 'Klinik Vaka',
     examFrequency: 'Her TUS Sorulur',
     entities: [
       {
         entityName: 'Kawasaki Hastalığı (≥5 Gün Ateş, Koroner Arter Anevrizması ve İVİG + Aspirin Tedavisi)',
         patientVignette:
-          '[2024 TUS Konsept İkizi] 3 yaşında erkek çocuk 6 gündür düşmeyen ateş, iki taraflı eksüdasız konjonktival hiperemi, çilek dili ve dudaklarda çatlama, tek taraflı servikal lenfadenopati (>1.5 cm) ve el-ayak sırtında ödem/eritem ile getiriliyor. Laboratuvarda CRP yüksekliği ve subakut dönemde 750.000/mm³ trombositoz saptanıyor.',
+          '[2021 TUS Konsept İkizi] 3 yaşında erkek çocuk 6 gündür düşmeyen ateş, iki taraflı eksüdasız konjonktival hiperemi, çilek dili ve dudaklarda çatlama, tek taraflı servikal lenfadenopati (>1.5 cm) ve el-ayak sırtında ödem/eritem ile getiriliyor. Laboratuvarda CRP yüksekliği ve subakut dönemde 750.000/mm³ trombositoz saptanıyor.',
         clues: ['≥5 gün süren ateş + eksüdasız bilateral konjonktivit', 'çilek dili + servikal LAP + ekstremite ödemi/soyulması', 'koroner arter anevrizması riski'],
-        questionPrompt: 'Orta çaplı arterleri tutan bu çocukluk çağı vaskülitinde en korkulan kardiyak komplikasyonu önlemek için verilmesi gereken birinci basamak tedavi hangisidir?',
+        questionPrompt: 'İlk 10 gün içinde yüksek doz İVİG ve Aspirin başlanmadığında koroner arter anevrizmasına yol açan bu çocukluk çağı vasküliti hangisidir?',
         mechanism:
           'Kawasaki hastalığı (mukokütanöz lenf nodu sendromu) orta çaplı arterleri, özellikle koroner arterleri tutan nekrotizan vaskülittir. İlk 10 gün içinde yüksek doz İntravenöz İmmünglobulin (İVİG) + Aspirin verilmesi koroner arter anevrizması riskini %25’ten <%5’e düşürür.',
         whenCorrectNote: '≥5 gün ateş + 4/5 kriter (eksüdasız konjonktivit, oral mukoza/çilek dili, polimorf döküntü, ekstremite ödemi/deskuamasyonu, servikal LAP) + Koroner anevrizma + İVİG + Aspirin.',
@@ -703,9 +703,9 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
       {
         entityName: 'Henoch-Schönlein Purpurası / IgA Vasküliti (Normal Trombositli Palpabl Purpura, Artralji, İnvajinasyon ve Böbrek Tutulumu)',
         patientVignette:
-          '[2023 TUS Konsept İkizi] Üst solunum yolu enfeksiyonundan 10 gün sonra 6 yaşındaki çocukta kalça ve alt ekstremite ekstansör yüzlerinde basmakla solmayan kabarık (palpabl) purpuralar, diz ve ayak bileklerinde artrit, kolik tarzda karın ağrısı ve mikroskopik hematüri saptanıyor. Trombosit sayısı 340.000/mm³ ve koagülasyon testleri normal bulunuyor.',
+          '[2025 TUS Konsept İkizi] Üst solunum yolu enfeksiyonundan 10 gün sonra 6 yaşındaki çocukta kalça ve alt ekstremite ekstansör yüzlerinde basmakla solmayan kabarık (palpabl) purpuralar, diz ve ayak bileklerinde artrit, kolik tarzda karın ağrısı ve mikroskopik hematüri saptanıyor. Trombosit sayısı 340.000/mm³ ve koagülasyon testleri normal bulunuyor.',
         clues: ['alt ekstremite ve kalçada palpabl purpura', 'TROMBOSİT SAYISI NORMAL', 'artralji + kolik karın ağrısı (invajinasyon) + hematüri'],
-        questionPrompt: 'Çocukluk çağının bu en sık vaskülitinde uzun dönem prognozu belirleyen ana organ tutulumu ve GİS’te en sık yol açtığı cerrahi komplikasyon hangisidir?',
+        questionPrompt: 'Uzun dönem prognozunu böbrek tutulumunun belirlediği ve GİS’te ileoileal invajinasyona yol açabilen çocukluk çağının bu en sık vasküliti hangisidir?',
         mechanism:
           'HSP (IgA vasküliti), küçük damarlarda IgA1 ve C3 birikimiyle giden lökositoklastik vaskülittir; trombosit sayısı normal veya artmıştır! En sık GİS cerrahi komplikasyonu ileoileal İnvajinasyon (intusepsiyon), uzun dönem prognozu ve mortaliteyi belirleyen tek faktör ise Böbrek tutulumudur (HSP nefriti).',
         whenCorrectNote: 'Normal trombositli palpabl purpura (%100 zorunlu kriter) + Artrit + GİS (ileoileal invajinasyon) + Uzun dönem prognozu belirleyen: Böbrek tutulumu.',
@@ -733,9 +733,9 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
       {
         entityName: 'Respiratuvar Distres Sendromu / RDS (Prematürite, Sürfaktan Eksikliği, Buzlu Cam + Hava Bronkogramı ve Antenatal Betametazon)',
         patientVignette:
-          '[2022 TUS Konsept İkizi] 29. gebelik haftasında doğan prematüre bebekte doğumdan sonraki ilk saatlerde inleme (grunting), interkostal çekilmeler ve oksijene dirençli siyanoz gelişiyor. Akciğer grafisinde akciğer hacminde azalma, yaygın retikülogranüler (buzlu cam) görünüm ve hava bronkogramları saptanıyor.',
+          '[2020 TUS Konsept İkizi] 29. gebelik haftasında doğan prematüre bebekte doğumdan sonraki ilk saatlerde inleme (grunting), interkostal çekilmeler ve oksijene dirençli siyanoz gelişiyor. Akciğer grafisinde akciğer hacminde azalma, yaygın retikülogranüler (buzlu cam) görünüm ve hava bronkogramları saptanıyor.',
         clues: ['29 haftalık prematüre bebek', 'inleme (grunting) ve interkostal çekilme', 'grafide buzlu cam (retikülogranüler) görünüm ve hava bronkogramı'],
-        questionPrompt: 'Bu hastalıkta amniyon sıvısında akciğer matürasyonunu gösteren altın standart oran ve doğum öncesi annede profilaksi için kullanılan steroid hangisidir?',
+        questionPrompt: 'Amniyon sıvısında Lesitin/Sfingomiyelin oranının <2 olduğu ve antenatal betametazon ile önlenebilen bu yenidoğan solunum sıkıntısı tablosu hangisidir?',
         mechanism:
           'Tip II pnömosit olgunlaşmamasına bağlı sürfaktan eksikliği alveollerin ekspiryumda kollabe olmasına (atelektazi) ve hyalen membran oluşumuna yol açar. Amniyon sıvısında Lesitin/Sfingomiyelin oranının ≥2 olması ve Fosfatidilgliserol varlığı matürasyonu gösterir; <34 hafta preterm doğum tehditlerinde anneye Betametazon (veya Deksametazon) verilir.',
         whenCorrectNote: 'Prematüre + Sürfaktan eksikliği + Buzlu cam & Hava bronkogramı + Lesitin/Sfingomiyelin < 2 + Profilakside Antenatal Betametazon, tedavide Nazal CPAP + Sürfaktan.',
@@ -748,9 +748,9 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
       {
         entityName: 'Büyük Arter Transpozisyonu / BAT (D-TGA — Aort Sağdan, Pulmoner Soldan Çıkar; Yumurta Dizilimi Grafisi ve Prostaglandin E1 + Rashkind Septostomi)',
         patientVignette:
-          '[2023 TUS Konsept İkizi] Diyabetik anneden doğan 39 haftalık yenidoğan bebekte doğumdan sonraki ilk saatlerde ağır santral siyanoz gelişiyor (%100 oksijen verilmesine rağmen PaO2 yükselmiyor). Akciğer grafisinde kalp gölgesinin yan yatmış yumurta (egg-on-a-string) şeklinde olduğu ve üst mediastenin daraldığı görülüyor.',
+          '[2019 TUS Konsept İkizi] Diyabetik anneden doğan 39 haftalık yenidoğan bebekte doğumdan sonraki ilk saatlerde ağır santral siyanoz gelişiyor (%100 oksijen verilmesine rağmen PaO2 yükselmiyor). Akciğer grafisinde kalp gölgesinin yan yatmış yumurta (egg-on-a-string) şeklinde olduğu ve üst mediastenin daraldığı görülüyor.',
         clues: ['doğumdan hemen sonra ilk 24 saatte ağır siyanoz', 'grafide yan yatmış yumurta (egg-on-a-string) görünümü', 'aort sağ ventrikülden, pulmoner arter sol ventrikülden çıkar'],
-        questionPrompt: 'Yenidoğan döneminde (ilk 24 saatte) siyanozla başvuran en sık konjenital kalp hastalığı olan bu tabloda yaşamla bağdaşması için acil verilmesi gereken ilaç hangisidir?',
+        questionPrompt: 'Yaşamla bağdaşması için duktusu açık tutmak adına acil Prostaglandin E1 infüzyonu gerektiren, yenidoğanda ilk gün siyanozun en sık kardiyak nedeni olan anomali hangisidir?',
         mechanism:
           'Büyük Arter Transpozisyonunda (D-TGA) aortikopulmoner septumun spiral dönmemesi (nöral krest kusuru) sonucu sistemik ve pulmoner dolaşım birbirine paralel iki kapalı devre halindedir. Yaşam için PDA veya ASD/VSD şarttır; duktusu açık tutmak için acil Prostaglandin E1 (Alprostadil) infüzyonu ve Balon Atriyal Septostomi (Rashkind) yapılır, kesin tedavisi ilk 2 haftada Arteriyel Switch (Jatene) ameliyatıdır.',
         whenCorrectNote: 'Yenidoğanda (ilk 24 saat) en sık siyanotik KKH + Yumurta kalp (egg-on-a-string) + Acil tedavi: PGE1 + Rashkind balon septostomi + Kesin cerrahi: Jatene (Arteriyel switch).',
@@ -765,16 +765,16 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
   // 10. CERRAHİ (Son Yıllar TUS İkizi: Hepatobiliyer Cerrahi, Özofagus Hastalıkları ve Akut Karın)
   {
     branchId: 'cerrahi',
-    subTopic: 'ÖSYM İkizi • Biliyer Aciller, Özofagus Cerrahisi ve Akut Karın (2022–2025 TUS)',
+    subTopic: 'ÖSYM İkizi • Biliyer Aciller, Özofagus Cerrahisi ve Akut Karın (2019–2025 TUS)',
     difficulty: 'Klinik Vaka',
     examFrequency: 'Her TUS Sorulur',
     entities: [
       {
         entityName: 'Akut Süpüratif Kolanjit (Charcot Triyadı, Reynolds Pentadı ve ERCP ile Acil Biliyer Drenaj)',
         patientVignette:
-          '[2024 TUS Konsept İkizi] Koledokolitiyazis öyküsü olan 64 yaşındaki kadın hasta titremeyle yükselen ateş, sağ üst kadran ağrısı ve sarılık ile acil servise getiriliyor. Takibinde hipotansiyon ve konfüzyon gelişen hastanın USG’sinde koledok çapı 14 mm ve içinde taş saptanıyor.',
+          '[2025 TUS Konsept İkizi] Koledokolitiyazis öyküsü olan 64 yaşındaki kadın hasta titremeyle yükselen ateş, sağ üst kadran ağrısı ve sarılık ile acil servise getiriliyor. Takibinde hipotansiyon ve konfüzyon gelişen hastanın USG’sinde koledok çapı 14 mm ve içinde taş saptanıyor.',
         clues: ['ateş + sarılık + sağ üst kadran ağrısı (Charcot triyadı)', '+ hipotansiyon ve konfüzyon (Reynolds pentadı)', 'koledok obstrüksiyonuna bağlı biliyer sepsis'],
-        questionPrompt: 'Bu hastada sıvı resüsitasyonu ve İV antibiyoterapi sonrasında hayat kurtarıcı İLK tercih biliyer dekompresyon yöntemi hangisidir?',
+        questionPrompt: 'Sıvı resüsitasyonu ve İV antibiyoterapi ile birlikte acil ERCP dekompresyonu gerektiren bu biliyer sepsis tablosu hangisidir?',
         mechanism:
           'Koledok tıkanıklığı (en sık taş) zemininde gelişen bakteriyel enfeksiyonda (en sık E. coli, Klebsiella) safra kanalı içi basınç artışı bakteriyemiye yol açar. Ateş + Sarılık + Sağ üst kadran ağrısına Charcot triyadı; buna Şok + Konfüzyon eklenmesine Reynolds pentadı denir. Tedavide acil ERCP ile sfinkterotomi/stentleme altın standarttır.',
         whenCorrectNote: 'Charcot triyadı (Ateş, Sarılık, Sağ üst kadran ağrısı) + Reynolds pentadı (+ Şok, Konfüzyon) + En sık etken E. coli + Acil drenaj: ERCP.',
@@ -787,9 +787,9 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
       {
         entityName: 'Boerhaave Sendromu (Şiddetli Kusma Sonrası Sol Posterolateral Distal Özofagus Tam Kat Rüptürü ve Suda Çözünür Kontrastlı Özofagografi)',
         patientVignette:
-          '[2023 TUS Konsept İkizi] Ağır alkol ve yemek alımı sonrası öğürerek şiddetli kusan 52 yaşındaki erkek hastada ani başlayan yırtıcı retrosternal/epigastrik ağrı, dispne ve boyunda cilt altı amfizemi (krepitasyon) saptanıyor. Akciğer grafisinde pnömomediastinum ve sol plevral efüzyon izleniyor.',
+          '[2021 TUS Konsept İkizi] Ağır alkol ve yemek alımı sonrası öğürerek şiddetli kusan 52 yaşındaki erkek hastada ani başlayan yırtıcı retrosternal/epigastrik ağrı, dispne ve boyunda cilt altı amfizemi (krepitasyon) saptanıyor. Akciğer grafisinde pnömomediastinum ve sol plevral efüzyon izleniyor.',
         clues: ['şiddetli kusma sonrası ani retrosternal ağrı + cilt altı amfizemi (Mackler triyadı)', 'sol plevral efüzyon (amilaz yüksek, pH < 6)', 'distal özofagus sol posterolateral tam kat perforasyon'],
-        questionPrompt: 'Spontan transmural özofagus perforasyonunun en sık yerleşim yeri ve tanıyı kesinleştirmek için İLK yapılması gereken kontrastlı tetkik hangisidir?',
+        questionPrompt: 'Distal özofagus sol posterolateral duvardan spontan tam kat yırtılmayla seyreden ve Gastrografin ile görüntülenen bu cerrahi acil hangisidir?',
         mechanism:
           'Boerhaave sendromu, şiddetli kusma sırasında krikofarengeus kasının gevşeyememesi sonucu özofagus içi basıncın ani artışıyla en zayıf nokta olan distal özofagusun SOL posterolateral duvarının (GE bileşkenin 2–3 cm üzeri) tam kat yırtılmasıdır. Tanıda mediastinit yapmaması için suda çözünür kontrastla (Gastrografin) özofagografi çekilir.',
         whenCorrectNote: 'Kusma + Retrosternal ağrı + Cilt altı amfizemi (Mackler triyadı) + Distal sol posterolateral tam kat rüptür + Tanı: Suda çözünür kontrastlı (Gastrografin) özofagografi.',
@@ -802,9 +802,9 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
       {
         entityName: 'Akalazya (Auerbach Pleksusunda VIP/NO İnhibitör Nöron Kaybı, Kuş Gagası Görünümü ve Altın Standart Yüksek Çözünürlüklü Manometri)',
         patientVignette:
-          '[2022 TUS Konsept İkizi] 38 yaşında kadın hasta 2 yıldır hem katı hem sıvı gıdalara karşı ilerleyici yutma güçlüğü (paradoksal disfaji), sindirilmemiş gıda regürjitasyonu ve kilo kaybı ile başvuruyor. Baryumlu özofagus grafisinde özofagus gövdesinde genişleme ve distal uçta "kuş gagası (bird-beak)" şeklinde incelme saptanıyor.',
+          '[2020 TUS Konsept İkizi] 38 yaşında kadın hasta 2 yıldır hem katı hem sıvı gıdalara karşı ilerleyici yutma güçlüğü (paradoksal disfaji), sindirilmemiş gıda regürjitasyonu ve kilo kaybı ile başvuruyor. Baryumlu özofagus grafisinde özofagus gövdesinde genişleme ve distal uçta "kuş gagası (bird-beak)" şeklinde incelme saptanıyor.',
         clues: ['hem katı hem sıvı gıdaya karşı disfaji', 'baryumlu grafide kuş gagası (bird-beak) görünümü', 'alt özofagus sfinkterinin gevşeyememesi ve aperistaltizm'],
-        questionPrompt: 'Maligniteyi dışlamak için endoskopi yapıldıktan sonra bu hastalığın KESİN tanısında altın standart olan yöntem hangisidir?',
+        questionPrompt: 'Auerbach pleksusunda NO/VIP inhibitör nöron kaybına bağlı gelişen ve kesin tanısı yüksek çözünürlüklü manometri ile konulan bu motilite bozukluğu hangisidir?',
         mechanism:
           'Akalazyada miyenterik (Auerbach) pleksustaki inhibitör nitrerjik (NO ve VIP salgılayan) gangliyon hücrelerinin kaybı sonucu Alt Özofagus Sfinkteri (AÖS) yutma ile gevşeyemez ve özofagus gövdesinde peristaltizm kaybolur. Tanıda altın standart Özofagus Manometrisidir; en etkili cerrahi tedavi Heller miyotomi (+ Dor/Toupet kısmi fundoplikasyon) veya POEM’dir.',
         whenCorrectNote: 'NO/VIP inhibitör nöron kaybı + Kuş gagası grafisi + Altın standart tanı: Özofagus Manometrisi + Cerrahi: Laparoskopik Heller miyotomi + Kısmi fundoplikasyon.',
@@ -817,9 +817,9 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
       {
         entityName: 'Akut Kolesistit (Murphy Belirtisi, İlk Görüntüleme USG ve Altın Standart HIDA Sintigrafisi)',
         patientVignette:
-          '[2024 TUS Konsept İkizi] 46 yaşında kadın hasta yağlı yemek sonrası başlayan, 8 saattir devam eden sağ üst kadran ağrısı, ateş ve lökositoz ile başvuruyor. Fizik muayenede sağ subkostal derin palpasyon sırasında inspiryumun ağrıyla kesildiği (Murphy belirtisi pozitif) görülüyor.',
+          '[2019 TUS Konsept İkizi] 46 yaşında kadın hasta yağlı yemek sonrası başlayan, 8 saattir devam eden sağ üst kadran ağrısı, ateş ve lökositoz ile başvuruyor. Fizik muayenede sağ subkostal derin palpasyon sırasında inspiryumun ağrıyla kesildiği (Murphy belirtisi pozitif) görülüyor.',
         clues: ['6 saatten uzun süren sağ üst kadran ağrısı + ateş', 'Murphy belirtisi (+)', 'sistik kanalın taşla tıkanması'],
-        questionPrompt: 'Bu hastada İLK tercih görüntüleme yöntemi ile USG’nin şüpheli kaldığı olgularda EN DUYARLI (altın standart) tanı yöntemi eşleşmesi hangisidir?',
+        questionPrompt: 'İlk tercih olarak USG ile değerlendirilen ve HIDA sintigrafisinde safra kesesinin dolmamasıyla kesinleştirilen bu biliyer acil hangisidir?',
         mechanism:
           'Akut taşlı kolesistit %90–95 sistik kanalın (Hartmann poşunun) taşla tıkanması sonucu gelişir. İlk tercih görüntüleme Ultrasonografidir (duvar kalınlığı >4 mm, perikolesistik sıvı, sonografik Murphy); en duyarlı altın standart tetkik ise Kolesintigrafidir (Tc-99m HIDA sintigrafisinde safra kesesinin dolmaması).',
         whenCorrectNote: 'Sistik kanal tıkanıklığı + Murphy (+) + İlk görüntüleme: USG + En duyarlı altın standart: HIDA Kolesintigrafisi + Tedavi: İlk 72 saatte erken laparoskopik kolesistektomi.',
@@ -834,7 +834,7 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           '[2023 TUS Konsept İkizi] 2 yaşında erkek çocuk acil servise karın ağrısı olmaksızın bol miktarda vişne çürüğü renginde rektal kanama ve anemi ile getiriliyor. İleoçekal valvin 50 cm proksimalinde bağırsağın antimezenterik yüzünde tüm katları içeren gerçek bir divertikül saptanıyor.',
         clues: ['2 yaş altı çocukta ağrısız alt GİS kanaması', 'ileoçekal valvin 45–60 cm proksimalinde antimezenterik gerçek divertikül', 'ektopik gastrik mukoza asit salgısına bağlı ileal ülser'],
-        questionPrompt: 'Omfalomezenterik (vitellin) kanalın kapanmaması sonucu oluşan bu anomalinin çocukta kanama odağını göstermede EN DUYARLI tanı yöntemi hangisidir?',
+        questionPrompt: 'Omfalomezenterik (vitellin) kanal artığı olan, çocukta ağrısız alt GİS kanaması yapan ve Tc-99m Perteknetat sintigrafisiyle saptanan bu anomali hangisidir?',
         mechanism:
           'Meckel divertikülü GİS’in en sık konjenital anomalisidir ve tüm bağırsak katlarını içeren GERÇEK bir divertiküldür. Çocuklarda en sık ağrısız alt GİS kanaması (ektopik mide mukozasının salgıladığı asidin komşu ileumu ülserleştirmesiyle), erişkinde ise obstrüksiyon/divertikülit yapar; tanıda ektopik mide mukozasını tutan Tc-99m Perteknetat (Meckel) sintigrafisi kullanılır.',
         whenCorrectNote: 'Vitellin kanal kalıntısı + Gerçek divertikül + En sık ektopik doku: Mide mukozası (2. pankreas) + Çocukta en sık ağrısız alt GİS kanaması + Tanı: Tc-99m Perteknetat sintigrafisi.',
@@ -849,16 +849,16 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
   // 11. KADIN HASTALIKLARI VE DOĞUM (Son Yıllar TUS İkizi: Obstetrik Aciller, Preeklampsi ve Jinekoloji)
   {
     branchId: 'kadindogum',
-    subTopic: 'ÖSYM İkizi • Preeklampsi/MgSO4, Obstetrik Kanamalar ve Ektopik Gebelik (2022–2025 TUS)',
+    subTopic: 'ÖSYM İkizi • Preeklampsi/MgSO4, Obstetrik Kanamalar ve Ektopik Gebelik (2019–2025 TUS)',
     difficulty: 'Klinik Vaka',
     examFrequency: 'Her TUS Sorulur',
     entities: [
       {
         entityName: 'Preeklampsi & Magnezyum Sülfat Toksisitesi (İlk Kaybolan Patella Refleksi ve Spesifik Antidot Kalsiyum Glukonat)',
         patientVignette:
-          '[2024 TUS Konsept İkizi] 34. gebelik haftasında kan basıncı 170/115 mmHg, baş ağrısı, görme bulanıklığı ve proteinürisi olan ağır preeklampsili gebeye eklampsi konvülziyon profilaksisi amacıyla İV Magnezyum sülfat (MgSO4) infüzyonu başlanıyor. Takipte hastanın derin tendon (patella) reflekslerinin kaybolduğu ve solunum sayısının 10/dakikaya düştüğü saptanıyor.',
+          '[2021 TUS Konsept İkizi] 34. gebelik haftasında kan basıncı 170/115 mmHg, baş ağrısı, görme bulanıklığı ve proteinürisi olan ağır preeklampsili gebeye eklampsi konvülziyon profilaksisi amacıyla İV Magnezyum sülfat (MgSO4) infüzyonu başlanıyor. Takipte hastanın derin tendon (patella) reflekslerinin kaybolduğu ve solunum sayısının 10/dakikaya düştüğü saptanıyor.',
         clues: ['ağır preeklampside MgSO4 infüzyonu', 'patella (derin tendon) refleksinin kaybı', 'solunum depresyonu ve antidot ihtiyacı'],
-        questionPrompt: 'Magnezyum sülfat toksisitesinin İLK klinik bulgusu ve bu hastaya acil olarak verilmesi gereken spesifik antidot eşleşmesi hangisidir?',
+        questionPrompt: 'İlk olarak patella refleksi kaybıyla bulgu veren ve acil İV Kalsiyum glukonat uygulanmasını gerektiren bu obstetrik ilaç toksisitesi tablosu hangisidir?',
         mechanism:
           'Ağır preeklampsi ve eklampside nöbet profilaksisinde en etkili ajan Magnezyum sülfattır (böbrekten atılır, oligüride toksisite riski artar). Toksisitede 8–10 mEq/L düzeyinde İLK olarak patella (derin tendon) refleksi kaybolur, >12 mEq/L’de solunum depresyonu gelişir; spesifik antidotu İV %10 Kalsiyum glukonattır.',
         whenCorrectNote: 'Eklampsi profilaksisi: MgSO4 • Toksisitenin İLK bulgusu: Patella (derin tendon) refleksi kaybı • Spesifik Antidot: İV Kalsiyum glukonat.',
@@ -871,9 +871,9 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
       {
         entityName: 'Ablasyo Plasenta / Dekolman (Ağrılı Koyu Kırmızı Kanama, Hipertonik Tahta Uterus ve Obstetride DİK’in En Sık Nedeni)',
         patientVignette:
-          '[2023 TUS Konsept İkizi] Kronik hipertansiyonu olan 36 haftalık gebe ani başlayan şiddetli karın ağrısı ve koyu kırmızı vajinal kanama ile acil servise getiriliyor. Muayenede uterusun gevşemediği (tahta sertliğinde hipertonik uterus), fetal bradikardi olduğu ve fibrinojen düzeyinin hızla düştüğü saptanıyor.',
+          '[2025 TUS Konsept İkizi] Kronik hipertansiyonu olan 36 haftalık gebe ani başlayan şiddetli karın ağrısı ve koyu kırmızı vajinal kanama ile acil servise getiriliyor. Muayenede uterusun gevşemediği (tahta sertliğinde hipertonik uterus), fetal bradikardi olduğu ve fibrinojen düzeyinin hızla düştüğü saptanıyor.',
         clues: ['hipertansiyon (en önemli risk faktörü)', 'ağrılı koyu kırmızı kanama + tahta sertliğinde hipertonik uterus', 'fetal distres ve dissemine intravasküler koagülopati (DİK)'],
-        questionPrompt: 'Normal yerleşimli plasentanın doğumdan önce ayrılmasıyla gelişen bu tablonun EN SIK risk faktörü ve en önemli hematolojik komplikasyonu hangisidir?',
+        questionPrompt: 'Maternal hipertansiyonun en sık risk faktörü olduğu ve obstetride tüketim koagülopatisinin (DİK) en sık nedenini oluşturan bu tablo hangisidir?',
         mechanism:
           'Ablasyo plasenta (plasenta dekolmanı), normal yerleşimli plasentanın 20. haftadan sonra erken ayrılmasıdır. En önemli risk faktörü maternal Hipertansiyondur (en yüksek tekrarlama riski ise önceki gebelikte dekolman öyküsüdür). Maternal dolaşıma doku tromboplastini geçişiyle obstetride tüketim koagülopatisinin (DİK) EN SIK nedenidir.',
         whenCorrectNote: 'En sık risk faktörü: Hipertansiyon + Ağrılı koyu kanama + Hipertonik uterus + Obstetride DİK’in en sık nedeni (Ablasyo plasenta).',
@@ -886,9 +886,9 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
       {
         entityName: 'Plasenta Previa (Ağrısız Parlak Kırmızı 3. Trimester Kanaması, Dijital Tuşe Kontrendikasyonu ve Transvajinal USG)',
         patientVignette:
-          '[2022 TUS Konsept İkizi] Daha önce 2 kez sezaryen doğum öyküsü olan 33 haftalık gebe sabah uyandığında hiçbir ağrısı veya kasılması olmadan başlayan parlak kırmızı vajinal kanama ile başvuruyor. Uterus tonusu normal (yumuşak) ve fetal kalp atımları olağan saptanıyor.',
+          '[2020 TUS Konsept İkizi] Daha önce 2 kez sezaryen doğum öyküsü olan 33 haftalık gebe sabah uyandığında hiçbir ağrısı veya kasılması olmadan başlayan parlak kırmızı vajinal kanama ile başvuruyor. Uterus tonusu normal (yumuşak) ve fetal kalp atımları olağan saptanıyor.',
         clues: ['ağrısız parlak kırmızı 3. trimester kanaması', 'uterus yumuşak ve fetal kalp atımı normal', 'önceki sezaryen öyküsü'],
-        questionPrompt: 'Bu hastada KESİNLİKLE yapılmaması gereken muayene ve tanıda altın standart görüntüleme yöntemi eşleşmesi hangisidir?',
+        questionPrompt: 'Dijital vajinal muayenenin kesinlikle kontrendike olduğu ve transvajinal USG ile tanısı doğrulanan bu 3. trimester kanama nedeni hangisidir?',
         mechanism:
           'Plasenta previa, plasentanın internal servikal osu kapatması veya çok yakın yerleşmesidir. Ağrısız parlak kırmızı kanama yapar; şiddetli kanamayı tetikleyeceği için dijital vajinal tuşe KESİNLİKLE kontrendikedir! Tanıda en doğru ve güvenli altın standart yöntem Transvajinal USG’dir.',
         whenCorrectNote: 'Ağrısız parlak kırmızı kanama + Yumuşak uterus + Dijital vajinal tuşe KESİNLİKLE kontrendike + Altın standart tanı: Transvajinal USG + Eski sezaryen kesi yerinde ise Plasenta akreata riski!',
@@ -901,9 +901,9 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
       {
         entityName: 'Ektopik Gebelik ve Medikal Metotreksat Tedavisi (En Sık Ampulla Yerleşimi ve Metotreksat Kontrendikasyonları)',
         patientVignette:
-          '[2024 TUS Konsept İkizi] Son adet tarihine göre 6 haftalık gebe olan hasta lekelenme tarzında vajinal kanama ile başvuruyor. Serum Beta-hCG düzeyi 2.400 mIU/mL ölçülüyor; transvajinal USG’de uterin kavite boş, sağ tuba uterina ampullasında 2.2 cm’lik fetal kalp atımı OLMAYAN ektopik gebelik kesesi izleniyor, batında serbest sıvı saptanmıyor ve hasta hemodinamik olarak stabil.',
+          '[2019 TUS Konsept İkizi] Son adet tarihine göre 6 haftalık gebe olan hasta lekelenme tarzında vajinal kanama ile başvuruyor. Serum Beta-hCG düzeyi 2.400 mIU/mL ölçülüyor; transvajinal USG’de uterin kavite boş, sağ tuba uterina ampullasında 2.2 cm’lik fetal kalp atımı OLMAYAN ekstrauterin gebelik kesesi izleniyor, batında serbest sıvı saptanmıyor ve hasta hemodinamik olarak stabil.',
         clues: ['en sık yerleşim: tuba uterina ampullası', 'hemodinamik stabil + rüptür yok + FKA yok + Beta-hCG < 5000', 'folik asit antagonisti ile medikal tedavi'],
-        questionPrompt: 'Bu hastada cerrahiye gerek kalmadan uygulanacak ilk tercih medikal ajan ve bu ajanın KESİN kontrendikasyonu hangisidir?',
+        questionPrompt: 'En sık tuba uterinanın ampulla bölgesine yerleşen ve seçilmiş stabil olgularda tek doz metotreksat ile medikal tedavi edilebilen bu tablo hangisidir?',
         mechanism:
           'Ektopik gebelik en sık (%70) tuba uterinanın Ampulla bölgesine yerleşir (en erken rüptüre olan ise İstmus’tur). Hemodinamik olarak stabil, rüptüre olmamış, kitle çapı <3.5–4 cm, fetal kalp atımı negatif ve Beta-hCG <5000 mIU/mL olan hastalarda tek doz İM Metotreksat verilir. Rüptür/hemodinamik instabilite, emzirme ve heterotopik gebelikte metotreksat kesin kontrendikedir.',
         whenCorrectNote: 'En sık yerleşim: Ampulla • Medikal tedavi: Metotreksat (Stabil hasta, rüptür yok, FKA yok, Beta-hCG < 5000) • Rüptür varsa: Acil лаparoskopik salpenjektomi.',
@@ -917,8 +917,8 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
         entityName: 'Polikistik Over Sendromu / PKOS (Rotterdam Kriterleri, LH/FSH Artışı, İnsülin Direnci, Endometrium Ca Riski ve Ovulasyon İndüksiyonunda İlk Tercih Letrozol)',
         patientVignette:
           '[2023 TUS Konsept İkizi] 26 yaşında kadın hasta yılda 3–4 kez adet görme (oligomenore), çene ve göğüste kıllanma artışı (hirsutizm), akantozis nigrikans ve 1.5 yıldır gebe kalamama şikayetiyle başvuruyor. USG’de bilateral overlerde periferik dizilimli çok sayıda antral follikül saptanıyor.',
-        clues: ['oligo/anovulasyon + hiperandrojenizm (hirsutizm) + polikistik over', 'insülin direnci ve karşılanmamış östrojen etkisi', 'anovulatuvar infertilitede ilk tercih ilaç'],
-        questionPrompt: 'Kronik anovulasyona bağlı karşılanmamış östrojen nedeniyle endometrium kanseri riski artan bu hastada çocuk istemi varsa ovulasyon indüksiyonunda İLK tercih ajan hangisidir?',
+        clues: ['oligo/anovulasyon + hiperandrojenizm (hirsutizm) + polikistik over', 'insülin direnci ve karşılanmamış östrojen etkisi', 'anovulatuvar infertilitede ilk tercih Letrozol'],
+        questionPrompt: 'Kronik anovulasyona bağlı endometrium kanseri riski artan ve ovulasyon indüksiyonunda ilk tercih olarak Letrozol kullanılan bu sendrom hangisidir?',
         mechanism:
           'PKOS’ta GnRH pulsatilitesinin artışına bağlı LH/FSH oranı yükselir, teka hücrelerinden androjen sentezi artar ve periferde östrona (E1) dönüşür. Kronik anovulasyon nedeniyle progesteron üretilemediği için "karşılanmamış östrojen" Endometrium hiperplazisi ve Endometrium adenokarsinomu riskini artırır. Gebelik isteyen PKOS hastasında ovulasyon indüksiyonunda birinci basamak ilk tercih ilaç Aromataz inhibitörü Letrozol’dür.',
         whenCorrectNote: 'Rotterdam kriterleri (2/3) + Karşılanmamış östrojene bağlı Endometrium Ca riski + Gebelik isteminde ovulasyon indüksiyonunda İLK tercih: Letrozol (Aromataz inhibitörü).',
@@ -933,16 +933,16 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
   // 12. BİYOKİMYA II (Son Yıllar TUS İkizi: Lizozomal ve Glikojen Depo Hastalıkları)
   {
     branchId: 'biyokimya',
-    subTopic: 'ÖSYM İkizi • Lizozomal Sfingolipidozlar ve Glikojen Depo Hastalıkları (2021–2025 TUS)',
+    subTopic: 'ÖSYM İkizi • Lizozomal Sfingolipidozlar ve Glikojen Depo Hastalıkları (2019–2025 TUS)',
     difficulty: 'Klinik Vaka',
     examFrequency: 'Her TUS Sorulur',
     entities: [
       {
         entityName: 'Gaucher Hastalığı (Beta-Glukoserebrozidaz Eksikliği, Buruşuk Kağıt Hücresi ve Erlenmeyer Şişesi Deformitesi)',
         patientVignette:
-          '[2024 TUS Konsept İkizi] Masif splenomegali, trombositopeni ve femur distalinde "Erlenmeyer şişesi" deformitesi saptanan 28 yaşındaki hastanın kemik iliği aspirasyonunda sitoplazması buruşuk kağıt (crinkled paper) görünümünde lipid yüklü makrofajlar izleniyor.',
-        clues: ['kemik iliğinde buruşuk kağıt (crinkled paper) makrofajlar', 'masif splenomegali + pansitopeni + Erlenmeyer şişesi femur', 'glukoserebrozid birikimi'],
-        questionPrompt: 'En sık görülen bu lizozomal depo hastalığında eksik olan enzim aşağıdakilerden hangisidir?',
+          '[2021 TUS Konsept İkizi] Masif splenomegali, trombositopeni ve femur distalinde "Erlenmeyer şişesi" deformitesi saptanan 28 yaşındaki hastanın kemik iliği aspirasyonunda sitoplazması buruşuk kağıt (crinkled paper) görünümünde lipid yüklü makrofajlar izleniyor.',
+        clues: ['kemik iliğinde buruşuk kağıt (crinkled paper) makrofajlar', 'masif splenomegali + pansitopeni + Erlenmeyer şişesi femur', 'beta-glukoserebrozidaz eksikliği'],
+        questionPrompt: 'Erişkin tipinde nörolojik tutulum beklenmeyen ve en sık görülen bu lizozomal depo hastalığı hangisidir?',
         mechanism:
           'Gaucher hastalığında lizozomal Beta-glukoserebrozidaz (glukozilseramidaz) enzimi eksiktir; makrofajlarda glukoserebrozid birikir (Gaucher hücresi: buruşuk kağıt görünümü). Tip 1 (erişkin tip) nöronopatik değildir, zeka normaldir.',
         whenCorrectNote: 'Beta-glukoserebrozidaz eksikliği + Glukoserebrozid birikimi + Buruşuk kağıt makrofaj + Masif splenomegali & Erlenmeyer şişesi femur.',
@@ -955,9 +955,9 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
       {
         entityName: 'Fabry Hastalığı (Alfa-Galaktosidaz A Eksikliği, X’e Bağlı Resesif Geçiş, Anjiyokeratom ve Akroparestezi)',
         patientVignette:
-          '[2023 TUS Konsept İkizi] 22 yaşında erkek hasta el ve ayaklarda yanıcı nöropatik ağrı (akroparestezi), terleme azlığı (hipohidroz), göbek ve kasık çevresinde kırmızı-mor punktat vasküler döküntüler (anjiyokeratom), korneal vertisillata ve proteinürik böbrek yetmezliği ile başvuruyor.',
-        clues: ['X’e bağlı geçiş + anjiyokeratom + akroparestezi + hipohidroz', 'korneal vertisillata ve erken yaşta böbrek/kalp yetmezliği', 'globotriaosilseramid (Gb3) birikimi'],
-        questionPrompt: 'Diğer sfingolipidozlardan farklı olarak X’e bağlı kalıtılan bu hastalıkta eksik olan lizozomal enzim hangisidir?',
+          '[2025 TUS Konsept İkizi] 22 yaşında erkek hasta el ve ayaklarda yanıcı nöropatik ağrı (akroparestezi), terleme azlığı (hipohidroz), göbek ve kasık çevresinde kırmızı-mor punktat vasküler döküntüler (anjiyokeratom), korneal vertisillata ve proteinürik böbrek yetmezliği ile başvuruyor.',
+        clues: ['X’e bağlı geçiş + anjiyokeratom + akroparestezi + hipohidroz', 'korneal vertisillata ve erken yaşta böbrek/kalp yetmezliği', 'alfa-galaktosidaz A eksikliği'],
+        questionPrompt: 'Diğer sfingolipidozlardan farklı olarak X’e bağlı resesif kalıtılan bu lizozomal depo hastalığı hangisidir?',
         mechanism:
           'Fabry hastalığı, sfingolipidozlar arasında X’e bağlı resesif kalıtılan TEK hastalıktır (diğerleri otozomal resesiftir). Alfa-galaktosidaz A eksikliği sonucu damar endotelinde, böbrek glomerüllerinde ve dorsal kök gangliyonlarında Globotriaosilseramid (Gb3 / seramid triheksozid) birikir.',
         whenCorrectNote: 'X’e bağlı sfingolipidoz + Alfa-galaktosidaz A eksikliği + Anjiyokeratom + Akroparestezi + Böbrek ve kalp yetmezliği.',
@@ -970,9 +970,9 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
       {
         entityName: 'Von Gierke Hastalığı / Tip I GSD (Glukoz-6-Fosfataz Eksikliği, Ağır Açlık Hipoglisemisi, Laktik Asidoz, Hiperürisemi ve Hiperlipidemi)',
         patientVignette:
-          '[2022 TUS Konsept İkizi] 6 aylık bebekte öğün aralarında ağır hipoglisemik nöbetler, taş bebek yüzü (doll-like face), masif hepatomegali ve renomegali saptanıyor. Kan tetkiklerinde ağır laktik asidoz, hiperürisemi ve hipertrigliseridemi görülüyor; glukagon uygulanmasına rağmen kan şekeri yükselmiyor.',
-        clues: ['ağır açlık hipoglisemisi + laktik asidoz + hiperürisemi + hiperlipidemi', 'hepatomegali ve renomegali (splenomegali yok)', 'glukagona yanıt vermeyen hipoglisemi'],
-        questionPrompt: 'Hem glikojenoliz hem glukoneogenezin son ortak basamağını bozan bu Tip I glikojen depo hastalığında eksik olan enzim hangisidir?',
+          '[2020 TUS Konsept İkizi] 6 aylık bebekte öğün aralarında ağır hipoglisemik nöbetler, taş bebek yüzü (doll-like face), masif hepatomegali ve renomegali saptanıyor. Kan tetkiklerinde ağır laktik asidoz, hiperürisemi ve hipertrigliseridemi görülüyor; glukagon uygulanmasına rağmen kan şekeri yükselmiyor.',
+        clues: ['ağır açlık hipoglisemisi + laktik asidoz + hiperürisemi + hiperlipidemi', 'hepatomegali ve renomegali (splenomegali yok)', 'glukoz-6-fosfataz eksikliği'],
+        questionPrompt: 'Hem glikojenoliz hem glukoneogenezin son ortak basamağını bozan ve glukagona yanıt vermeyen bu Tip I glikojen depo hastalığı hangisidir?',
         mechanism:
           'Tip Ia GSD’de (Von Gierke) endoplazmik retikulumdaki Glukoz-6-fosfataz (Tip Ib’de ise Glukoz-6-fosfat translokaz + nötropeni) eksiktir. Glukoz-6-fosfat serbest glukoza dönüşemediği için ağır açlık hipoglisemisi, HMP şantına kayışla hiperürisemi ve glikolize kayışla laktik asidoz + hiperlipidemi gelişir.',
         whenCorrectNote: 'Glukoz-6-fosfataz eksikliği + Ağır açlık hipoglisemisi + Laktik asidoz + Hiperürisemi + Hipertrigliseridemi + Taş bebek yüzü.',
@@ -986,8 +986,8 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
         entityName: 'Pompe Hastalığı / Tip II GSD (Lizozomal Alfa-1,4-Glukozidaz / Asit Maltaz Eksikliği ve Masif Kardiyomegali)',
         patientVignette:
           '[2024 TUS Konsept İkizi] 4 aylık bebekte ağır jeneralize hipotoni (gevşek bebek / floppy infant), makroglossi, beslenme güçlüğü ve solunum sıkıntısı saptanıyor. Akciğer grafisinde ve ekokardiyografide dev kardiyomegali (hipertrofik kardiyomiyopati), EKG’de ise çok kısa PR mesafesi ve dev QRS kompleksleri izleniyor; kan şekeri tamamen normal bulunuyor.',
-        clues: ['gevşek bebek (hipotoni) + DEV KARDİYOMEGALİ + makroglossi', 'kan şekeri normal (normoglisemi)', 'lizozom içinde glikojen birikimi'],
-        questionPrompt: 'Glikojen depo hastalıkları içinde LİZOZOMAL olan tek tip (Tip II) ve eksik olan enzim eşleşmesi hangisidir?',
+        clues: ['gevşek bebek (hipotoni) + DEV KARDİYOMEGALİ + makroglossi', 'kan şekeri normal (normoglisemi)', 'lizozomal alfa-1,4-glukozidaz eksikliği'],
+        questionPrompt: 'Glikojen depo hastalıkları içinde lizozomal olan tek tip (Tip II) olup masif kardiyomegali ile seyreden hastalık hangisidir?',
         mechanism:
           'Pompe hastalığında (Tip II GSD) lizozomal Alfa-1,4-glukozidaz (Asit maltaz) enzimi eksiktir. Sitoplazmik glikojenoliz normal olduğu için HİPOGLİSEMİ GÖRÜLMEZ; ancak lizozomlarda biriken glikojen kalp ve iskelet kasını yıkarak masif kardiyomegali ve hipotoni yapar.',
         whenCorrectNote: 'Tek lizozomal GSD + Alfa-1,4-glukozidaz (Asit maltaz) eksikliği + Masif kardiyomegali + Hipotoni + Kan şekeri NORMAL.',
@@ -1000,9 +1000,9 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
       {
         entityName: 'McArdle Hastalığı / Tip V GSD (Kas Glikojen Fosforilaz / Miyofosforilaz Eksikliği, Egzersiz İntoleransı, Miyoglobinüri ve "İkinci Rüzgar" Fenomeni)',
         patientVignette:
-          '[2023 TUS Konsept İkizi] 21 yaşında erkek hasta ağır egzersiz başladıktan birkaç dakika sonra ortaya çıkan şiddetli kas krampları, miyalji ve koyu kırmızı-kahverengi idrar (miyoglobinüri) ile başvuruyor. Kısa süre dinlendikten sonra egzersize daha rahat devam edebildiği (ikinci rüzgar fenomeni) ve iskemik önkol egzersiz testinde venöz kanda laktat düzeyinin YÜKSELMEDİĞİ saptanıyor.',
+          '[2019 TUS Konsept İkizi] 21 yaşında erkek hasta ağır egzersiz başladıktan birkaç dakika sonra ortaya çıkan şiddetli kas krampları, miyalji ve koyu kırmızı-kahverengi idrar (miyoglobinüri) ile başvuruyor. Kısa süre dinlendikten sonra egzersize daha rahat devam edebildiği (ikinci rüzgar fenomeni) ve iskemik önkol egzersiz testinde venöz kanda laktat düzeyinin YÜKSELMEDİĞİ saptanıyor.',
         clues: ['egzersizle kas krampı + miyoglobinüri (rabdomiyoliz)', 'ikinci rüzgar (second wind) fenomeni', 'egzersiz sonrası venöz laktatın yükselmemesi (düz laktat eğrisi)'],
-        questionPrompt: 'Karaciğerin etkilenmediği ve açlık hipoglisemisinin görülmediği bu kas glikojen depo hastalığında (Tip V) eksik olan enzim hangisidir?',
+        questionPrompt: 'Karaciğerin etkilenmediği ve kas glikojen fosforilaz eksikliğiyle seyreden bu Tip V glikojen depo hastalığı hangisidir?',
         mechanism:
           'McArdle hastalığında (Tip V GSD) çizgili kasa özgü Glikojen fosforilaz (Miyofosforilaz) izoenzimi eksiktir (B6 vitamini / PLP kofaktörlüdür). Egzersizde kas glikojeni yıkılamadığı için venöz laktat yükselmez (amonyak yükselir); dinlenince yağ asitleri ve kan glukozu devreye girerek "ikinci rüzgar (second wind)" rahatlaması sağlar.',
         whenCorrectNote: 'Kas glikojen fosforilaz (Miyofosforilaz) eksikliği + Egzersiz krampı & Miyoglobinüri + Venöz laktat yükselmez + İkinci rüzgar fenomeni.',
@@ -1017,16 +1017,16 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
   // 13. DAHİLİYE II (Son Yıllar TUS İkizi: Endokrinoloji, Nefroloji ve Romatoloji Klasikleri)
   {
     branchId: 'dahiliye',
-    subTopic: 'ÖSYM İkizi • Feokromositoma, Conn, SIADH ve Endokrin/Romatoloji Vakaları (2021–2025 TUS)',
+    subTopic: 'ÖSYM İkizi • Feokromositoma, Conn, SIADH ve Endokrin/Romatoloji Vakaları (2019–2025 TUS)',
     difficulty: 'Klinik Vaka',
     examFrequency: 'Her TUS Sorulur',
     entities: [
       {
         entityName: 'Feokromositoma (Baş Ağrısı + Terleme + Çarpıntı Triyadı, Plazma Serbest Metanefrinler ve Preoperatif İlk İlaç Alfa-Blokör Fenoksibenzamin)',
         patientVignette:
-          '[2024 TUS Konsept İkizi] 36 yaşında kadın hasta ataklarla gelen şiddetli baş ağrısı, aşırı terleme, çarpıntı ve kan basıncının 220/130 mmHg’ye çıkması nedeniyle başvuruyor. Plazma serbest metanefrin ve 24 saatlik idrar fraksiyone metanefrin düzeyleri normalin 4 katı yüksek bulunuyor; sürrenal BT’de sağ adrenal medullada 4 cm’lik kitle saptanıyor.',
-        clues: ['epizodik hipertansiyon + baş ağrısı + terleme + çarpıntı', 'plazma serbest metanefrin yüksekliği', 'cerrahi öncesi hazırlık sırası'],
-        questionPrompt: 'Bu hastada cerrahi rezeksiyon öncesinde hipertansif krizi önlemek için İLK başlanması gereken ilaç ve tek başına verilmesi KESİNLİKLE kontrendike olan ilaç grubu hangisidir?',
+          '[2025 TUS Konsept İkizi] 36 yaşında kadın hasta ataklarla gelen şiddetli baş ağrısı, aşırı terleme, çarpıntı ve kan basıncının 220/130 mmHg’ye çıkması nedeniyle başvuruyor. Plazma serbest metanefrin ve 24 saatlik idrar fraksiyone metanefrin düzeyleri normalin 4 katı yüksek bulunuyor; sürrenal BT’de sağ adrenal medullada 4 cm’lik kitle saptanıyor.',
+        clues: ['epizodik hipertansiyon + baş ağrısı + terleme + çarpıntı', 'plazma serbest metanefrin yüksekliği', 'cerrahi öncesi önce alfa-blokör başlama şartı'],
+        questionPrompt: 'Cerrahi rezeksiyon öncesinde mutlaka alfa-blokör başlanmasını gerektiren, biyopsinin ve tek başına beta-blokörün kontrendike olduğu adrenal tümörü hangisidir?',
         mechanism:
           'Feokromositomada preoperatif hazırlıkta İLK olarak en az 10–14 gün Alfa-blokör (non-selektif irreverzibl Fenoksibenzamin veya selektif Alfa-1 blokör Doksazosin) + tuz/sıvı yüklemesi başlanır. Alfa blokaj sağlanmadan TEK BAŞINA Beta-blokör verilmesi, vazodilatatör Beta-2 reseptörleri kapatıp karşılanmamış Alfa-1 vazokonstriksiyonu ile ölümcül hipertansif krize yol açar!',
         whenCorrectNote: 'En duyarlı tarama: Plazma serbest metanefrinler • Biyopsi KESİNLİKLE kontrendike • Preop İLK ilaç: Alfa-blokör (Fenoksibenzamin/Doksazosin), SONRA Beta-blokör.',
@@ -1039,9 +1039,9 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
       {
         entityName: 'Primer Hiperaldosteronizm / Conn Sendromu (Dirençli Hipertansiyon + Hipokalemi + Metabolik Alkaloz, Ödem Yokluğu ve Plazma Aldosteron/Renin Oranı)',
         patientVignette:
-          '[2023 TUS Konsept İkizi] 44 yaşında hasta 3’lü antihipertansif tedaviye rağmen kan basıncının 165/105 mmHg olması ve kas güçsüzlüğü ile başvuruyor. Fizik muayenede pretibial ödem saptanmıyor; biyokimyada potasyum 2.8 mEq/L, sodyum 145 mEq/L ve metabolik alkaloz görülüyor.',
+          '[2020 TUS Konsept İkizi] 44 yaşında hasta 3’lü antihipertansif tedaviye rağmen kan basıncının 165/105 mmHg olması ve kas güçsüzlüğü ile başvuruyor. Fizik muayenede pretibial ödem saptanmıyor; biyokimyada potasyum 2.8 mEq/L, sodyum 145 mEq/L ve metabolik alkaloz görülüyor.',
         clues: ['hipertansiyon + hipokalemi + metabolik alkaloz', 'fizik muayenede ÖDEM YOKLUĞU (aldosteron kaçış fenomeni)', 'Plazma Aldosteron / Plazma Renin Aktivitesi oranı > 20'],
-        questionPrompt: 'Sekonder hipertansiyonun en sık endokrin nedeni olan bu tabloda İLK yapılacak tarama testi ve ödem görülmeme mekanizması hangisidir?',
+        questionPrompt: 'Plazma aldosteron/renin oranıyla taranan ve kaçış fenomeni nedeniyle ödem görülmemesiyle tanınan sekonder hipertansiyon nedeni hangisidir?',
         mechanism:
           'Primer hiperaldosteronizmde (Conn adenomu veya bilateral adrenal hiperplazi) aşırı aldosteron Na+ tutar, K+ ve H+ atar. Ancak artan hücre dışı hacim ANP salınımını ve basınç natriürezini tetiklediği için ("Aldosteron kaçış fenomeni") hastalarda ÖDEM GÖRÜLMEZ! İlk tarama testi Plazma Aldosteron / Renin Aktivitesi Oranıdır (ARR > 20–30).',
         whenCorrectNote: 'Dirençli HT + Hipokalemi + Alkaloz + Ödem YOK (Aldosteron kaçışı / ANP) + İlk tarama: Aldosteron/Renin oranı + Doğrulama: Tuz yükleme testi.',
@@ -1054,9 +1054,9 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
       {
         entityName: 'Akromegali (Somatotrop Hipofiz Adenomu, En İyi Tarama Testi IGF-1 ve Kesin Tanı OGTT ile GH Baskılanmaması)',
         patientVignette:
-          '[2022 TUS Konsept İkizi] 49 yaşında erkek hasta yüz hatlarında kabalaşma, prognatizm, el-ayak numaralarında büyüme, karpal tünel sendromu, aşırı terleme ve yeni tanı diyabet ile başvuruyor.',
-        clues: ['akral büyüme + prognatizm + karpal tünel sendromu + DM', 'pulsatil salınım nedeniyle bazal GH tek başına tanı koydurmaz', 'taramada IGF-1, doğrulamada 75 g OGTT'],
-        questionPrompt: 'Bu hastada EN İYİ ilk tarama testi, KESİN tanı (doğrulama) testi ve en sık ölüm nedeni eşleşmesi hangisidir?',
+          '[2021 TUS Konsept İkizi] 49 yaşında erkek hasta yüz hatlarında kabalaşma, prognatizm, el-ayak numaralarında büyüme, karpal tünel sendromu, aşırı terleme ve yeni tanı diyabet ile başvuruyor.',
+        clues: ['akral büyüme + prognatizm + karpal tünel sendromu + DM', 'taramada Serum IGF-1 (Somatomedin C)', 'doğrulamada 75 g OGTT ile GH baskılanmaması'],
+        questionPrompt: 'Serum IGF-1 ile taranıp 75 g OGTT ile büyüme hormonu baskılanma testiyle kesin tanısı konulan bu hipofiz hastalığı hangisidir?',
         mechanism:
           'Büyüme hormonu (GH) pulsatil salındığı ve yarı ömrü kısa olduğu için rastgele GH ölçümü tanı koydurmaz. En iyi tarama testi düzeyi gün boyu stabil olan Serum IGF-1 (Somatomedin C) ölçümüdür; kesin tanı (altın standart) ise 75 g Oral Glukoz Tolerans Testi (OGTT) ile GH’nın <1 ng/mL’ye BASKILANAMAMASIDIR. En sık ölüm nedeni kardiyovasküler hastalıklardır.',
         whenCorrectNote: 'En iyi tarama: Serum IGF-1 • Kesin tanı (Altın standart): OGTT ile GH baskılanmaması • İlk tedavi: Transsfenoidal cerrahi • Medikal: Oktreotid/Lanreotid, Pegvisomant.',
@@ -1071,7 +1071,7 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           '[2024 TUS Konsept İkizi] Küçük hücreli akciğer karsinomu tanılı hastada halsizlik ve konfüzyon gelişiyor. Fizik muayenede ödem veya dehidratasyon bulgusu yok (övolemik). Biyokimyada serum Na: 118 mEq/L, serum ozmolalitesi: 245 mOsm/kg, ürik asit: 2.4 mg/dL (düşük), idrar ozmolalitesi: 480 mOsm/kg ve idrar sodyumu: 65 mEq/L saptanıyor; tiroid ve adrenal fonksiyonları normal bulunuyor.',
         clues: ['küçük hücreli akciğer Ca (ektopik ADH)', 'övolemik hiponatremi + hipoürisemi', 'idrar ozmolalitesi > 100 mOsm/kg ve idrar Na > 40 mEq/L'],
-        questionPrompt: 'Bu hastada en olası tanı, ilk basamak yaklaşım ve toplayıcı kanallardaki V2 reseptörlerini bloke eden spesifik ilaç grubu hangisidir?',
+        questionPrompt: 'Övolemik hiponatremi, hipoürisemi ve V2 reseptör antagonisti Tolvaptan ile tedavi edilebilen bu endokrin-renal tablo hangisidir?',
         mechanism:
           'SIADH’ta aşırı ADH (vazopressin) toplayıcı kanallardaki V2 reseptörleri üzerinden Akuaporin-2 kanallarını artırarak saf su tutar; gelişen hafif hipervolemi ANP salgılatıp idrarla Na+ ve ürik asit atılımını artırır (Övolemik hiponatremi + İdrar Na > 40 + Hipoürisemi). İlk basamak tedavi sıvı kısıtlamasıdır; V2 reseptör antagonistleri Tolvaptan / Konivaptan’dır.',
         whenCorrectNote: 'Övolemik hiponatremi + Serum Osm < 275 + İdrar Osm > 100 + İdrar Na > 40 + Hipoürisemi & Düşük BUN + Normal tiroid/adrenal + Tedavi: Sıvı kısıtlaması, Tolvaptan (V2 antagonisti).',
@@ -1084,9 +1084,9 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
       {
         entityName: 'Behçet Hastalığı (Tekrarlayan Oral Aft + Genital Ülser + Üveit, Paterji Testi ve En Ölümcül Komplikasyon Pulmoner Arter Anevrizması)',
         patientVignette:
-          '[2023 TUS Konsept İkizi] Yılda 5–6 kez tekrarlayan ağrılı oral aftlar, skrotal skar bırakan ülserler, hipopyonlu panüveit ve alt ekstremitede tromboflebit öyküsü olan 28 yaşındaki erkek hasta acil servise masif hemoptizi ve dispne ile getiriliyor. Toraks BT anjiyografide iki taraflı pulmoner arter dallarında sakküler anevrizmalar saptanıyor.',
+          '[2019 TUS Konsept İkizi] Yılda 5–6 kez tekrarlayan ağrılı oral aftlar, skrotal skar bırakan ülserler, hipopyonlu panüveit ve alt ekstremitede tromboflebit öyküsü olan 28 yaşındaki erkek hasta acil servise masif hemoptizi ve dispne ile getiriliyor. Toraks BT anjiyografide iki taraflı pulmoner arter dallarında sakküler anevrizmalar saptanıyor.',
         clues: ['oral aft (%100 zorunlu kriter) + skar bırakan genital ülser + üveit', 'her çapta hem arter hem ven tutulumu', 'genç erkekte masif hemoptizi -> Pulmoner arter anevrizması'],
-        questionPrompt: 'Her çapta arter ve veni tutabilen bu vaskülitte EN SIK mortalite (ölüm) nedeni olan vasküler komplikasyon hangisidir?',
+        questionPrompt: 'Her çapta arter ve veni tutabilen, tekrarlayan oral aftların tanı için zorunlu olduğu ve en ölümcül komplikasyonunun pulmoner arter anevrizması olduğu vaskülit hangisidir?',
         mechanism:
           'Behçet hastalığı HLA-B51 ilişkili, her çapta hem arter hem veni tutabilen tek sistemik vaskülittir (venöz tutulum arteriyelden daha sıktır, en sık yüzeyel/derin ven trombozu yapar). Ancak EN ÖLÜMCÜL (mortalitesi en yüksek) komplikasyonu Pulmoner Arter Anevrizması rüptürüne bağlı masif hemoptizidir!',
         whenCorrectNote: 'Zorunlu tanı kriteri: Yılda ≥3 kez tekrarlayan Oral Aft + Genital ülser (skar bırakır) + Paterji (+) + En sık ölüm nedeni: Pulmoner arter anevrizması.',
@@ -1095,6 +1095,258 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
         trueStatement: 'Behçet hastalığı her çapta arter ve veni tutabilir; tanı için tekrarlayan oral aft zorunludur ve en ölümcül komplikasyonu pulmoner arter anevrizmasıdır.',
         falseStatement: 'Behçet hastalığında en sık ölüm nedeni glomerülonefrite bağlı son dönem böbrek yetmezliği olup oral aftlar iyileşirken derin skar bırakır.',
         falseHighlight: 'glomerülonefrite bağlı son dönem böbrek yetmezliği olup oral aftlar iyileşirken derin skar bırakır',
+      },
+    ],
+  },
+  // 14. DAHİLİYE III — NÖROLOJİ (2019–2025 ÖSYM TUS İkizi: İnme, Miyastenia Gravis, Guillain-Barré, MS ve Normal Basınçlı Hidrosefali)
+  {
+    branchId: 'dahiliye',
+    subTopic: 'ÖSYM İkizi • Nöroloji Acilleri, Myastenia, GBS, Demans ve İnme Sendromları (2019–2025 TUS)',
+    difficulty: 'Klinik Vaka',
+    examFrequency: 'Her TUS Sorulur',
+    entities: [
+      {
+        entityName: 'Guillain-Barré Sendromu (AIDP — Albüminositolojik Dissosiasyon, C. jejuni Öyküsü ve IVIG / Plazmaferez)',
+        patientVignette:
+          '[2025 TUS Konsept İkizi] İki hafta önce Campylobacter jejuni gastroenteriti geçiren 34 yaşında hasta ayaklardan başlayıp yukarı doğru ilerleyen (assendan) simetrik kas güçsüzlüğü, arefleksi ve parestezi ile acil servise başvuruyor. BOS incelemesinde hücre sayısı normal (<5/mm³) iken protein 190 mg/dL (çok yüksek) saptanıyor.',
+        clues: ['C. jejuni enfeksiyonu sonrası assendan paralizi', 'derin tendon reflekslerinde kayıp (arefleksi)', 'BOS’ta albüminositolojik dissosiasyon'],
+        questionPrompt: 'Steroidin etkisiz olduğu, tedavisinde IVIG veya plazmaferez uygulanan bu akut inflamatuvar demiyelinizan polinöropati hangisidir?',
+        mechanism:
+          'Guillain-Barré Sendromu (GBS), en sık Campylobacter jejuni enfeksiyonu sonrası moleküler benzerlikle (anti-GM1 / GQ1b antikorları) gelişen akut inflamatuvar demiyelinizan polinöropatidir. BOS’ta hücre artmadan proteinin belirgin artmasına albüminositolojik dissosiasyon denir. Tedavide IVIG veya Plazmaferez eşit etkilidir; kortikosteroidlerin yeri yoktur!',
+        whenCorrectNote: 'Assendan flask paralizi + Arefleksi + BOS albüminositolojik dissosiasyon + C. jejuni tetikleyicisi + Tedavi IVIG / Plazmaferez.',
+        firstVsGold: 'GBS Tedavisi: IVIG veya Plazmaferez (Kortikosteroid ETKİSİZ!) • Miller-Fisher Varyantı (Anti-GQ1b): Oftalmopleji + Ataksi + Arefleksi.',
+        pearl: 'Guillain-Barré sendromunda kortikosteroidler etkisizdir; ilk tercih tedavi IVIG veya plazmaferezdir ve solunum kas tutulumu FVC ile izlenir!',
+        trueStatement: 'Guillain-Barré sendromunda BOS’ta hücre artışı olmadan protein yükselir (albüminositolojik dissosiasyon) ve tedavisinde IVIG veya plazmaferez kullanılır.',
+        falseStatement: 'Guillain-Barré sendromunun birinci basamak tedavisi yüksek doz oral prednizolon olup BOS’ta belirgin lenfositik pleositoz saptanır.',
+        falseHighlight: 'birinci basamak tedavisi yüksek doz oral prednizolon olup BOS’ta belirgin lenfositik pleositoz',
+      },
+      {
+        entityName: 'Myastenia Gravis (Nikotinik AChR Antikorları, Akşama Doğru Artan Yorulma, Timoma ve Piridostigmin)',
+        patientVignette:
+          '[2022 TUS Konsept İkizi] 29 yaşında kadın hasta günün ilerleyen saatlerinde belirginleşen çift görme (diplopi), pitoz ve çiğneme güçlüğü şikayetiyle başvuruyor. Dinlenmekle semptomların azaldığı görülüyor; toraks BT’de ön mediastende kitle (timoma) ve serumda anti-AChR antikoru saptanıyor.',
+        clues: ['akşama doğru ve yorulmakla artan pitoz/diplopi', 'derin tendon refleksleri ve duyu normal', 'ön mediastende timoma + anti-AChR antikoru'],
+        questionPrompt: 'Postsinaptik nöromüsküler kavşak nikotinik asetilkolin reseptörlerine karşı antikor gelişimiyle seyreden bu hastalık hangisidir?',
+        mechanism:
+          'Myastenia Gravis, postsinaptik nikotinik asetilkolin reseptörlerine (veya MuSK’a) karşı Tip II aşırı duyarlılık otoantikorlarıyla gelişir; pür motor tutulum vardır (duyu/DTR normal). Semptomatik tedavide AChE inhibitörü Piridostigmin, krizde IVIG/Plazmaferez, timoma varlığında ise timektomi yapılır. Aminoglikozid ve florokinolonlar miyastenik krizi tetikler!',
+        whenCorrectNote: 'Postsinaptik anti-AChR antikoru + Yorgunlukla artan pitoz/diplopi + Timoma/Timik hiperplazi + İlk semptomatik ilaç Piridostigmin.',
+        firstVsGold: 'Myastenia Gravis (Postsinaptik): Tekrarlayan uyarıda yanıt AZALIR, DTR normal • Lambert-Eaton (Presinaptik VGCC): Tekrarlayan uyarıda güç ARTAR, DTR azalmış, Küçük hücreli akciğer Ca!',
+        pearl: 'Myastenia Gravis tekrarlayan kullanımla KÖTÜLEŞİR ve DTR normaldir; Lambert-Eaton (Küçük hücreli Akc Ca) ise kullandıkça DÜZELİR ve DTR azalmıştır!',
+        trueStatement: 'Myastenia Gravis postsinaptik nikotinik asetilkolin reseptörlerine karşı antikor gelişimiyle oluşur, timoma ile ilişkilidir ve semptomatik tedavisinde piridostigmin kullanılır.',
+        falseStatement: 'Myastenia Gravis presinaptik voltaj bağımlı kalsiyum kanallarının tutulmasıyla gelişir ve ağrı duyusu erken dönemde tamamen kaybolur.',
+        falseHighlight: 'presinaptik voltaj bağımlı kalsiyum kanallarının tutulmasıyla gelişir ve ağrı duyusu erken dönemde',
+      },
+      {
+        entityName: 'Multipl Skleroz / MS (Oligoklonal IgG Bantları, İnternükleer Oftalmopleji, Optik Nörit ve Okrelizumab / Natalizumab)',
+        patientVignette:
+          '[2021 TUS Konsept İkizi] 27 yaşında kadın hasta bir gözünde ağrılı görme kaybı (optik nörit) ve sıcak banyo sonrası semptomlarda geçici kötüleşme (Uhthoff fenomeni) ile başvuruyor. Boyun fleksiyonuyla omurgada elektrik çarpması hissi (Lhermitte belirtisi) ve kraniyal MR’da periventriküler beyaz cevherde "Dawson parmakları" görülüyor.',
+        clues: ['optik nörit + internükleer oftalmopleji (MLF lezyonu)', 'Uhthoff fenomeni ve Lhermitte belirtisi', 'BOS’ta oligoklonal IgG bantları ve periventriküler Dawson parmakları'],
+        questionPrompt: 'Zaman ve mekan içinde yayılım gösteren, genç erişkinlerde santral demiyelinizasyonla seyreden bu otoimmün hastalık hangisidir?',
+        mechanism:
+          'Multipl Skleroz (MS), SSS beyaz cevherinde (oligodendrosit miyelininde) otoimmün T hücre aracılı demiyelinizan plaklarla gider. Bilateral İNTER-NÜKLEER OFTALMOPLEJİ (MLF lezyonu), optik nörit, Uhthoff ve Lhermitte bulguları çok karakteristiktir. Akut atak tedavisinde Yüksek doz İV Metilprednizolon kullanılır; Natalizumab (alfa-4 integrin blokörü) kullanan hastalarda JC virüsüne bağlı PML riski vardır.',
+        whenCorrectNote: 'Periventriküler Dawson parmakları + BOS Oligoklonal IgG + MLF (İNOP) + Akut atakta İV Puls Metilprednizolon.',
+        firstVsGold: 'Akut MS Atağında İlk Tercih: Yüksek Doz İV Metilprednizolon • Atak Sıklığını Azaltanlar: İnterferon-beta, Fingolimod (bradikardi), Dimetil fumarat, Natalizumab, Okrelizumab.',
+        pearl: 'Genç kadında bilateral İnternükleer Oftalmopleji (İNO) görülmesi aksi kanıtlanana kadar Multipl Skleroz lehinedir!',
+        trueStatement: 'Multipl Sklerozda kraniyal MR’da periventriküler Dawson parmakları ve BOS’ta oligoklonal IgG bantları saptanır; akut atakta yüksek doz İV metilprednizolon verilir.',
+        falseStatement: 'Multipl Skleroz periferik sinirlerdeki Schwann hücrelerini hedef alır ve akut atak tedavisinde yüksek doz oral aspirin ilk tercihtir.',
+        falseHighlight: 'periferik sinirlerdeki Schwann hücrelerini hedef alır ve akut atak tedavisinde yüksek doz oral aspirin',
+      },
+      {
+        entityName: 'Normal Basınçlı Hidrosefali (Hakim-Adams Triyadı — Yürüme Apraksisi, Demans, İdrar İnkontinansı)',
+        patientVignette:
+          '[2020 TUS Konsept İkizi] 72 yaşında erkek hasta son 6 aydır giderek artan "ayakları yere yapışıyormuş gibi" küçük adımlı manyetik yürüme bozukluğu, unutkanlık ve idrar kaçırma şikayetiyle getiriliyor. Kraniyal BT’de kortikal atrofiyle orantısız belirgin ventrikülomegali saptanıyor; lomber ponksiyon ile 30–50 mL BOS alındıktan sonra yürümesi belirgin düzeliyor.',
+        clues: ['mıknatıs/manyetik yürüme apraksisi + demans + idrar inkontinansı', 'ventrikülomegali ve normal BOS açılış basıncı', 'LP (tap testi) sonrası hızlı düzelme -> VP şant'],
+        questionPrompt: 'Uygun hastalarda ventriküloperitoneal (VP) şant ile geri döndürülebilen bu demans nedeni tablo hangisidir?',
+        mechanism:
+          'Normal Basınçlı Hidrosefali (NBH), kommunike tip hidrosefali olup "Islak (inkontinans), Şaşkın (demans), Sallantılı (yürüme bozukluğu)" Hakim-Adams triyadı ile tanınır; ilk ortaya çıkan bulgu genellikle yürüme bozukluğudur. BOS açılış basıncı normaldir; yüksek hacimli LP (tap testi) sonrası yürümede belirgin düzelme olursa kalıcı tedavi Ventriküloperitoneal (VP) Şant’tır.',
+        whenCorrectNote: 'Hakim-Adams triyadı (Yürüme apraksisi + Demans + İdrar inkontinansı) + Ventrikülomegali + LP ile düzelme + Tedavi VP şant.',
+        firstVsGold: 'Tanı Doğrulama: Yüksek Hacimli Lomber Ponksiyon (Tap Testi) • Kesin Geri Döndürülebilir Tedavi: Ventriküloperitoneal (VP) Şant.',
+        pearl: 'Geri döndürülebilen demans nedenlerinden Normal Basınçlı Hidrosefalide ilk ve LP sonrası en iyi düzelen bulgu YÜRÜME BOZUKLUĞUDUR!',
+        trueStatement: 'Normal basınçlı hidrosefalide yürüme apraksisi, demans ve üriner inkontinans triyadı görülür; tap testi pozitif olgularda tedavi VP şant uygulamasıdır.',
+        falseStatement: 'Normal basınçlı hidrosefalide BOS açılış basıncı 450 mmH2O’nun üzerindedir ve yalnız kolinesteraz inhibitörleriyle tedavi edilir.',
+        falseHighlight: 'BOS açılış basıncı 450 mmH2O’nun üzerindedir ve yalnız kolinesteraz inhibitörleriyle',
+      },
+      {
+        entityName: 'Lateral Medüller Sendrom / Wallenberg Sendromu (PICA Tıkanıklığı — Çapraz Ağrı-Isı Kaybı, Horner ve Disfaji)',
+        patientVignette:
+          '[2019 TUS Konsept İkizi] Hipertansif 65 yaşında hasta ani başlayan şiddetli vertigo, kusma, ses kısıklığı ve yutma güçlüğü ile acil servise getiriliyor. Nörolojik muayenede sağ tarafta Horner sendromu (pitoz, miyozis) ve yüz ağrı-ısı duyusu kaybı; sol tarafta (karşı vücut yarısında) ağrı-ısı duyusu kaybı saptanırken piramidal güç kaybı (hemiparezi) İZLENMİYOR.',
+        clues: ['aynı tarafta yüz ağrı-ısı kaybı + Horner + ataksi + disfaji', 'karşı vücut yarısında ağrı-ısı duyusu kaybı', 'PICA (Posterior İnferior Serebellar Arter) enfarktı — motor güç kaybı yok'],
+        questionPrompt: 'Nucleus ambiguus, inen sempatik yollar ve spinotalamik traktus tutulumuyla oluşan bu beyin sapı inme sendromu hangisidir?',
+        mechanism:
+          'Lateral Medüller (Wallenberg) Sendromu genellikle Vertebral arter veya PICA tıkanıklığına bağlı gelişir: Medulla lateralindeki Nucleus ambiguus (disfaji, ses kısıklığı), Vestibüler çekirdek (vertigo), İnferior serebellar pedünkül (ipsilateral ataksi), İnen sempatik lifler (ipsilateral Horner), İpsilateral N. trigeminus spinal çekirdeği (aynı taraf yüz ağrı-ısı kaybı) ve Kontralateral gövde-ekstremitede ağrı-ısı kaybı görülür. Mediyaldeki kortikospinal yol korunduğu için HEMİPAREZİ OLMAZ!',
+        whenCorrectNote: 'PICA / Vertebral arter + Çapraz ağrı-ısı kaybı + İpsilateral Horner & Ataksi + Disfaji (Nuc. ambiguus) + Motor defisit (hemiparezi) YOK.',
+        firstVsGold: 'PICA (Lateral Medüller / Wallenberg): Disfaji + Horner + Ataksi + Çapraz ağrı-ısı kaybı (Hemiparezi YOK!) • ASA (Mediyal Medüller): Kontralateral hemiparezi + Dil lezyon tarafına kayar (CN XII).',
+        pearl: 'Wallenberg sendromunun (PICA tıkanıklığı) en ayırt edici TUS anahtarı: Aynı tarafta yüz + karşı tarafta gövde ağrı-ısı kaybı, Horner ve disfaji varken HEMİPAREZİ YOKTUR!',
+        trueStatement: 'Wallenberg sendromu PICA/vertebral arter tıkanıklığı sonucu gelişir; çapraz ağrı-ısı kaybı, ipsilateral Horner sendromu ve disfaji görülür ancak hemiparezi olmaz.',
+        falseStatement: 'Wallenberg sendromunda kortikospinal yolun tutulmasına bağlı ağır karşı taraf hemiplejisi ve 12. kraniyal sinir felci en erken bulgulardır.',
+        falseHighlight: 'kortikospinal yolun tutulmasına bağlı ağır karşı taraf hemiplejisi ve 12. kraniyal sinir felci',
+      },
+    ],
+  },
+  // 15. FARMAKOLOJİ II (2019–2025 ÖSYM TUS İkizi: Klinik Zehirlenmeler, Antidotlar ve Biyolojik İlaçlar)
+  {
+    branchId: 'farmakoloji',
+    subTopic: 'ÖSYM İkizi • Toksikoloji Acilleri, Spesifik Antidotlar ve İlaç Toksisiteleri (2019–2025 TUS)',
+    difficulty: 'Klinik Vaka',
+    examFrequency: 'Her TUS Sorulur',
+    entities: [
+      {
+        entityName: 'N-Asetilsistein (Parasetamol / Asetaminofen Zehirlenmesinde NAPQI Detoksifikasyonu ve Glutatyon Donörü)',
+        patientVignette:
+          '[2024 TUS Konsept İkizi] İntihar amacıyla 20 gram parasetamol (asetaminofen) alan 24 yaşındaki kadın hasta 6 saat sonra acil servise getiriliyor. Serum ilacın toksik düzeyde olduğu (Rumack-Matthew nomogramı üstünde) saptanıyor; CYP2E1 ile oluşan toksik NAPQI metabolitinin karaciğerde glutatyon depolarını tükettiği ve sentrilobüler nekroz riski olduğu biliniyor.',
+        clues: ['yüksek doz parasetamol (asetaminofen) alımı', 'toksik metabolit NAPQI ve glutatyon tükenmesi', 'karaciğer sentrilobüler (Zon 3) nekroz riski'],
+        questionPrompt: 'Sülfhidril grubu sağlayarak karaciğer glutatyon depolarını yenileyen ve ilk 8–10 saatte verildiğinde tam koruma sağlayan spesifik antidot hangisidir?',
+        mechanism:
+          'Parasetamol normalde glukuronidasyon ve sülfatasyonla atılır; yüksek dozda CYP2E1 ile toksik N-asetil-p-benzokinonimin (NAPQI) oluşur ve hepatik glutatyonu tüketir. N-Asetilsistein glutatyon prekürsörü (sistein/SH vericisi) olarak NAPQI’yi zararsız merkaptürik aside çevirir.',
+        whenCorrectNote: 'Parasetamol + NAPQI (Zon 3 sentrilobüler nekroz) -> Spesifik Antidot: N-Asetilsistein (Rumack-Matthew nomogramı).',
+        firstVsGold: 'En Güvenilir Antidot Zamanlaması: İlk 8 saat içinde N-Asetilsistein (Ancak 24 saat sonra gelinse bile karaciğer yetmezliğinde verilmeye devam edilir!).',
+        pearl: 'Parasetamol hepatotoksisitesi karaciğerde EN GEÇ oksijenlenen Zon 3 (sentrilobüler) bölgede nekroz yapar; spesifik antidotu N-Asetilsisteindir!',
+        trueStatement: 'Parasetamol zehirlenmesinde CYP2E1 aracılı oluşan NAPQI metaboliti glutatyonu tüketerek sentrilobüler nekroz yapar; spesifik antidotu N-asetilsisteindir.',
+        falseStatement: 'Parasetamol zehirlenmesinde toksisiteden glukuronidasyon artışı sorumludur ve spesifik antidotu flumazenildir.',
+        falseHighlight: 'glukuronidasyon artışı sorumludur ve spesifik antidotu flumazenildir',
+      },
+      {
+        entityName: 'Atropin + Pralidoksim / PAM (Organofosfat İnsektisit Zehirlenmesi — Yaş Muskarinik + Nikotinik Belirtiler)',
+        patientVignette:
+          '[2021 TUS Konsept İkizi] Tarım ilacı (organofosfat) içtikten sonra acil servise getirilen hastada miyozis (toplu iğne başı pupil), aşırı terleme, bronkore, bronkospazm, bradikardi, ishal (DUMBBELLS muskarinik bulgular) ile birlikte kas fasikülasyonları ve solunum kası güçsüzlüğü saptanıyor.',
+        clues: ['DUMBBELLS muskarinik bulgular (bronkore, miyozis, bradikardi)', 'kas fasikülasyonları (nikotinik bulgu)', 'asetilkolinesteraz enzimini irreversibl fosforilasyon'],
+        questionPrompt: 'Bronkoreyi kurutmak için verilen ve "yaşlanma (aging)" olmadan önce enzimi reaktive etmek amacıyla uygulanan ikili antidot yaklaşımı hangisidir?',
+        mechanism:
+          'Organofosfatlar Asetilkolinesterazı (AChE) irreversibl olarak fosforiller. Atropin yalnız muskarinik reseptörleri (bronkore, bradikardi) bloke eder ancak nikotinik kas felcini DÜZELTEMEZ! Pralidoksim (PAM) ise fosforil grubunu kopararak AChE enzimini reaktive eder ve solunum kası felcini düzeltir (Karbamat zehirlenmesinde ise PAM verilmez!).',
+        whenCorrectNote: 'Muskarinik (DUMBBELLS) + Nikotinik (Fasikülasyon) -> İkili Antidot: Atropin + Pralidoksim (PAM). Karbamat zehirlenmesinde sadece Atropin!',
+        firstVsGold: 'Atropin: Muskarinik blokaj (En önemli hedef: Bronkorenin kurutulması) • Pralidoksim (PAM): AChE reaktivasyonu (Nikotinik kas felcini düzeltir!).',
+        pearl: 'Organofosfat zehirlenmesinde Atropin nikotinik kas felcini DÜZELTMEZ, bu nedenle mutlaka Pralidoksim (PAM) eklenir; Atropin dozunu belirleyen tek kriter pupiller değil BRONKORENİN (akciğer sekresyonlarının) kurumasıdır!',
+        trueStatement: 'Organofosfat zehirlenmesinde muskarinik bulgular için atropin, AChE enzimini reaktive etmek ve kas felcini düzeltmek için pralidoksim birlikte uygulanır.',
+        falseStatement: 'Atropin organofosfatların neden olduğu çizgili kas felcini doğrudan geri çevirdiğinden pralidoksime hiçbir zaman gerek yoktur.',
+        falseHighlight: 'çizgili kas felcini doğrudan geri çevirdiğinden pralidoksime hiçbir zaman gerek yoktur',
+      },
+      {
+        entityName: 'Flumazenil (Benzodiazepin Reseptör Antagonisti — Trisiklik Antidepresan Eşlik Ediyorsa Nöbet Riski)',
+        patientVignette:
+          '[2020 TUS Konsept İkizi] Acil servise yalnızca yüksek doz diazepam (benzodiazepin) alımı sonrası gelişen solunum depresyonu ve sedasyonla getirilen hastada GABA-A reseptöründeki allosterik bağlanma bölgesini kompetitif olarak bloke eden bir antidot uygulanıyor.',
+        clues: ['GABA-A benzodiazepin bölgesi kompetitif antagonisti', 'benzodiazepin doz aşımı', 'karma TSA alımında nöbet tetikleme uyarısı'],
+        questionPrompt: 'Benzodiazepin zehirlenmesinde kullanılan ancak eş zamanlı trisiklik antidepresan (TSA) alımı veya kronik bağımlılıkta nöbete yol açabildiği için dikkatli kullanılan antidot hangisidir?',
+        mechanism:
+          'Flumazenil, GABA-A reseptör kompleksinin benzodiazepin bağlanma bölgesinin spesifik kompetitif antagonistidir. Ancak hasta aynı anda Trisiklik Antidepresan (TSA - EKG’de QRS genişlemesi >100 ms) aldıysa veya kronik benzodiazepin bağımlısıysa Flumazenil refrakter STATUS EPİLEPTİKUS tetikleyebilir!',
+        whenCorrectNote: 'GABA-A benzodiazepin antagonisti: Flumazenil • TSA eşliğinde (QRS > 100 ms) verilmesi KESİNLİKLE kontrendikedir (nöbet riski!).',
+        firstVsGold: 'Saf Benzodiazepin Aşırı Dozu: Destek + Flumazenil • TSA + Benzodiazepin Mikst İntoksikasyon: Sodyum Bikarbonat (Flumazenil KONTRENDİKE!).',
+        pearl: 'Flumazenil kısa yarı ömürlüdür (yeniden sedasyon gelişebilir) ve eşlik eden Trisiklik Antidepresan zehirlenmesi şüphesinde ölümcül nöbet riski nedeniyle KONTRENDİKEDİR!',
+        trueStatement: 'Flumazenil GABA-A reseptöründe benzodiazepinlerin kompetitif antagonistidir; ancak eşlik eden trisiklik antidepresan zehirlenmesinde nöbet riski nedeniyle kontrendikedir.',
+        falseStatement: 'Flumazenil opioid reseptörlerini bloke ederek morfin ve eroin zehirlenmelerinde solunum depresyonunu geri çevirir.',
+        falseHighlight: 'opioid reseptörlerini bloke ederek morfin ve eroin zehirlenmelerinde',
+      },
+      {
+        entityName: 'Sodyum Bikarbonat (Trisiklik Antidepresan Toksisitesinde QRS >100 ms ve Sodyum Kanal Blokajı Tedavisi)',
+        patientVignette:
+          '[2019 TUS Konsept İkizi] Amitriptilin (trisiklik antidepresan) aşırı dozuyla acil servise getirilen hastada antikolinerjik bulgular (midriyazis, sıcak kuru cilt, idrar retansiyonu), hipotansiyon ve EKG’de QRS süresinin 136 milisaniyeye uzadığı ve aVR’de belirgin R dalgası saptanıyor.',
+        clues: ['amitriptilin (TSA) aşırı dozu + antikolinerjik sendrom', 'EKG’de QRS > 100 ms ve aVR’de terminal R dalgası', 'kardiyak hızlı Na+ kanallarının blokajı'],
+        questionPrompt: 'QRS genişlemesini ve ventriküler aritmi riskini düzeltmek için bu hastada İLK tercih olarak uygulanması gereken intravenöz tedavi ajanı hangisidir?',
+        mechanism:
+          'Trisiklik antidepresanlar (TSA) kardiyak hızlı sodyum kanallarını bloke ederek QRS genişlemesi (QRS >100 ms nöbet, >160 ms ventriküler aritmi riski!) ve alfa-1 blokajıyla hipotansiyon yapar. İV Sodyum Bikarbonat (NaHCO3) hem serum pH’sını artırıp (alkalinizasyon) ilacın sodyum kanalından ayrılmasını sağlar hem de yüksek Na+ yüküyle blokajı yarışmalı aşar.',
+        whenCorrectNote: 'TSA toksisitesi: Antikolinerjik tablo + QRS >100 ms + aVR R dalgası -> İLK tedavi İV Sodyum Bikarbonat (NaHCO3).',
+        firstVsGold: 'TSA Kardiyotoksisitesi (QRS > 100 ms): İV Sodyum Bikarbonat • Kinidin / Sınıf IA-IC Antiaritmik (Tip III hariç): Sodyum Bikarbonat.',
+        pearl: 'Trisiklik antidepresan zehirlenmesinde EKG’de QRS ≥100 ms olması en kritik risk göstergesidir ve acil tedavisi İV SODYUM BİKARBONAT’tır (Fizostigmin KONTRENDİKEDİR)!',
+        trueStatement: 'Trisiklik antidepresan toksisitesinde QRS >100 ms uzaması sodyum kanal blokajını gösterir ve ilk tercih tedavisi İV sodyum bikarbonattır.',
+        falseStatement: 'Trisiklik antidepresanlara bağlı QRS genişlemesinde ilk tercih tedavi intravenöz fizostigmin veya amiodarondur.',
+        falseHighlight: 'ilk tercih tedavi intravenöz fizostigmin veya amiodarondur',
+      },
+      {
+        entityName: 'Glukagon (Beta-Blokör Zehirlenmesine Bağlı Refrakter Bradikardi ve Şok Tedavisi)',
+        patientVignette:
+          '[2025 TUS Konsept İkizi] Yüksek doz propranolol alımı sonrası derin bradikardi (nabız 34/dk), hipotansiyon (TA 70/40 mmHg) ve hipoglisemi ile getirilen hastada İV sıvı ve atropine yanıt alınamıyor.',
+        clues: ['yüksek doz propranolol (beta-blokör) intoksikasyonu', 'atropine dirençli bradikardi + hipotansiyon + hipoglisemi', 'beta reseptöründen bağımsız adenilat siklaz aktivasyonu'],
+        questionPrompt: 'Miyokard hücrelerinde beta-adrenerjik reseptörleri baypas ederek Gs proteini üzerinden doğrudan cAMP düzeyini artıran spesifik antidot hangisidir?',
+        mechanism:
+          'Beta-blokör zehirlenmesinde kalp kasındaki beta-1 reseptörleri bloke olduğu için atropin ve standart doz katekolaminler yetersiz kalabilir. Glukagon kalpte kendine ait ayrı Gs-kenetli reseptörüne bağlanarak beta reseptöründen bağımsız olarak adenilat siklazı uyarır, hücre içi cAMP ve Ca+2’yi artırıp kronotropi/inotropiyi düzeltir.',
+        whenCorrectNote: 'Beta-blokör toksisitesi (Refrakter bradikardi + Hipoglisemi) -> Beta reseptöründen bağımsız cAMP artıran Antidot: Glukagon.',
+        firstVsGold: 'Beta-Blokör Antidotu: İV Glukagon • Kalsiyum Kanal Blokörü Antidotu (Hiperglisemi yapmasıyla ayrılır!): İV Kalsiyum + Yüksek Doz İnsülin-Öglisemi.',
+        pearl: 'Beta-blokör zehirlenmesi HİPOGLİSEMİ ve Glukagon ile tedavi edilirken; Kalsiyum kanal blokörü (Verapamil/Diltiazem) zehirlenmesi insülin salınımını bozduğu için HİPERGLİSEMİ ile seyreder ve İV Kalsiyum + Yüksek Doz İnsülinle tedavi edilir!',
+        trueStatement: 'Beta-blokör zehirlenmesine bağlı refrakter bradikardi ve hipotansiyonda beta reseptöründen bağımsız cAMP artışı sağlayan intravenöz glukagon spesifik antidottur.',
+        falseStatement: 'Kalsiyum kanal blokörü zehirlenmesinde karakteristik olarak ağır hipoglisemi gelişir ve tek başına düşük doz atropin tüm vakaları düzeltir.',
+        falseHighlight: 'karakteristik olarak ağır hipoglisemi gelişir ve tek başına düşük doz atropin',
+      },
+    ],
+  },
+  // 16. DAHİLİYE IV — KARDİYOLOJİ & GÖĞÜS (2019–2025 ÖSYM TUS İkizi: Tamponad, Aort Diseksiyonu, Aort Darlığı ve Koah/Astım)
+  {
+    branchId: 'dahiliye',
+    subTopic: 'ÖSYM İkizi • Kardiyak Tamponad, Aort Diseksiyonu, Kapak ve Pulmoner Aciller (2019–2025 TUS)',
+    difficulty: 'Klinik Vaka',
+    examFrequency: 'Her TUS Sorulur',
+    entities: [
+      {
+        entityName: 'Kardiyak Tamponad (Beck Triyadı, Pulsus Paradoksus >10 mmHg ve EKG’de Elektriksel Alternans)',
+        patientVignette:
+          '[2025 TUS Konsept İkizi] Akciğer kanseri olan 61 yaşındaki hasta nefes darlığı ve senkop ile acil servise getiriliyor. TA 78/52 mmHg, boyun venöz dolgunluğu belirgin ve kalp sesleri derinden geliyor (Beck triyadı). İnspiryumda sistolik kan basıncının 18 mmHg düştüğü (pulsus paradoksus), EKG’de ise QRS amplitüdlerinin atımdan atıma değiştiği (elektriksel alternans) görülüyor.',
+        clues: ['Beck triyadı (hipotansiyon + JVD + derinden gelen kalp sesleri)', 'pulsus paradoksus (>10 mmHg düşüş)', 'EKG’de elektriksel alternans ve Y inişinin kaybolması'],
+        questionPrompt: 'Solunum seslerinin bilateral eşit olduğu, acil perikardiyosentez gerektiren bu obstrüktif şok tablosu hangisidir?',
+        mechanism:
+          'Kardiyak tamponadda perikard içi basınç arttığı için tüm kalp boşluklarının diyastolik basıncı eşitlenir, ventriküler doluş (özellikle Y inişi kaybolur) engellenir. İnspiryumda artan sağ kalp doluşu interventriküler septumu sola iterek sol kalp atım hacmini düşürür (>10 mmHg Pulsus paradoksus). Kesin tedavisi acil Perikardiyosentezdir.',
+        whenCorrectNote: 'Beck triyadı + Pulsus paradoksus (>10 mmHg) + Elektriksel alternans + Juguler venöz dalgada Y inişinin silinmesi -> Acil Perikardiyosentez.',
+        firstVsGold: 'Kardiyak Tamponad: Y inişi KAYBOLUR, Kussmaul belirtisi genellikle YOK • Konstriktif Perikardit: Y inişi DERİN, Perikardiyal vuru (knock), Kussmaul belirtisi (+)!',
+        pearl: 'Kardiyak Tamponadda juguler venöz trasede X inişi belirgin, Y inişi SİLİNMİŞTİR; Konstriktif Perikarditte ise diyastolde hızlı erken doluş nedeniyle derin X ve çok derin Y inişi + Kussmaul belirtisi vardır!',
+        trueStatement: 'Kardiyak tamponadda Beck triyadı, pulsus paradoksus (>10 mmHg) ve elektriksel alternans görülür; tedavisi acil perikardiyosentezdir.',
+        falseStatement: 'Kardiyak tamponadda juguler venöz trasede çok derin Y inişi görülür ve ilk tercih tedavi yüksek doz loop diüretiklerle hacmi azaltmaktır.',
+        falseHighlight: 'çok derin Y inişi görülür ve ilk tercih tedavi yüksek doz loop diüretiklerle',
+      },
+      {
+        entityName: 'Akut Aort Diseksiyonu (Stanford Tip A Cerrahi Acil — Sırt/Kürek Kemiğine Vuran Yırtıcı Ağrı ve İlk İlaç İV Beta-Blokör)',
+        patientVignette:
+          '[2023 TUS Konsept İkizi] Uzun süredir kontrolsüz hipertansiyonu olan 63 yaşında erkek hasta ani başlayan, maksimum şiddette, göğüsten kürek kemikleri arasına doğru yayılan "yırtılır tarzda" ağrı ile getiriliyor. İki kol arasında 32 mmHg kan basıncı farkı ve PA akciğer grafisinde mediasten genişlemesi saptanıyor.',
+        clues: ['maksimum şiddette sırt/skapula arasına yayılan yırtıcı ağrı', 'iki kol arasında nabız/tansiyon farkı (>20 mmHg)', 'mediasten genişlemesi + Stanford Tip A (çıkan aort)'],
+        questionPrompt: 'İlk tıbbi tedavi olarak İV Beta-blokör başlanmasını ve çıkan aort tutulumunda (Tip A) acil cerrahi gerektiren damar acili hangisidir?',
+        mechanism:
+          'Akut aort diseksiyonunda en önemli risk faktörü HT’dir (gençlerde Marfan/biküspit aort). Medikal tedavide ÖNCE İV BETA-BLOKÖR (Esmolol veya Labetalol) başlanarak kalp hızı (<60/dk) ve dP/dt düşürülür; gerekirse ardından Sodyum Nitroprussid eklenir (Beta blokör verilmeden tek başına vazodilatör vermek refleks taşikardiyle diseksiyonu ilerletir!). Çıkan aortu tutan Tip A acil CERRAHİ gerektirir.',
+        whenCorrectNote: 'Yırtıcı sırt ağrısı + Kol basınç farkı + İlk ilaç: İV Beta-blokör (Esmolol/Labetalol) -> Tip A (Çıkan aort) acil CERRAHİ, Tip B medikal.',
+        firstVsGold: 'İlk Medikal İlaç: İV Esmolol / Labetalol (ÖNCE kalp hızını düşür!) • Tanı: Stabilde BT Anjiyo, İnstabilde Yatakbaşı TEE • Tip A = Acil Cerrahi.',
+        pearl: 'Aort diseksiyonunda asla tek başına Sodyum Nitroprussid ile başlanmaz; ÖNCE İV Beta-blokör (Esmolol/Labetalol) ile refleks taşikardi engellenmelidir!',
+        trueStatement: 'Akut aort diseksiyonunda ilk medikal tedavi İV beta-blokördür (Esmolol/Labetalol) ve çıkan aortu tutan Stanford Tip A diseksiyon acil cerrahi gerektirir.',
+        falseStatement: 'Stanford Tip A aort diseksiyonunda acil cerrahi yapılmaz ve ilk ilaç olarak kalp hızını artırarak perfüzyonu koruyan tek başına hidralazin verilir.',
+        falseHighlight: 'acil cerrahi yapılmaz ve ilk ilaç olarak kalp hızını artırarak',
+      },
+      {
+        entityName: 'Aort Darlığı (Pulsus Parvus et Tardus, Sistolik Kreşendo-Dekreşendo Üfürüm, Heyde Sendromu)',
+        patientVignette:
+          '[2022 TUS Konsept İkizi] 76 yaşında erkek hasta eforla gelen göğüs ağrısı (angina), egzersiz sırasında bayılma (senkop) ve nefes darlığı ile başvuruyor. Fizik muayenede sağ 2. interkostal aralıkta karotislere yayılan sert sistolik ejeksiyon üfürümü, S2’de paradoksal çiftleşme ve karotis nabzının zayıf/geç tepe yaptığı (pulsus parvus et tardus) saptanıyor.',
+        clues: ['angina + senkop + kalp yetmezliği (semptom gelişince kötü prognoz)', 'sağ 2. İKA’da boyna yayılan sistolik kreşendo-dekreşendo üfürüm', 'pulsus parvus et tardus + S2 paradoks çiftleşme'],
+        questionPrompt: 'Semptomatik olduğunda cerrahi/TAVR gerektiren ve kolonik anjiyodisplazi kanaması (Heyde sendromu) yapabilen bu kapak hastalığı hangisidir?',
+        mechanism:
+          'İleri yaşta en sık nedeni kalsifik dejenerasyon, <65 yaşta biküspit aort kapağıdır. Sağ 2. İKA’dan boyna yayılan sistolik kreşendo-dekreşendo üfürüm, pulsus parvus et tardus ve S2 paradoksal çiftleşme görülür. Yüksek shear stresi nedeniyle vWF multimerleri parçalanır -> GİS anjiyodisplazi kanaması (Heyde sendromu)! Semptomatik ağır AD’de balon değil Kapak Replasmanı (SAVR/TAVR) gerekir.',
+        whenCorrectNote: 'Angina-Senkop-Dispne + Sağ 2. İKA boyna yayılan sistolik üfürüm + Pulsus parvus et tardus + Heyde sendromu -> Kesin tedavi Kapak Replasmanı.',
+        firstVsGold: 'Etyoloji (<65 yaş): Biküspit Aort Kapağı • (>70 yaş): Senil Kalsifik • Semptom Başladığında Ortalama Sağkalım (Tedavisiz): Kalp yetmezliği ~2 yıl, Senkop ~3 yıl, Angina ~5 yıl.',
+        pearl: 'Ağır Aort Darlığında yüksek akım hızı vWF multimerlerini yıktığı için GİS anjiyodisplazi kanaması görülmesine HEYDE SENDROMU denir; vazodilatörlerden (nitrogliserin!) kaçınılmalıdır!',
+        trueStatement: 'Ağır aort darlığında boyna yayılan sistolik kreşendo-dekreşendo üfürüm ve pulsus parvus et tardus görülür; anjiyodisplazi kanaması eşlik ettiğinde Heyde sendromu adını alır.',
+        falseStatement: 'Aort darlığında karotis nabzı sıçrayıcı (pulsus celer et altus) olup kesin tedavisinde ömür boyu yalnız yüksek doz ACE inhibitörü yeterlidir.',
+        falseHighlight: 'karotis nabzı sıçrayıcı (pulsus celer et altus) olup kesin tedavisinde ömür boyu yalnız',
+      },
+      {
+        entityName: 'Light Kriterleri — Eksüda / Transüda Plevral Efüzyon Ayrımı (Plevra/Serum Protein >0.5, LDH >0.6)',
+        patientVignette:
+          '[2021 TUS Konsept İkizi] Sağ plevral efüzyon nedeniyle torasentez yapılan hastanın plevral sıvı proteini 4.2 g/dL (serum protein 6.8 g/dL), plevral sıvı LDH 340 U/L (serum LDH 400 U/L, laboratuvar LDH üst sınırı 220 U/L) ölçülüyor.',
+        clues: ['plevra / serum protein oranı > 0.5', 'plevra / serum LDH oranı > 0.6', 'plevra LDH > serum normal üst sınırının 2/3’ü'],
+        questionPrompt: 'En sık parapnömonik efüzyon, malignite ve tüberküloz gibi nedenlerle oluşan eksüdatif efüzyonu tanımlayan tanı kriteri bütünü hangisidir?',
+        mechanism:
+          'Light kriterlerine göre şu 3 maddeden HERHANGİ BİRİNİN varlığı plevral sıvının EKSÜDA olduğunu gösterir: 1) Plevra/Serum Protein > 0.5, 2) Plevra/Serum LDH > 0.6, 3) Plevra LDH > Serum LDH normal üst sınırının 2/3’ü. Üçü de yoksa TRANSÜDA’dır (Kalp yetmezliği, siroz, nefrotik sendrom).',
+        whenCorrectNote: 'Protein oranı > 0.5, LDH oranı > 0.6 veya Plevra LDH > 2/3 ULN maddelerinden biri varsa EKSÜDA; hiçbiri yoksa TRANSÜDA.',
+        firstVsGold: 'Transüda En Sık Nedeni: Kalp Yetmezliği (diüretik sonrası yalancı eksüda çıkarsa Serum-Plevra Albümin gradienti >1.2 g/dL transüdayı doğrular!).',
+        pearl: 'Diüretik kullanan kalp yetmezliği hastasında Light kriterleri yalancı eksüda verebilir; bu durumda Serum Albümin - Plevra Albümin > 1.2 g/dL olması sıvının gerçekte TRANSÜDA olduğunu gösterir!',
+        trueStatement: 'Light kriterlerinden (plevra/serum protein >0.5, plevra/serum LDH >0.6 veya plevra LDH >2/3 normal üst sınır) herhangi birinin sağlanması sıvının eksüda olduğunu gösterir.',
+        falseStatement: 'Light kriterlerine göre plevral sıvı eksüda tanısı konulabilmesi için her üç parametrenin de normalin altında ölçülmesi zorunludur.',
+        falseHighlight: 'her üç parametrenin de normalin altında ölçülmesi zorunludur',
+      },
+      {
+        entityName: 'Hipertansif Akut Pulmoner Ödem & KOAH Alevlenmesinde Solunum Yetmezliği (Hedef SpO2 %88–92 ve NIMV)',
+        patientVignette:
+          '[2020 TUS Konsept İkizi] Ağır KOAH (amfizem/kronik bronşit) öyküsü olan 69 yaşında hasta artan nefes darlığı ve pürülan balgamla acil servise getiriliyor. Bilinci açık ancak solunum sıkıntısı belirgin; arteriyel kan gazında pH: 7.28, PaCO2: 64 mmHg, PaO2: 52 mmHg saptanıyor.',
+        clues: ['KOAH akut alevlenme + hiperkapnik respiratuvar asidoz (pH < 7.35)', 'bilinci açık ve kooperatif', 'kontrollü O2 (hedef SpO2 %88–92) + NIMV (BiPAP)'],
+        questionPrompt: 'Entübasyon gereksinimini azaltmak için Non-İnvaziv Mekanik Ventilasyon (NIMV) ve %88–92 SpO2 hedefi gerektiren klinik tablo hangisidir?',
+        mechanism:
+          'KOAH akut alevlenmesinde pH < 7.35 ve PaCO2 > 45 mmHg (respiratuvar asidoz) geliştiğinde, hastanın bilinci açık/havayolu korunuyorsa altın standart ilk solunum desteği Non-İnvaziv Mekanik Ventilasyondur (NIMV / BiPAP). Kontrolsüz %100 yüksek akımlı oksijen verilmesi Haldane etkisi ve V/Q bozulmasıyla hiperkapniyi derinleştirir; hedef SpO2 %88–92 tutulmalıdır!',
+        whenCorrectNote: 'KOAH alevlenmede pH < 7.35 + PaCO2 > 45 (bilinç açık) -> Altın standart NIMV (BiPAP) + Hedef SpO2 %88–92.',
+        firstVsGold: 'Akut Hiperkapnik KOAH Alevlenmede Hedef SpO2: %88–92 • NIMV (BiPAP) Kesin Kontrendikasyonları: Kardiyopulmoner arrest, bilinç kaybı/koma, havayolunu koruyamama, ağır hemoraji/kusma.',
+        pearl: 'KOAH alevlenmede kontrolsüz yüksek akımlı oksijen (SpO2 > %92) vermek CO2 retansiyonunu ve asidozu kötüleştirir; hedef SpO2 %88–92 ve ilk basamak destek NIMV’dir!',
+        trueStatement: 'Akut hiperkapnik KOAH alevlenmesinde (pH <7.35, bilinç açık) Non-İnvaziv Mekanik Ventilasyon (NIMV) mortaliteyi azaltır ve hedef SpO2 %88–92 olmalıdır.',
+        falseStatement: 'KOAH alevlenmesinde bilinci açık ve pH 7.28 olan tüm hastalarda NIMV denenmeden doğrudan %100 oksijenle SpO2 %100 hedeflenmelidir.',
+        falseHighlight: 'NIMV denenmeden doğrudan %100 oksijenle SpO2 %100 hedeflenmelidir',
       },
     ],
   },

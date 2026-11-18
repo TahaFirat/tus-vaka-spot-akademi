@@ -71,6 +71,7 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
 
   const [sessionFilter, setSessionFilter] = useState<'ALL' | TusSessionType>('ALL');
   const [branchFilter, setBranchFilter] = useState<'ALL' | TusBranchId>(initialBranch);
+  const [yearFilter, setYearFilter] = useState<'ALL' | '2025' | '2024' | '2023' | '2022' | '2021' | '2020' | '2019'>('ALL');
   const [basketFilter, setBasketFilter] = useState<
     'all' | 'osym_twin' | 'unsolved' | 'wrong' | 'correct' | 'bookmarked'
   >(isDedicatedTwinTab ? 'all' : initialBasket);
@@ -143,6 +144,13 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
     const matched = sourcePool.filter((q) => {
       if (sessionFilter !== 'ALL' && q.session !== sessionFilter) return false;
       if (branchFilter !== 'ALL' && q.branchId !== branchFilter) return false;
+      if (
+        isDedicatedTwinTab &&
+        yearFilter !== 'ALL' &&
+        !(q.osymYearTag || '').includes(yearFilter)
+      ) {
+        return false;
+      }
 
       if (q.id !== pinnedQuestionId) {
         const record = vakaAnswers[q.id];
@@ -187,8 +195,10 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
     });
   }, [
     sourcePool,
+    isDedicatedTwinTab,
     sessionFilter,
     branchFilter,
+    yearFilter,
     basketFilter,
     searchQuery,
     vakaAnswers,
@@ -208,7 +218,7 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
     setPinnedQuestionId(null);
     setShowClues(false);
     setShowDiffDetails(false);
-  }, [sessionFilter, branchFilter, basketFilter, searchQuery, isPro, smartFocusMode, isDedicatedTwinTab]);
+  }, [sessionFilter, branchFilter, yearFilter, basketFilter, searchQuery, isPro, smartFocusMode, isDedicatedTwinTab]);
 
   const safeIndex =
     filteredQuestions.length > 0
@@ -320,7 +330,7 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
     let segments: Segment[] = [{ text, type: 'none' }];
 
     if (cleanSearch.length >= 2) {
-      const qLower = cleanSearch.toLowerCase();
+      const qLower = cleanSearch.toLocaleLowerCase('tr-TR');
       const nextSegments: Segment[] = [];
       segments.forEach((seg) => {
         if (seg.type !== 'none') {
@@ -329,7 +339,7 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
         }
         let remaining = seg.text;
         while (remaining.length > 0) {
-          const idx = remaining.toLowerCase().indexOf(qLower);
+          const idx = remaining.toLocaleLowerCase('tr-TR').indexOf(qLower);
           if (idx === -1) {
             nextSegments.push({ text: remaining, type: 'none' });
             break;
@@ -348,14 +358,14 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
     }
 
     activeClues.forEach((clue) => {
-      const cLower = clue.toLowerCase();
+      const cLower = clue.toLocaleLowerCase('tr-TR');
       const nextSegments: Segment[] = [];
       segments.forEach((seg) => {
         if (seg.type !== 'none') {
           nextSegments.push(seg);
           return;
         }
-        const idx = seg.text.toLowerCase().indexOf(cLower);
+        const idx = seg.text.toLocaleLowerCase('tr-TR').indexOf(cLower);
         if (idx === -1) {
           nextSegments.push(seg);
         } else {
@@ -420,10 +430,10 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
 
   return (
     <div className="space-y-2">
-      {/* Dedicated ÖSYM Çıkmış İkizleri Header Banner when in Çıkmış İkiz Tab */}
+      {/* Dedicated ÖSYM Çıkmış İkizleri Header Banner + Year Filter when in Çıkmış İkiz Tab */}
       {isDedicatedTwinTab && (
         <div
-          className={`rounded-2xl border px-3.5 py-2.5 flex items-center justify-between gap-2 ${
+          className={`rounded-2xl border px-3.5 py-2.5 space-y-2 ${
             isLight
               ? 'bg-gradient-to-r from-amber-50 via-emerald-50 to-teal-50 border-amber-300/90 text-slate-900'
               : 'bg-gradient-to-r from-amber-950/60 via-[#0C1B24] to-emerald-950/50 border-amber-500/35 text-slate-100'
@@ -437,7 +447,7 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
               <div className="text-xs font-extrabold truncate flex items-center gap-1.5">
                 <span>ÖSYM Çıkmış TUS Konsept İkizleri</span>
                 <span className="px-1.5 py-0.5 rounded text-[10px] font-extrabold bg-amber-500/20 text-amber-500">
-                  2021–2025
+                  2019–2025
                 </span>
               </div>
               <p
@@ -445,9 +455,34 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
                   isLight ? 'text-slate-600' : 'text-slate-300'
                 }`}
               >
-                Tüm 11 TUS branşında yalnızca çıkmış soruların özgün klinik ikizleri ({sourcePool.length} soru)
+                Tüm 11 TUS branşında 2019–2025 çıkmış soru konseptlerinin özgün ikizleri ({sourcePool.length} soru)
               </p>
             </div>
+          </div>
+
+          <div className="flex items-center gap-1 overflow-x-auto no-scrollbar pb-0.5">
+            {(['ALL', '2025', '2024', '2023', '2022', '2021', '2020', '2019'] as const).map((yr) => {
+              const active = yearFilter === yr;
+              return (
+                <button
+                  key={yr}
+                  type="button"
+                  onClick={() => {
+                    triggerHaptic('light');
+                    setYearFilter(yr);
+                  }}
+                  className={`px-2.5 py-1 rounded-xl text-[11px] font-extrabold whitespace-nowrap border transition shrink-0 ${
+                    active
+                      ? 'bg-amber-500 border-amber-400 text-slate-950 shadow-xs'
+                      : isLight
+                      ? 'bg-white/80 border-amber-200 text-slate-700 hover:bg-amber-100/70'
+                      : 'bg-[#071117]/80 border-white/10 text-slate-300 hover:border-amber-400/40'
+                  }`}
+                >
+                  {yr === 'ALL' ? 'Tüm Yıllar' : `${yr} TUS`}
+                </button>
+              );
+            })}
           </div>
         </div>
       )}
@@ -701,7 +736,13 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
                 {currentQuestion.session}
               </span>
               <span className="text-xs font-bold truncate">
-                {currentQuestion.branchName}
+                <span className="sm:hidden">
+                  {TUS_BRANCHES.find((b) => b.id === currentQuestion.branchId)
+                    ?.shortName || currentQuestion.branchName}
+                </span>
+                <span className="hidden sm:inline">
+                  {currentQuestion.branchName}
+                </span>
               </span>
 
               {isOsymTwinQuestion(currentQuestion) && (
@@ -713,7 +754,11 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
                   }`}
                 >
                   <Award className="w-2.5 h-2.5" />
-                  <span>ÖSYM İkizi</span>
+                  <span>
+                    {currentQuestion.osymYearTag
+                      ? currentQuestion.osymYearTag.replace(' Konsept İkizi', ' İkizi')
+                      : 'ÖSYM İkizi'}
+                  </span>
                 </span>
               )}
             </div>
@@ -973,6 +1018,20 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
               type="button"
               onClick={() => {
                 triggerHaptic('light');
+                const wasPinnedAndWillLeave =
+                  pinnedQuestionId === currentQuestion.id &&
+                  (basketFilter === 'unsolved' ||
+                    (basketFilter === 'wrong' && currentAnswer?.isCorrect) ||
+                    (basketFilter === 'bookmarked' && !isBookmarked));
+
+                if (wasPinnedAndWillLeave) {
+                  setPinnedQuestionId(null);
+                  setCurrentIndex(safeIndex);
+                  setShowClues(false);
+                  setShowDiffDetails(false);
+                  return;
+                }
+
                 if (
                   !isPro &&
                   safeIndex >= filteredQuestions.length - 1 &&

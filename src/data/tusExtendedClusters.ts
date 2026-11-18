@@ -157,7 +157,7 @@ export const EXTENDED_TUS_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           'Tatarcık (Phlebotomus) sineği ısırığı öyküsü olan 5 yaşında çocukta aylardır süren ateş, kilo kaybı, masif hepatosplenomegali, pansitopeni ve poliklonal hipergammaglobulinemi saptanıyor. Kemik iliği yaymasında makrofajlar içinde kamçısız "amastigot (Leishman-Donovan cisimcikleri)" görülüyor.',
         clues: ['Phlebotomus', 'masif hepatosplenomegali, pansitopeni', 'poliklonal hipergammaglobulinemi', 'amastigot'],
-        questionPrompt: 'NNN besiyerinde kamçılı promastigot formunda üreyen bu visseral leishmaniasis tablosunda ilk tercih tedavi hangisidir?',
+        questionPrompt: 'NNN besiyerinde kamçılı promastigot formunda üreyen ve Lipozomal Amfoterisin B ile tedavi edilen bu visseral leishmaniasis etkeni hangisidir?',
         mechanism:
           'Visseral Leishmaniasis (Kala-Azar), Phlebotomus vektörüyle promastigot olarak bulaşır, insanda makrofaj içinde kamçısız AMASTİGOT formunda çoğalır. Masif splenomegali + pansitopeni + hipergammaglobulinemi yapar. Tedavide günümüzde en etkili ve ilk tercih ilaç Lipozomal Amfoterisin B’dir.',
         whenCorrectNote: 'Tatarcık (Phlebotomus), makrofaj içinde amastigot, kültürde (NNN) promastigot, masif splenomegali + pansitopeni, Lipozomal Amfoterisin B.',
@@ -310,7 +310,7 @@ export const EXTENDED_TUS_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           'Meme kanseri ve lenfoma kemoterapisi alan iki hastadan birincisinde serbest radikal artışına bağlı doz bağımlı dilate kardiyomiyopati, ikincisinde ise akrolein metabolitine bağlı steril hemorajik sistit gelişiyor.',
         clues: ['dilate kardiyomiyopati', 'akrolein metabolitine bağlı', 'hemorajik sistit'],
-        questionPrompt: 'Doksorubisin kardiyotoksisitesini ve Siklofosfamid/İfosfamid hemorajik sistitini önleyen koruyucu ajanlar sırasıyla hangisidir?',
+        questionPrompt: 'Serbest radikallere bağlı dilate kardiyomiyopatisi Deksrazoksan ile, hemorajik sistiti ise Mesna ile önlenen antineoplastik ikilisi hangisidir?',
         mechanism:
           '1. Doksorubisin (Antrasiklin): Topoizomeraz II’yi inhibe eder ve demir aracılı serbest oksijen radikalleri oluşturarak irreversibl Dilate Kardiyomiyopati yapar; koruyucu antidotu demir şelatörü DEKSRAZOKSAN’dır.\n2. Siklofosfamid / İfosfamid: Alkilleyici ajanlardır; toksik metabolitleri olan AKROLEİN mesanede Hemorajik Sistit yapar; koruyucu antidotu sülfhidril grubu içeren MESNA’dır.',
         whenCorrectNote: 'Doksorubisin -> Kardiyotoksisite (Antidot: Deksrazoksan); Siklofosfamid -> Akrolein / Hemorajik sistit (Antidot: Mesna).',

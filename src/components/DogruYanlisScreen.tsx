@@ -267,7 +267,7 @@ export const DogruYanlisScreen: React.FC<DogruYanlisScreenProps> = ({
     let segments: Segment[] = [{ text, type: 'none' }];
 
     if (cleanSearch.length >= 2) {
-      const qLower = cleanSearch.toLowerCase();
+      const qLower = cleanSearch.toLocaleLowerCase('tr-TR');
       const nextSegments: Segment[] = [];
       segments.forEach((seg) => {
         if (seg.type !== 'none') {
@@ -276,7 +276,7 @@ export const DogruYanlisScreen: React.FC<DogruYanlisScreenProps> = ({
         }
         let remaining = seg.text;
         while (remaining.length > 0) {
-          const idx = remaining.toLowerCase().indexOf(qLower);
+          const idx = remaining.toLocaleLowerCase('tr-TR').indexOf(qLower);
           if (idx === -1) {
             nextSegments.push({ text: remaining, type: 'none' });
             break;
@@ -295,14 +295,14 @@ export const DogruYanlisScreen: React.FC<DogruYanlisScreenProps> = ({
     }
 
     if (activeCritical) {
-      const cLower = activeCritical.toLowerCase();
+      const cLower = activeCritical.toLocaleLowerCase('tr-TR');
       const nextSegments: Segment[] = [];
       segments.forEach((seg) => {
         if (seg.type !== 'none') {
           nextSegments.push(seg);
           return;
         }
-        const idx = seg.text.toLowerCase().indexOf(cLower);
+        const idx = seg.text.toLocaleLowerCase('tr-TR').indexOf(cLower);
         if (idx === -1) {
           nextSegments.push(seg);
         } else {
