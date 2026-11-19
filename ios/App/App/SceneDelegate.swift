@@ -6,6 +6,12 @@ import StoreKit
 import UserNotifications
 
 // MARK: - Native StoreKit 2 + StoreKit 1 Fallback Lifetime Pro Manager (com.tus.akademi.lifetime.pro)
+private struct SK1ProductFetchResult {
+    let product: SKProduct?
+    let invalidIdentifier: Bool
+    let error: Error?
+}
+
 @available(iOS 15.0, *)
 final class TUSStoreKitManager: NSObject, SKProductsRequestDelegate, SKPaymentTransactionObserver {
     static let shared = TUSStoreKitManager()
@@ -18,7 +24,7 @@ final class TUSStoreKitManager: NSObject, SKProductsRequestDelegate, SKPaymentTr
 
     // StoreKit 1 continuation bridges
     private var sk1ProductRequest: SKProductsRequest?
-    private var sk1ProductsContinuation: CheckedContinuation<(SKProduct?, Bool, Error?), Never>?
+    private var sk1ProductsContinuation: CheckedContinuation<SK1ProductFetchResult, Never>?
     private weak var sk1PurchaseBridge: TUSBridgeViewController?
     private var sk1RestoreContinuation: CheckedContinuation<Bool, Never>?
     private var sk1PurchaseInFlight = false
@@ -88,13 +94,13 @@ final class TUSStoreKitManager: NSObject, SKProductsRequestDelegate, SKPaymentTr
         return (nil, lastError)
     }
 
-    private func fetchSK1Product() async -> (product: SKProduct?, invalidIdentifier: Bool, error: Error?) {
+    private func fetchSK1Product() async -> SK1ProductFetchResult {
         if let cached = cachedSK1Product {
-            return (cached, false, nil)
+            return SK1ProductFetchResult(product: cached, invalidIdentifier: false, error: nil)
         }
         return await withCheckedContinuation { continuation in
             DispatchQueue.main.async {
-                self.sk1ProductsContinuation?.resume(returning: (nil, false, nil))
+                self.sk1ProductsContinuation?.resume(returning: SK1ProductFetchResult(product: nil, invalidIdentifier: false, error: nil))
                 self.sk1ProductsContinuation = continuation
                 self.sk1ProductRequest?.cancel()
                 let request = SKProductsRequest(productIdentifiers: [Self.lifetimeProductId])
@@ -338,7 +344,7 @@ final class TUSStoreKitManager: NSObject, SKProductsRequestDelegate, SKPaymentTr
             let cont = self.sk1ProductsContinuation
             self.sk1ProductsContinuation = nil
             self.sk1ProductRequest = nil
-            cont?.resume(returning: (product, isInvalid, nil))
+            cont?.resume(returning: SK1ProductFetchResult(product: product, invalidIdentifier: isInvalid, error: nil))
         }
     }
 
@@ -348,7 +354,7 @@ final class TUSStoreKitManager: NSObject, SKProductsRequestDelegate, SKPaymentTr
             let cont = self.sk1ProductsContinuation
             self.sk1ProductsContinuation = nil
             self.sk1ProductRequest = nil
-            cont?.resume(returning: (nil, false, error))
+            cont?.resume(returning: SK1ProductFetchResult(product: nil, invalidIdentifier: false, error: error))
         }
     }
 
