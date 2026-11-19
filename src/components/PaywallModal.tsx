@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   CheckCircle2,
   Crown,
@@ -18,6 +18,7 @@ import {
   PRO_PRICE_LABEL,
   PRO_PRODUCT_ID,
   purchaseLifetimePro,
+  refreshNativeProPrice,
   restoreLifetimePro,
   triggerHaptic,
 } from '../services/nativeBridge';
@@ -43,6 +44,14 @@ export const PaywallModal: React.FC<PaywallModalProps> = ({
 }) => {
   const [loading, setLoading] = useState<'purchase' | 'restore' | null>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [statusTone, setStatusTone] = useState<'success' | 'error'>('success');
+
+  useEffect(() => {
+    if (isOpen) {
+      setStatusMessage(null);
+      refreshNativeProPrice();
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -54,12 +63,14 @@ export const PaywallModal: React.FC<PaywallModalProps> = ({
     const res = await purchaseLifetimePro();
     setLoading(null);
     if (res.success) {
+      setStatusTone('success');
       setStatusMessage(res.message);
       onUnlocked();
       setTimeout(() => {
         onClose();
       }, 450);
     } else if (!res.cancelled) {
+      setStatusTone('error');
       setStatusMessage(res.message);
     }
   };
@@ -71,6 +82,7 @@ export const PaywallModal: React.FC<PaywallModalProps> = ({
     setStatusMessage(null);
     const res = await restoreLifetimePro();
     setLoading(null);
+    setStatusTone(res.success ? 'success' : 'error');
     setStatusMessage(res.message);
     if (res.success) {
       onUnlocked();
@@ -228,9 +240,13 @@ export const PaywallModal: React.FC<PaywallModalProps> = ({
         {statusMessage && (
           <div
             className={`mb-2.5 rounded-xl border px-3 py-1.5 text-xs text-center font-medium ${
-              isLight
-                ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
-                : 'bg-emerald-500/15 border-emerald-400/30 text-emerald-200'
+              statusTone === 'error'
+                ? isLight
+                  ? 'bg-rose-50 border-rose-200 text-rose-800'
+                  : 'bg-rose-500/15 border-rose-400/35 text-rose-200'
+                : isLight
+                  ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+                  : 'bg-emerald-500/15 border-emerald-400/30 text-emerald-200'
             }`}
           >
             {statusMessage}
@@ -284,7 +300,7 @@ export const PaywallModal: React.FC<PaywallModalProps> = ({
           >
             <span className="inline-flex items-center gap-1">
               <ShieldCheck className="w-3 h-3 text-emerald-500" />
-              StoreKit 2
+              Apple StoreKit
             </span>
             <span>•</span>
             <a

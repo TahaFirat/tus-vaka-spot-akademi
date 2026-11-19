@@ -5,26 +5,40 @@ import CoreSpotlight
 import StoreKit
 import UserNotifications
 
-// MARK: - Native StoreKit 2 Lifetime Pro Manager (com.tus.akademi.lifetime.pro)
+// MARK: - Native StoreKit 2 + StoreKit 1 Fallback Lifetime Pro Manager (com.tus.akademi.lifetime.pro)
 @available(iOS 15.0, *)
-final class TUSStoreKitManager {
+final class TUSStoreKitManager: NSObject, SKProductsRequestDelegate, SKPaymentTransactionObserver {
     static let shared = TUSStoreKitManager()
     static let lifetimeProductId = "com.tus.akademi.lifetime.pro"
     private let storageKey = "tus_akademi_pro_unlocked_v1"
     private var updatesTask: Task<Void, Never>?
+    private var cachedProduct: Product?
+    private var cachedSK1Product: SKProduct?
     private var cachedDisplayPrice: String = "200,00 ₺"
+
+    // StoreKit 1 continuation bridges
+    private var sk1ProductRequest: SKProductsRequest?
+    private var sk1ProductsContinuation: CheckedContinuation<(SKProduct?, Bool, Error?), Never>?
+    private weak var sk1PurchaseBridge: TUSBridgeViewController?
+    private var sk1RestoreContinuation: CheckedContinuation<Bool, Never>?
+    private var sk1PurchaseInFlight = false
+
+    private override init() {
+        super.init()
+        SKPaymentQueue.default().add(self)
+    }
 
     var isProUnlocked: Bool {
         get { UserDefaults.standard.bool(forKey: storageKey) }
         set { UserDefaults.standard.set(newValue, forKey: storageKey) }
     }
 
-    private var isSandboxEnvironment: Bool {
-        #if DEBUG
-        return true
-        #else
-        return Bundle.main.appStoreReceiptURL?.lastPathComponent == "sandboxReceipt"
-        #endif
+    private func formatSK1Price(_ product: SKProduct) -> String {
+        let formatter = NumberFormatter()
+        formatter.formatterBehavior = .behavior10_4
+        formatter.numberStyle = .currency
+        formatter.locale = product.priceLocale
+        return formatter.string(from: product.price) ?? cachedDisplayPrice
     }
 
     func startObservingTransactions(bridge: TUSBridgeViewController?) {
@@ -36,29 +50,79 @@ final class TUSStoreKitManager {
                     if transaction.productID == Self.lifetimeProductId {
                         self.isProUnlocked = (transaction.revocationDate == nil)
                         await transaction.finish()
-                        bridge?.notifyProStatus(
-                            isPro: self.isProUnlocked,
-                            cancelled: false,
-                            message: "TUS Vaka & Spot Akademi Ömür Boyu Tam Erişim (Pro) aktif edildi!"
-                        )
+                        if self.isProUnlocked {
+                            TUSNativeHapticsEngine.shared.trigger(style: "success")
+                            bridge?.notifyProStatus(
+                                isPro: true,
+                                cancelled: false,
+                                message: "TUS Vaka & Spot Akademi Ömür Boyu Tam Erişim (Pro) aktif edildi!"
+                            )
+                        }
                     }
                 }
             }
         }
     }
 
-    func fetchLiveProductPrice(bridge: TUSBridgeViewController?) async {
-        do {
-            let products = try await Product.products(for: [Self.lifetimeProductId])
-            if let product = products.first {
-                self.cachedDisplayPrice = product.displayPrice
-                bridge?.dispatchWebEvent(name: "tus:proPrice", payload: [
-                    "productId": Self.lifetimeProductId,
-                    "displayPrice": product.displayPrice
-                ])
+    private func fetchSK2ProductWithRetry(maxAttempts: Int = 3) async -> (Product?, Error?) {
+        if let cached = cachedProduct {
+            return (cached, nil)
+        }
+        var lastError: Error?
+        for attempt in 0..<maxAttempts {
+            do {
+                let products = try await Product.products(for: [Self.lifetimeProductId])
+                if let product = products.first {
+                    self.cachedProduct = product
+                    self.cachedDisplayPrice = product.displayPrice
+                    return (product, nil)
+                }
+            } catch {
+                lastError = error
             }
-        } catch {
-            // Keep default localized fallback price when offline
+            if attempt + 1 < maxAttempts {
+                let delayNs: UInt64 = attempt == 0 ? 450_000_000 : 1_000_000_000
+                try? await Task.sleep(nanoseconds: delayNs)
+            }
+        }
+        return (nil, lastError)
+    }
+
+    private func fetchSK1Product() async -> (product: SKProduct?, invalidIdentifier: Bool, error: Error?) {
+        if let cached = cachedSK1Product {
+            return (cached, false, nil)
+        }
+        return await withCheckedContinuation { continuation in
+            DispatchQueue.main.async {
+                self.sk1ProductsContinuation?.resume(returning: (nil, false, nil))
+                self.sk1ProductsContinuation = continuation
+                self.sk1ProductRequest?.cancel()
+                let request = SKProductsRequest(productIdentifiers: [Self.lifetimeProductId])
+                request.delegate = self
+                self.sk1ProductRequest = request
+                request.start()
+            }
+        }
+    }
+
+    func fetchLiveProductPrice(bridge: TUSBridgeViewController?) async {
+        let (sk2Product, _) = await fetchSK2ProductWithRetry(maxAttempts: 2)
+        if let product = sk2Product {
+            self.cachedDisplayPrice = product.displayPrice
+            bridge?.dispatchWebEvent(name: "tus:proPrice", payload: [
+                "productId": Self.lifetimeProductId,
+                "displayPrice": product.displayPrice
+            ])
+            return
+        }
+        let sk1Result = await fetchSK1Product()
+        if let sk1 = sk1Result.product {
+            let formatted = formatSK1Price(sk1)
+            self.cachedDisplayPrice = formatted
+            bridge?.dispatchWebEvent(name: "tus:proPrice", payload: [
+                "productId": Self.lifetimeProductId,
+                "displayPrice": formatted
+            ])
         }
     }
 
@@ -84,12 +148,32 @@ final class TUSStoreKitManager {
         }
     }
 
+    @MainActor
+    private func performSK2Purchase(product: Product) async throws -> Product.PurchaseResult {
+        return try await product.purchase()
+    }
+
     func purchaseLifetimePro(bridge: TUSBridgeViewController?) {
         Task {
-            do {
-                let products = try await Product.products(for: [Self.lifetimeProductId])
-                if let product = products.first {
-                    let result = try await product.purchase()
+            guard AppStore.canMakePayments && SKPaymentQueue.canMakePayments() else {
+                bridge?.notifyProStatus(
+                    isPro: self.isProUnlocked,
+                    cancelled: false,
+                    message: "Bu cihazda Uygulama İçi Satın Alma kısıtlanmış. Lütfen Ayarlar > Ekran Süresi bölümünden satın alımlara izin verin."
+                )
+                return
+            }
+
+            // 1. Primary path: StoreKit 2
+            let (sk2Product, sk2Error) = await fetchSK2ProductWithRetry(maxAttempts: 3)
+            if let product = sk2Product {
+                self.cachedDisplayPrice = product.displayPrice
+                bridge?.dispatchWebEvent(name: "tus:proPrice", payload: [
+                    "productId": Self.lifetimeProductId,
+                    "displayPrice": product.displayPrice
+                ])
+                do {
+                    let result = try await performSK2Purchase(product: product)
                     switch result {
                     case .success(let verification):
                         switch verification {
@@ -102,16 +186,14 @@ final class TUSStoreKitManager {
                                 cancelled: false,
                                 message: "Tebrikler! TUS Vaka & Spot Akademi Ömür Boyu Tam Erişim (Pro) başarıyla açıldı."
                             )
+                            return
                         case .unverified:
-                            if self.isSandboxEnvironment {
-                                self.presentSandboxFallbackSheet(bridge: bridge)
-                            } else {
-                                bridge?.notifyProStatus(
-                                    isPro: self.isProUnlocked,
-                                    cancelled: false,
-                                    message: "Apple StoreKit ödeme doğrulaması tamamlanamadı. Lütfen tekrar deneyin."
-                                )
-                            }
+                            bridge?.notifyProStatus(
+                                isPro: self.isProUnlocked,
+                                cancelled: false,
+                                message: "Apple StoreKit ödeme doğrulaması tamamlanamadı. Lütfen Satın Alımları Geri Yükle seçeneğini deneyin."
+                            )
+                            return
                         }
                     case .userCancelled:
                         bridge?.notifyProStatus(
@@ -119,80 +201,77 @@ final class TUSStoreKitManager {
                             cancelled: true,
                             message: "Satın alma işlemi iptal edildi."
                         )
+                        return
                     case .pending:
                         bridge?.notifyProStatus(
                             isPro: self.isProUnlocked,
                             cancelled: false,
-                            message: "Satın alma onayı bekleniyor."
+                            message: "Satın alma onayı bekleniyor. Onaylandığında erişiminiz otomatik açılacaktır."
                         )
+                        return
                     @unknown default:
                         break
                     }
-                } else {
-                    if self.isSandboxEnvironment {
-                        // TestFlight / App Review Sandbox ortamında ürün henüz CDN yayılımındaysa yerel onay penceresi
-                        self.presentSandboxFallbackSheet(bridge: bridge)
-                    } else {
-                        bridge?.notifyProStatus(
-                            isPro: self.isProUnlocked,
-                            cancelled: false,
-                            message: "Apple App Store ödeme servisine şu an ulaşılamıyor. Lütfen internet bağlantınızı kontrol edip tekrar deneyin."
-                        )
-                    }
-                }
-            } catch {
-                if self.isSandboxEnvironment {
-                    self.presentSandboxFallbackSheet(bridge: bridge)
-                } else {
+                } catch StoreKitError.userCancelled {
                     bridge?.notifyProStatus(
                         isPro: self.isProUnlocked,
-                        cancelled: false,
-                        message: "Apple StoreKit işlemi sırasında bir hata oluştu. Lütfen tekrar deneyin."
+                        cancelled: true,
+                        message: "Satın alma işlemi iptal edildi."
                     )
+                    return
+                } catch {
+                    // Fall through to StoreKit 1 fallback only if purchase invocation failed before sheet
                 }
+            }
+
+            // 2. Fallback path: StoreKit 1 (SKProductsRequest + SKPaymentQueue)
+            let sk1Result = await fetchSK1Product()
+            if let sk1Product = sk1Result.product {
+                let formatted = formatSK1Price(sk1Product)
+                self.cachedDisplayPrice = formatted
+                bridge?.dispatchWebEvent(name: "tus:proPrice", payload: [
+                    "productId": Self.lifetimeProductId,
+                    "displayPrice": formatted
+                ])
+                DispatchQueue.main.async {
+                    self.sk1PurchaseBridge = bridge
+                    self.sk1PurchaseInFlight = true
+                    let payment = SKPayment(product: sk1Product)
+                    SKPaymentQueue.default().add(payment)
+                }
+                return
+            }
+
+            // 3. Accurate, honest diagnostics when both StoreKit 2 and StoreKit 1 cannot load the product
+            if sk1Result.invalidIdentifier {
+                bridge?.notifyProStatus(
+                    isPro: self.isProUnlocked,
+                    cancelled: false,
+                    message: "Ömür Boyu Pro ürünü şu anda App Store onay veya mağaza yayılımı aşamasındadır. Kısa süre sonra tekrar deneyin."
+                )
+            } else if isNetworkError(sk1Result.error ?? sk2Error) {
+                bridge?.notifyProStatus(
+                    isPro: self.isProUnlocked,
+                    cancelled: false,
+                    message: "Apple App Store ödeme sunucusuna şu anda ulaşılamıyor. Lütfen internet bağlantınızı kontrol edip tekrar deneyin."
+                )
+            } else {
+                bridge?.notifyProStatus(
+                    isPro: self.isProUnlocked,
+                    cancelled: false,
+                    message: "App Store ödeme bilgisi alınamadı. Lütfen Apple Hesabınızı ve bağlantınızı kontrol edip tekrar deneyin."
+                )
             }
         }
     }
 
-    private func presentSandboxFallbackSheet(bridge: TUSBridgeViewController?) {
-        DispatchQueue.main.async {
-            guard let vc = bridge else { return }
-            let priceText = self.cachedDisplayPrice
-            let alert = UIAlertController(
-                title: "TUS Vaka & Spot Akademi — Tam Erişim (\(priceText))",
-                message: "Ömür Boyu Tam Erişim (Pro)\nTek Seferlik Ödeme: \(priceText)\n\nTüm 3.200+ açıklamalı 5 şıklı vaka sorusunu, doğru/yanlış spot kartlarını ve ÖSYM net hesaplamalı TTBT/KTBT denemelerini ömür boyu açmak istiyor musunuz?",
-                preferredStyle: .actionSheet
-            )
-
-            let confirmAction = UIAlertAction(title: "Onayla ve Tam Erişimi Aç (\(priceText))", style: .default) { _ in
-                self.isProUnlocked = true
-                TUSNativeHapticsEngine.shared.trigger(style: "success")
-                bridge?.notifyProStatus(
-                    isPro: true,
-                    cancelled: false,
-                    message: "Tebrikler! TUS Vaka & Spot Akademi Ömür Boyu Tam Erişim (Pro) başarıyla açıldı."
-                )
-            }
-
-            let cancelAction = UIAlertAction(title: "Vazgeç", style: .cancel) { _ in
-                bridge?.notifyProStatus(
-                    isPro: self.isProUnlocked,
-                    cancelled: true,
-                    message: "İşlem iptal edildi."
-                )
-            }
-
-            alert.addAction(confirmAction)
-            alert.addAction(cancelAction)
-
-            if let popover = alert.popoverPresentationController {
-                popover.sourceView = vc.view
-                popover.sourceRect = CGRect(x: vc.view.bounds.midX, y: vc.view.bounds.midY, width: 0, height: 0)
-                popover.permittedArrowDirections = []
-            }
-
-            vc.present(alert, animated: true, completion: nil)
+    private func isNetworkError(_ error: Error?) -> Bool {
+        guard let nsErr = error as NSError? else { return false }
+        if nsErr.domain == NSURLErrorDomain { return true }
+        if nsErr.domain == SKErrorDomain, nsErr.code == SKError.cloudServiceNetworkConnectionFailed.rawValue {
+            return true
         }
+        return false
     }
 
     func restorePurchases(bridge: TUSBridgeViewController?) {
@@ -208,8 +287,16 @@ final class TUSStoreKitManager {
                     }
                 }
             } catch {
-                // Ignore sync error in sandbox
+                // Continue to StoreKit 1 restore check even if AppStore.sync fails or cancels
             }
+
+            if !restored {
+                let sk1Restored = await restoreViaSK1()
+                if sk1Restored {
+                    restored = true
+                }
+            }
+
             self.isProUnlocked = restored
             if restored {
                 TUSNativeHapticsEngine.shared.trigger(style: "success")
@@ -226,6 +313,110 @@ final class TUSStoreKitManager {
                     message: "Bu Apple hesabına ait aktif bir satın alım kaydı bulunamadı."
                 )
             }
+        }
+    }
+
+    private func restoreViaSK1() async -> Bool {
+        return await withCheckedContinuation { continuation in
+            DispatchQueue.main.async {
+                self.sk1RestoreContinuation?.resume(returning: false)
+                self.sk1RestoreContinuation = continuation
+                SKPaymentQueue.default().restoreCompletedTransactions()
+            }
+        }
+    }
+
+    // MARK: - SKProductsRequestDelegate
+    func productsRequest(_ request: SKProductsRequest, didReceive response: SKProductsResponse) {
+        let product = response.products.first(where: { $0.productIdentifier == Self.lifetimeProductId })
+        if let product = product {
+            self.cachedSK1Product = product
+        }
+        let isInvalid = response.invalidProductIdentifiers.contains(Self.lifetimeProductId)
+        DispatchQueue.main.async {
+            guard request === self.sk1ProductRequest else { return }
+            let cont = self.sk1ProductsContinuation
+            self.sk1ProductsContinuation = nil
+            self.sk1ProductRequest = nil
+            cont?.resume(returning: (product, isInvalid, nil))
+        }
+    }
+
+    func request(_ request: SKRequest, didFailWithError error: Error) {
+        DispatchQueue.main.async {
+            guard request === self.sk1ProductRequest else { return }
+            let cont = self.sk1ProductsContinuation
+            self.sk1ProductsContinuation = nil
+            self.sk1ProductRequest = nil
+            cont?.resume(returning: (nil, false, error))
+        }
+    }
+
+    // MARK: - SKPaymentTransactionObserver
+    func paymentQueue(_ queue: SKPaymentQueue, updatedTransactions transactions: [SKPaymentTransaction]) {
+        for tx in transactions {
+            guard tx.payment.productIdentifier == Self.lifetimeProductId else { continue }
+            switch tx.transactionState {
+            case .purchased, .restored:
+                self.isProUnlocked = true
+                queue.finishTransaction(tx)
+                if sk1PurchaseInFlight {
+                    sk1PurchaseInFlight = false
+                    TUSNativeHapticsEngine.shared.trigger(style: "success")
+                    sk1PurchaseBridge?.notifyProStatus(
+                        isPro: true,
+                        cancelled: false,
+                        message: "Tebrikler! TUS Vaka & Spot Akademi Ömür Boyu Tam Erişim (Pro) başarıyla açıldı."
+                    )
+                }
+            case .failed:
+                let err = tx.error as? SKError
+                let cancelled = (err?.code == .paymentCancelled)
+                queue.finishTransaction(tx)
+                if sk1PurchaseInFlight {
+                    sk1PurchaseInFlight = false
+                    sk1PurchaseBridge?.notifyProStatus(
+                        isPro: self.isProUnlocked,
+                        cancelled: cancelled,
+                        message: cancelled
+                            ? "Satın alma işlemi iptal edildi."
+                            : (tx.error?.localizedDescription ?? "Satın alma işlemi tamamlanamadı. Lütfen tekrar deneyin.")
+                    )
+                }
+            case .deferred:
+                if sk1PurchaseInFlight {
+                    sk1PurchaseInFlight = false
+                    sk1PurchaseBridge?.notifyProStatus(
+                        isPro: self.isProUnlocked,
+                        cancelled: false,
+                        message: "Satın alma onayı bekleniyor."
+                    )
+                }
+            case .purchasing:
+                break
+            @unknown default:
+                break
+            }
+        }
+    }
+
+    func paymentQueueRestoreCompletedTransactionsFinished(_ queue: SKPaymentQueue) {
+        let found = self.isProUnlocked || queue.transactions.contains {
+            $0.payment.productIdentifier == Self.lifetimeProductId &&
+            ($0.transactionState == .restored || $0.transactionState == .purchased)
+        }
+        DispatchQueue.main.async {
+            let cont = self.sk1RestoreContinuation
+            self.sk1RestoreContinuation = nil
+            cont?.resume(returning: found)
+        }
+    }
+
+    func paymentQueue(_ queue: SKPaymentQueue, restoreCompletedTransactionsFailedWithError error: Error) {
+        DispatchQueue.main.async {
+            let cont = self.sk1RestoreContinuation
+            self.sk1RestoreContinuation = nil
+            cont?.resume(returning: self.isProUnlocked)
         }
     }
 }
@@ -440,6 +631,11 @@ class TUSBridgeViewController: CAPBridgeViewController, WKScriptMessageHandler {
         case "checkEntitlement", "checkProStatus":
             Task {
                 await TUSStoreKitManager.shared.refreshEntitlements(bridge: self)
+            }
+
+        case "refreshPrice":
+            Task {
+                await TUSStoreKitManager.shared.fetchLiveProductPrice(bridge: self)
             }
 
         case "setTheme":

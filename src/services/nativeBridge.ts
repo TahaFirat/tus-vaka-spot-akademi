@@ -172,6 +172,16 @@ export async function shareClinicalSummary(text: string): Promise<void> {
   }
 }
 
+export function refreshNativeProPrice(): void {
+  const handler = getNativeHandler();
+  if (handler) {
+    handler.postMessage({
+      action: 'refreshPrice',
+      productId: PRO_PRODUCT_ID,
+    });
+  }
+}
+
 export async function purchaseLifetimePro(): Promise<{
   success: boolean;
   cancelled?: boolean;
@@ -191,7 +201,7 @@ export async function purchaseLifetimePro(): Promise<{
           cancelled: true,
           message: 'Apple StoreKit yanıt süresi aşıldı. Lütfen tekrar deneyin.',
         });
-      }, 28000);
+      }, 120000);
 
       const onProEvent = async (e: Event) => {
         if (settled) return;
@@ -266,7 +276,7 @@ export async function restoreLifetimePro(): Promise<{
             ? 'Önceki satın alımınız başarıyla geri yüklendi!'
             : 'Bu Apple hesabında daha önce yapılmış bir satın alım bulunamadı.',
         });
-      }, 10000);
+      }, 30000);
 
       const onRestoreEvent = async (e: Event) => {
         if (settled) return;
