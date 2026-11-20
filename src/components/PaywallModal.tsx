@@ -15,6 +15,8 @@ import {
 } from '../data/tusMedicalRepository';
 import {
   FREE_QUESTION_LIMIT,
+  PRO_MONTHLY_PRICE_LABEL,
+  PRO_MONTHLY_PRODUCT_ID,
   PRO_PRICE_LABEL,
   PRO_PRODUCT_ID,
   purchaseLifetimePro,
@@ -30,6 +32,7 @@ interface PaywallModalProps {
   totalSolvedCount: number;
   reasonMessage?: string;
   priceLabel?: string;
+  monthlyPriceLabel?: string;
   isLight?: boolean;
 }
 
@@ -40,8 +43,10 @@ export const PaywallModal: React.FC<PaywallModalProps> = ({
   totalSolvedCount,
   reasonMessage,
   priceLabel = PRO_PRICE_LABEL,
+  monthlyPriceLabel = PRO_MONTHLY_PRICE_LABEL,
   isLight = false,
 }) => {
+  const [selectedPlan, setSelectedPlan] = useState<'monthly' | 'lifetime'>('lifetime');
   const [loading, setLoading] = useState<'purchase' | 'restore' | null>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [statusTone, setStatusTone] = useState<'success' | 'error'>('success');
@@ -55,12 +60,17 @@ export const PaywallModal: React.FC<PaywallModalProps> = ({
 
   if (!isOpen) return null;
 
+  const activeProductId =
+    selectedPlan === 'monthly' ? PRO_MONTHLY_PRODUCT_ID : PRO_PRODUCT_ID;
+  const activePriceDisplay =
+    selectedPlan === 'monthly' ? `${monthlyPriceLabel} / Ay` : priceLabel;
+
   const handlePurchase = async () => {
     if (loading) return;
     await triggerHaptic('medium');
     setLoading('purchase');
     setStatusMessage(null);
-    const res = await purchaseLifetimePro();
+    const res = await purchaseLifetimePro(activeProductId);
     setLoading(null);
     if (res.success) {
       setStatusTone('success');
@@ -127,7 +137,7 @@ export const PaywallModal: React.FC<PaywallModalProps> = ({
             }`}
           >
             <Crown className="w-3.5 h-3.5 shrink-0" />
-            <span className="truncate">Tek Seferlik • Ömür Boyu Erişim</span>
+            <span className="truncate">Aylık veya Ömür Boyu PRO Erişim</span>
           </div>
 
           <button
@@ -199,46 +209,133 @@ export const PaywallModal: React.FC<PaywallModalProps> = ({
           ))}
         </div>
 
-        {/* Price Summary Box */}
-        <div
-          className={`flex items-center justify-between rounded-2xl border px-3.5 py-2.5 mb-3 ${
-            isLight
-              ? 'bg-emerald-50/80 border-emerald-200'
-              : 'bg-gradient-to-r from-emerald-950/80 via-teal-950/70 to-cyan-950/70 border-emerald-400/35'
-          }`}
-        >
-          <div>
-            <div
-              className={`text-[11px] uppercase tracking-wider font-extrabold ${
-                isLight ? 'text-emerald-800' : 'text-emerald-300'
-              }`}
-            >
-              Ömür Boyu Tam Paket
+        {/* Dual Plan Selector: Monthly (Aylık) & Lifetime (Ömür Boyu) */}
+        <div className="grid grid-cols-2 gap-2 mb-3">
+          {/* Plan 1: Monthly PRO */}
+          <button
+            type="button"
+            onClick={() => {
+              triggerHaptic('selection');
+              setSelectedPlan('monthly');
+            }}
+            className={`relative rounded-2xl border p-3 text-left transition ${
+              selectedPlan === 'monthly'
+                ? isLight
+                  ? 'bg-emerald-50 border-emerald-500 ring-2 ring-emerald-500/20'
+                  : 'bg-emerald-500/15 border-emerald-400 ring-2 ring-emerald-400/20'
+                : isLight
+                ? 'bg-slate-50 border-slate-200 hover:border-slate-300'
+                : 'bg-[#071117] border-white/10 hover:border-white/20'
+            }`}
+          >
+            <div className="flex items-center justify-between gap-1 mb-1">
+              <span
+                className={`text-[10.5px] uppercase tracking-wider font-extrabold ${
+                  selectedPlan === 'monthly'
+                    ? isLight
+                      ? 'text-emerald-700'
+                      : 'text-emerald-300'
+                    : isLight
+                    ? 'text-slate-500'
+                    : 'text-slate-400'
+                }`}
+              >
+                Aylık Plan
+              </span>
+              <span
+                className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center ${
+                  selectedPlan === 'monthly'
+                    ? 'border-emerald-500 bg-emerald-500 text-white'
+                    : isLight
+                    ? 'border-slate-300'
+                    : 'border-slate-600'
+                }`}
+              >
+                {selectedPlan === 'monthly' && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-white" />
+                )}
+              </span>
             </div>
             <div
-              className={`text-[11px] ${
-                isLight ? 'text-slate-600' : 'text-slate-300'
+              className={`text-base sm:text-lg font-extrabold leading-tight ${
+                isLight ? 'text-slate-900' : 'text-white'
               }`}
             >
-              Abonelik yok • Tek ödeme
+              {monthlyPriceLabel}
+              <span className="text-[11px] font-bold opacity-75"> / ay</span>
             </div>
-          </div>
-          <div className="text-right shrink-0 pl-2">
             <div
-              className={`text-lg font-extrabold whitespace-nowrap ${
+              className={`text-[10.5px] mt-0.5 leading-snug ${
+                isLight ? 'text-slate-600' : 'text-slate-400'
+              }`}
+            >
+              Esnek aylık • İstediğin an iptal
+            </div>
+          </button>
+
+          {/* Plan 2: Lifetime PRO (Most Popular) */}
+          <button
+            type="button"
+            onClick={() => {
+              triggerHaptic('selection');
+              setSelectedPlan('lifetime');
+            }}
+            className={`relative rounded-2xl border p-3 text-left transition ${
+              selectedPlan === 'lifetime'
+                ? isLight
+                  ? 'bg-emerald-50 border-emerald-500 ring-2 ring-emerald-500/25'
+                  : 'bg-gradient-to-br from-emerald-950/90 via-teal-950/80 to-cyan-950/80 border-emerald-400 ring-2 ring-emerald-400/25'
+                : isLight
+                ? 'bg-slate-50 border-slate-200 hover:border-slate-300'
+                : 'bg-[#071117] border-white/10 hover:border-white/20'
+            }`}
+          >
+            <span className="inline-block mb-1 px-1.5 py-0.5 rounded-md bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[9px] font-extrabold uppercase tracking-wider">
+              ★ EN AVANTAJLI
+            </span>
+            <div className="flex items-center justify-between gap-1">
+              <span
+                className={`text-[10.5px] uppercase tracking-wider font-extrabold ${
+                  selectedPlan === 'lifetime'
+                    ? isLight
+                      ? 'text-emerald-800'
+                      : 'text-emerald-300'
+                    : isLight
+                    ? 'text-slate-500'
+                    : 'text-slate-400'
+                }`}
+              >
+                Ömür Boyu
+              </span>
+              <span
+                className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center ${
+                  selectedPlan === 'lifetime'
+                    ? 'border-emerald-500 bg-emerald-500 text-white'
+                    : isLight
+                    ? 'border-slate-300'
+                    : 'border-slate-600'
+                }`}
+              >
+                {selectedPlan === 'lifetime' && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-white" />
+                )}
+              </span>
+            </div>
+            <div
+              className={`text-base sm:text-lg font-extrabold leading-tight ${
                 isLight ? 'text-slate-900' : 'text-white'
               }`}
             >
               {priceLabel}
             </div>
             <div
-              className={`text-[10px] font-semibold whitespace-nowrap ${
-                isLight ? 'text-emerald-700' : 'text-emerald-300'
+              className={`text-[10.5px] mt-0.5 leading-snug ${
+                isLight ? 'text-emerald-700' : 'text-emerald-300/90'
               }`}
             >
-              Tek Seferlik
+              Tek ödeme • Süresiz erişim
             </div>
-          </div>
+          </button>
         </div>
 
         {statusMessage && (
@@ -262,14 +359,16 @@ export const PaywallModal: React.FC<PaywallModalProps> = ({
           type="button"
           disabled={loading !== null}
           onClick={handlePurchase}
-          data-product-id={PRO_PRODUCT_ID}
+          data-product-id={activeProductId}
           className="w-full rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-500 hover:to-teal-500 active:scale-[0.99] text-white font-extrabold text-xs sm:text-sm py-3 px-3 shadow-lg shadow-emerald-900/25 flex items-center justify-center gap-2 transition disabled:opacity-60"
         >
           <Sparkles className="w-4 h-4 shrink-0" />
           <span className="text-center leading-tight">
             {loading === 'purchase'
               ? 'Apple StoreKit Onaylanıyor...'
-              : `Ömür Boyu Tam Erişimi Aç • ${priceLabel}`}
+              : selectedPlan === 'monthly'
+              ? `Aylık PRO Başlat • ${activePriceDisplay}`
+              : `Ömür Boyu PRO Aç • ${activePriceDisplay}`}
           </span>
         </button>
 

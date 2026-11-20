@@ -1,18 +1,27 @@
 import fs from 'node:fs';
-import { TUS_EXPECTED_PEARLS } from '../src/data/tusExpectedPearls';
+import { TUS_ALL_EXPECTED_PEARLS } from '../src/data/tusMedicalRepository';
 
-const esc = (s: string) => s.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+const esc = (s: string) =>
+  s
+    .replace(/\\/g, '\\\\')
+    .replace(/"/g, '\\"')
+    .replace(/\r?\n/g, ' ');
 
-const swiftItems = TUS_EXPECTED_PEARLS.map(
-  (p) =>
-    `        TusWidgetPearl(id: "${esc(p.id)}", branch: "${esc(
-      p.branchShort
-    )}", category: "${esc(p.category)}", title: "${esc(
-      p.shortTitle
-    )}", summary: "${esc(p.widgetSummary)}", comparison: "${esc(
-      p.examComparison
-    )}", trap: "${esc(p.redFlagTrap)}")`
-).join(',\n');
+// Sync 180 diverse high-yield pearls (60 core + 120 rotated across all 11 branches) into WidgetKit offline store
+const selectedForWidget = TUS_ALL_EXPECTED_PEARLS.slice(0, 180);
+
+const swiftItems = selectedForWidget
+  .map(
+    (p) =>
+      `        TusWidgetPearl(id: "${esc(p.id)}", branch: "${esc(
+        p.branchShort
+      )}", category: "${esc(p.category)}", title: "${esc(
+        p.shortTitle.slice(0, 42)
+      )}", summary: "${esc(p.widgetSummary.slice(0, 135))}", comparison: "${esc(
+        p.examComparison.slice(0, 145)
+      )}", trap: "${esc(p.redFlagTrap.slice(0, 145))}")`
+  )
+  .join(',\n');
 
 const swiftFile = `import Foundation
 import Security
@@ -28,6 +37,24 @@ public struct TusWidgetPearl: Codable, Hashable {
     public let summary: String
     public let comparison: String
     public let trap: String
+
+    public init(
+        id: String,
+        branch: String,
+        category: String,
+        title: String,
+        summary: String,
+        comparison: String,
+        trap: String
+    ) {
+        self.id = id
+        self.branch = branch
+        self.category = category
+        self.title = title
+        self.summary = summary
+        self.comparison = comparison
+        self.trap = trap
+    }
 }
 
 public struct TusWidgetSnapshot: Codable {
@@ -40,6 +67,7 @@ public struct TusWidgetSnapshot: Codable {
     public var dailyGoalMinutes: Int
     public var topicTourPct: Int
     public var pinnedPearlId: String?
+    public var customPinnedPearl: TusWidgetPearl?
     public var updatedAt: Date
 
     public init(
@@ -52,6 +80,7 @@ public struct TusWidgetSnapshot: Codable {
         dailyGoalMinutes: Int,
         topicTourPct: Int = 0,
         pinnedPearlId: String? = nil,
+        customPinnedPearl: TusWidgetPearl? = nil,
         updatedAt: Date = Date()
     ) {
         self.targetTusDate = targetTusDate
@@ -63,6 +92,7 @@ public struct TusWidgetSnapshot: Codable {
         self.dailyGoalMinutes = dailyGoalMinutes
         self.topicTourPct = topicTourPct
         self.pinnedPearlId = pinnedPearlId
+        self.customPinnedPearl = customPinnedPearl
         self.updatedAt = updatedAt
     }
 
@@ -76,6 +106,7 @@ public struct TusWidgetSnapshot: Codable {
         dailyGoalMinutes: 120,
         topicTourPct: 0,
         pinnedPearlId: nil,
+        customPinnedPearl: nil,
         updatedAt: Date()
     )
 }
@@ -151,10 +182,20 @@ public enum TusDailySpots {
 ${swiftItems}
     ]
 
-    public static func activePearl(date: Date = Date(), pinnedId: String? = nil, offset: Int = 0) -> TusWidgetPearl {
-        if offset == 0, let pid = pinnedId, !pid.isEmpty,
-           let pinned = allPearls.first(where: { $0.id == pid }) {
-            return pinned
+    public static func activePearl(
+        date: Date = Date(),
+        pinnedId: String? = nil,
+        customPinned: TusWidgetPearl? = nil,
+        offset: Int = 0
+    ) -> TusWidgetPearl {
+        if offset == 0 {
+            if let custom = customPinned {
+                return custom
+            }
+            if let pid = pinnedId, !pid.isEmpty,
+               let pinned = allPearls.first(where: { $0.id == pid }) {
+                return pinned
+            }
         }
         let slot = Int(date.timeIntervalSince1970) / 7200
         let idx = abs(slot + offset) % allPearls.count
@@ -164,7 +205,7 @@ ${swiftItems}
 
 public enum TusKeychainStore {
     private static let service = "com.tus.akademi.widget.snapshot"
-    private static let account = "snapshot_v2"
+    private static let account = "snapshot_v3"
     private static let accessGroup = "U3YT2CXH58.com.tus.akademi.shared"
 
     public static func save(_ snapshot: TusWidgetSnapshot) {
@@ -247,4 +288,10 @@ public struct TusStudyActivityAttributes: ActivityAttributes {
 `;
 
 fs.writeFileSync('ios/App/Shared/TusSharedModels.swift', swiftFile, 'utf8');
-console.log('Successfully generated ios/App/Shared/TusSharedModels.swift with', TUS_EXPECTED_PEARLS.length, 'synced pearls!');
+console.log(
+  'Generated TusSharedModels.swift with',
+  selectedForWidget.length,
+  'offline widget pearls (out of',
+  TUS_ALL_EXPECTED_PEARLS.length,
+  'in-app expected pearls)!'
+);

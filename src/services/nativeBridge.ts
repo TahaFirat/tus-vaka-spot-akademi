@@ -1,6 +1,8 @@
 export const FREE_QUESTION_LIMIT = 30;
 export const PRO_PRODUCT_ID = 'com.tus.akademi.lifetime.pro';
-export const PRO_PRICE_LABEL = '200,00 ₺';
+export const PRO_MONTHLY_PRODUCT_ID = 'com.tus.akademi.pro.monthly';
+export const PRO_PRICE_LABEL = '199,99 ₺';
+export const PRO_MONTHLY_PRICE_LABEL = '79,99 ₺';
 export const PRO_STORAGE_KEY = 'tus_akademi_pro_unlocked_v1';
 
 interface WebKitMessageHandler {
@@ -102,6 +104,15 @@ export interface WidgetSnapshotPayload {
   dailyGoalMinutes: number;
   topicTourPct?: number;
   pinnedPearlId?: string | null;
+  customPinnedPearl?: {
+    id: string;
+    branch: string;
+    category: string;
+    title: string;
+    summary: string;
+    comparison: string;
+    trap: string;
+  } | null;
 }
 
 export function notifyNativeAppReady(): void {
@@ -255,7 +266,9 @@ export function refreshNativeProPrice(): void {
   }
 }
 
-export async function purchaseLifetimePro(): Promise<{
+export async function purchaseLifetimePro(
+  selectedProductId: string = PRO_PRODUCT_ID
+): Promise<{
   success: boolean;
   cancelled?: boolean;
   message: string;
@@ -289,7 +302,7 @@ export async function purchaseLifetimePro(): Promise<{
             success: true,
             message:
               detail.message ||
-              'TUS Vaka & Spot Akademi Ömür Boyu Tam Erişim (Pro) başarıyla aktif edildi!',
+              'TUS Vaka & Spot Akademi PRO erişiminiz başarıyla aktif edildi!',
           });
         } else {
           resolve({
@@ -303,7 +316,7 @@ export async function purchaseLifetimePro(): Promise<{
       window.addEventListener('tus:proStatus', onProEvent as EventListener);
       handler.postMessage({
         action: 'purchasePro',
-        productId: PRO_PRODUCT_ID,
+        productId: selectedProductId,
       });
     });
   }
@@ -317,15 +330,15 @@ export async function purchaseLifetimePro(): Promise<{
       new CustomEvent('tus:proStatus', {
         detail: {
           isPro: true,
-          productId: PRO_PRODUCT_ID,
-          message: 'Ömür Boyu Tam Erişim (Pro) başarıyla açıldı!',
+          productId: selectedProductId,
+          message: 'TUS Akademi PRO tam erişim başarıyla açıldı!',
         },
       })
     );
   }
   return {
     success: true,
-    message: 'TUS Vaka & Spot Akademi Ömür Boyu Tam Erişim (Pro) başarıyla aktif edildi!',
+    message: 'TUS Vaka & Spot Akademi PRO erişiminiz başarıyla aktif edildi!',
   };
 }
 

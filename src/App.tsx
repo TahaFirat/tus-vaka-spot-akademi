@@ -20,11 +20,15 @@ import {
 import {
   OptionLetter,
   TOTAL_INTERACTIVE_TUS_ITEMS,
+  TUS_ALL_EXPECTED_PEARLS,
   TUS_CORE_TOPICS,
   TusBranchId,
 } from './data/tusMedicalRepository';
 import {
+  PRO_MONTHLY_PRICE_LABEL,
+  PRO_MONTHLY_PRODUCT_ID,
   PRO_PRICE_LABEL,
+  PRO_PRODUCT_ID,
   loadPersistedProStatus,
   notifyNativeAppReady,
   requestNativeEntitlementCheck,
@@ -83,6 +87,9 @@ export const App: React.FC = () => {
 
   const [isPro, setIsPro] = useState<boolean>(false);
   const [proPriceLabel, setProPriceLabel] = useState<string>(PRO_PRICE_LABEL);
+  const [proMonthlyPriceLabel, setProMonthlyPriceLabel] = useState<string>(
+    PRO_MONTHLY_PRICE_LABEL
+  );
   const [paywallOpen, setPaywallOpen] = useState<boolean>(false);
   const [paywallReason, setPaywallReason] = useState<string | undefined>(undefined);
   const [proBannerVisible, setProBannerVisible] = useState<boolean>(false);
@@ -149,6 +156,9 @@ export const App: React.FC = () => {
   useEffect(() => {
     const t = window.setTimeout(() => {
       const info = getTusCountdownParts(studyState.targetTusDate);
+      const pinnedObj = studyState.pinnedWidgetPearlId
+        ? TUS_ALL_EXPECTED_PEARLS.find((p) => p.id === studyState.pinnedWidgetPearlId)
+        : null;
       syncNativeWidgetSnapshot({
         targetTusDate: info.effectiveDate,
         examLabel: info.examLabel,
@@ -159,6 +169,17 @@ export const App: React.FC = () => {
         dailyGoalMinutes: studyState.dailyGoalMinutes,
         topicTourPct,
         pinnedPearlId: studyState.pinnedWidgetPearlId,
+        customPinnedPearl: pinnedObj
+          ? {
+              id: pinnedObj.id,
+              branch: pinnedObj.branchShort,
+              category: pinnedObj.category,
+              title: pinnedObj.shortTitle,
+              summary: pinnedObj.widgetSummary,
+              comparison: pinnedObj.examComparison,
+              trap: pinnedObj.redFlagTrap,
+            }
+          : null,
       });
     }, 450);
     return () => window.clearTimeout(t);
@@ -194,7 +215,14 @@ export const App: React.FC = () => {
     const onNativeProPrice = (e: Event) => {
       const detail = (e as CustomEvent).detail || {};
       if (detail.displayPrice) {
-        setProPriceLabel(String(detail.displayPrice));
+        if (detail.productId === PRO_MONTHLY_PRODUCT_ID) {
+          setProMonthlyPriceLabel(String(detail.displayPrice));
+        } else if (!detail.productId || detail.productId === PRO_PRODUCT_ID) {
+          setProPriceLabel(String(detail.displayPrice));
+        }
+      }
+      if (detail.monthlyDisplayPrice) {
+        setProMonthlyPriceLabel(String(detail.monthlyDisplayPrice));
       }
     };
 
@@ -671,7 +699,7 @@ export const App: React.FC = () => {
                 })}
           </div>
 
-          {/* Sağ Liquid Glass Damlacıkları */}
+          {/* Sağ Liquid Glass Damlacıkları (Sıfır Taşma — 320px'den 1024px'e Tam Responsive) */}
           <div className="flex items-center gap-1 shrink-0">
             {isOdakMode ? (
               <button
@@ -682,51 +710,30 @@ export const App: React.FC = () => {
                 }}
                 aria-label="Uygulama Tanıtımı"
                 title="Uygulama Tanıtımı"
-                className={`w-8 h-8 rounded-full flex items-center justify-center transition ${glassOrbClass}`}
+                className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition ${glassOrbClass}`}
               >
-                <Compass className="w-4 h-4 text-teal-500" />
+                <Compass className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-teal-500" />
               </button>
             ) : (
-              <>
-                <button
-                  type="button"
-                  onClick={() => {
-                    triggerHaptic('light');
-                    handleNavigateTab('beklenen');
-                  }}
-                  aria-label="Muhtemel Çıkacaklar Köşesi"
-                  title="Muhtemel Çıkacaklar Köşesi"
-                  className={`hidden xs:flex lg:hidden w-8 h-8 rounded-full items-center justify-center transition ${
-                    activeTab === 'beklenen' ? activeGlassPillClass : glassOrbClass
+              <button
+                type="button"
+                onClick={() => {
+                  triggerHaptic('light');
+                  setActiveTab('analiz');
+                }}
+                aria-label="Karne ve Ayarlar"
+                title="Karne ve Ayarlar"
+                className={`lg:hidden w-7 h-7 sm:w-auto sm:h-8 sm:px-2.5 rounded-full text-[11px] font-extrabold inline-flex items-center justify-center gap-1 transition ${
+                  activeTab === 'analiz' ? activeGlassPillClass : glassOrbClass
+                }`}
+              >
+                <BarChart3
+                  className={`w-3.5 h-3.5 ${
+                    activeTab === 'analiz' ? 'text-white' : 'text-emerald-500'
                   }`}
-                >
-                  <Sparkles
-                    className={`w-3.5 h-3.5 ${
-                      activeTab === 'beklenen' ? 'text-white' : 'text-amber-500'
-                    }`}
-                  />
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    triggerHaptic('light');
-                    setActiveTab('analiz');
-                  }}
-                  aria-label="Karne ve Ayarlar"
-                  title="Karne ve Ayarlar"
-                  className={`lg:hidden w-8 h-8 xs:w-auto xs:px-2.5 rounded-full text-[11px] font-extrabold inline-flex items-center justify-center gap-1 transition ${
-                    activeTab === 'analiz' ? activeGlassPillClass : glassOrbClass
-                  }`}
-                >
-                  <BarChart3
-                    className={`w-3.5 h-3.5 ${
-                      activeTab === 'analiz' ? 'text-white' : 'text-emerald-500'
-                    }`}
-                  />
-                  <span className="hidden xs:inline">Karne</span>
-                </button>
-              </>
+                />
+                <span className="hidden sm:inline">Karne</span>
+              </button>
             )}
 
             <button
@@ -739,7 +746,7 @@ export const App: React.FC = () => {
                 }));
               }}
               aria-label="Tema Değiştir"
-              className={`w-8 h-8 rounded-full flex items-center justify-center transition ${glassOrbClass}`}
+              className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition ${glassOrbClass}`}
             >
               {isLightMode ? (
                 <Moon className="w-3.5 h-3.5 text-slate-700" />
@@ -756,7 +763,7 @@ export const App: React.FC = () => {
                     triggerHaptic('light');
                     setProBannerVisible((v) => !v);
                   }}
-                  className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10.5px] font-extrabold whitespace-nowrap transition ${activeGlassPillClass}`}
+                  className={`inline-flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-full text-[10px] sm:text-[10.5px] font-extrabold whitespace-nowrap shrink-0 transition ${activeGlassPillClass}`}
                 >
                   <span>PRO</span>
                 </button>
@@ -767,9 +774,9 @@ export const App: React.FC = () => {
                     triggerHaptic('medium');
                     handleOpenPaywall();
                   }}
-                  className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-[10.5px] font-extrabold whitespace-nowrap shadow-xs"
+                  className="inline-flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-[10px] sm:text-[10.5px] font-extrabold whitespace-nowrap shrink-0 shadow-xs"
                 >
-                  <Crown className="w-3 h-3" />
+                  <Crown className="w-3 h-3 shrink-0" />
                   <span>PRO</span>
                 </button>
               ))}
@@ -1118,6 +1125,7 @@ export const App: React.FC = () => {
         totalSolvedCount={summaryStats.totalSolved}
         reasonMessage={paywallReason}
         priceLabel={proPriceLabel}
+        monthlyPriceLabel={proMonthlyPriceLabel}
         isLight={isLightMode}
       />
     </div>

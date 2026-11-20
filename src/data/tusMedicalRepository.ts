@@ -27,6 +27,11 @@ import { STRUCTURED_PEDIATRICS_1_CLUSTERS } from './tusStructuredPediatrics1';
 import { STRUCTURED_PEDIATRICS_2_CLUSTERS } from './tusStructuredPediatrics2';
 import { STRUCTURED_SURGERY_CLUSTERS } from './tusStructuredSurgery';
 import { STRUCTURED_OBGYN_CLUSTERS } from './tusStructuredObGyn';
+import {
+  ExpectedPearlCategory,
+  TUS_EXPECTED_PEARLS,
+  TusExpectedPearl,
+} from './tusExpectedPearls';
 
 export * from './tusTypes';
 export { TUS_CLINICAL_GUIDE_ENTRIES };
@@ -521,53 +526,55 @@ function hydrateStructuredSpot(
   let statement = '';
   let criticalHighlight = '';
 
+  const ctxTag = `${cluster.subTopic.split(' ve ')[0].trim()}`;
+
   switch (sIdx) {
     case 0:
-      statement = `[${cluster.subTopic}] ${e.name} için birincil sorumlu mekanizma veya hedef: ${cleanDot(e.target)}.`;
+      statement = `${e.name} (${ctxTag}) için birincil sorumlu mekanizma veya hedef: ${cleanDot(e.target)}.`;
       criticalHighlight = cleanDot(e.target);
       break;
     case 1:
-      statement = `[${cluster.subTopic}] ${e.name} açısından ${cleanDot(e.trapFalse)}.`;
+      statement = `${e.name} (${ctxTag}) açısından ${cleanDot(e.trapFalse)}.`;
       criticalHighlight = e.trapHighlight;
       break;
     case 2:
-      statement = `[${cluster.subTopic}] ${e.name} kapsamında karakteristik özellik olarak "${cleanDot(e.hallmark)}" izlenir.`;
+      statement = `${e.name} (${ctxTag}) kapsamında karakteristik özellik olarak "${cleanDot(e.hallmark)}" izlenir.`;
       criticalHighlight = e.clues[0] || e.name;
       break;
     case 3:
-      statement = `[${cluster.subTopic}] ${e.name} mekanizmasında birincil sorumlu hedef/etken "${cleanDot(sib1.target)}" olarak tanımlanır.`;
+      statement = `${e.name} (${ctxTag}) mekanizmasında birincil sorumlu hedef/etken "${cleanDot(sib1.target)}" olarak tanımlanır.`;
       criticalHighlight = cleanDot(sib1.target);
       break;
     case 4:
-      statement = `[${cluster.subTopic}] ${e.name} tanı ve yönetiminde standart yaklaşım: ${cleanDot(e.management)}.`;
+      statement = `${e.name} (${ctxTag}) tanı ve yönetiminde standart yaklaşım: ${cleanDot(e.management)}.`;
       criticalHighlight = e.name;
       break;
     case 5:
-      statement = `[${cluster.subTopic}] "${cleanDot(e.hallmark)}" saptandığında öncelikli karşılık ${sib2.name} olup ${e.name} beklenmez.`;
+      statement = `${ctxTag} değerlendirmesinde "${cleanDot(e.hallmark)}" saptandığında öncelikli karşılık ${sib2.name} olup ${e.name} beklenmez.`;
       criticalHighlight = sib2.name;
       break;
     case 6:
-      statement = `[${cluster.subTopic}] ${e.name} için TUS altın kuralı: ${cleanDot(e.pearl)}.`;
+      statement = `${e.name} (${ctxTag}) için TUS altın kuralı: ${cleanDot(e.pearl)}.`;
       criticalHighlight = e.name;
       break;
     case 7:
-      statement = `[${cluster.subTopic}] ${e.name} için en tipik klinik veya yapısal bulgu "${cleanDot(sib3.hallmark)}" şeklindedir.`;
+      statement = `${e.name} (${ctxTag}) için en tipik klinik veya yapısal bulgu "${cleanDot(sib3.hallmark)}" şeklindedir.`;
       criticalHighlight = cleanDot(sib3.hallmark);
       break;
     case 8:
-      statement = `[${cluster.subTopic}] "${e.clues.join(' + ')}" anahtarları bir arada görüldüğünde öncelikle ${e.name} düşünülmelidir.`;
+      statement = `${ctxTag} kapsamında "${e.clues.join(' + ')}" anahtarları bir arada görüldüğünde öncelikle ${e.name} düşünülmelidir.`;
       criticalHighlight = e.name;
       break;
     case 9:
-      statement = `[${cluster.subTopic}] ${e.name} değerlendirmesinde birinci basamak spesifik yaklaşım "${cleanDot(sib4.management)}" uygulamasıdır.`;
+      statement = `${e.name} (${ctxTag}) değerlendirmesinde birinci basamak spesifik yaklaşım "${cleanDot(sib4.management)}" uygulamasıdır.`;
       criticalHighlight = cleanDot(sib4.management);
       break;
     case 10:
-      statement = `[${cluster.subTopic}] "${cleanDot(e.target)}" mekanizması "${cleanDot(e.hallmark)}" bulgusu ile doğrudan ilişkilidir.`;
+      statement = `${ctxTag} kapsamında "${cleanDot(e.target)}" mekanizması "${cleanDot(e.hallmark)}" bulgusu ile doğrudan ilişkilidir.`;
       criticalHighlight = cleanDot(e.target);
       break;
     default:
-      statement = `[${cluster.subTopic}] "${e.clues.join(' + ')}" bulgularına yol açan birincil mekanizma "${cleanDot(sib2.target)}" olarak kabul edilir.`;
+      statement = `${ctxTag} kapsamında "${e.clues.join(' + ')}" bulgularına yol açan birincil mekanizma "${cleanDot(sib2.target)}" olarak kabul edilir.`;
       criticalHighlight = cleanDot(sib2.target);
       break;
   }
@@ -1136,6 +1143,110 @@ function computeStaticBranchCounts(): Record<TusBranchId | 'ALL', StaticBranchCo
 }
 
 export const STATIC_BRANCH_COUNTS = computeStaticBranchCounts();
+
+// ============================================================================
+// 2,800+ "2027-TUS MUHTEMEL ÇIKACAKLAR & ALTIN SPOT KÖŞESİ" REPOSITORY
+// ============================================================================
+function inferPearlCategory(
+  branchId: TusBranchId,
+  subTopic: string,
+  idx: number
+): ExpectedPearlCategory {
+  const s = subTopic.toLowerCase();
+  if (branchId === 'farmakoloji' || s.includes('antidot') || s.includes('toksisite') || s.includes('ilaç')) {
+    return idx % 2 === 0 ? 'Toksikoloji & Antidot' : '2027 Beklenen';
+  }
+  if (branchId === 'biyokimya' || s.includes('enzim') || s.includes('genetik') || s.includes('mutasyon') || s.includes('sendrom')) {
+    return idx % 2 === 0 ? 'Enzim & Genetik' : '2027 Beklenen';
+  }
+  if (s.includes('acil') || s.includes('şok') || s.includes('travma') || s.includes('kanama') || s.includes('toksik')) {
+    return 'Acil Kırmızı Bayrak';
+  }
+  if (branchId === 'patoloji' || branchId === 'anatomi' || branchId === 'histoloji') {
+    return idx % 2 === 0 ? 'Patognomonik Bulgu' : '2027 Beklenen';
+  }
+  return idx % 2 === 0 ? 'İlk Tercih & Altın Standart' : '2027 Beklenen';
+}
+
+function buildExpandedExpectedPearls(): TusExpectedPearl[] {
+  const result: TusExpectedPearl[] = [...TUS_EXPECTED_PEARLS];
+  const seenTitles = new Set<string>(
+    TUS_EXPECTED_PEARLS.map((p) => p.shortTitle.toLowerCase())
+  );
+  let nextIdNum = TUS_EXPECTED_PEARLS.length + 1;
+
+  // 1. Add all 1,280 Structured Textbook Entities (Primary Pearl + Differential Comparison Pearl)
+  ALL_STRUCTURED_CLUSTERS.forEach((cluster, cIdx) => {
+    const bMeta = getBranchMeta(cluster.branchId);
+    cluster.entities.forEach((e, eIdx) => {
+      const sib = cluster.entities[(eIdx + 1) % 5];
+      const cat1 = inferPearlCategory(cluster.branchId, cluster.subTopic, cIdx + eIdx);
+
+      // Card A: Core Mechanism & Hallmark Expected Pearl
+      const titleA = e.name;
+      if (!seenTitles.has(titleA.toLowerCase())) {
+        seenTitles.add(titleA.toLowerCase());
+        result.push({
+          id: `exp-${nextIdNum++}`,
+          session: bMeta.session,
+          branchId: cluster.branchId,
+          branchShort: bMeta.shortName,
+          category: cat1,
+          shortTitle: titleA,
+          widgetSummary: `${e.name}: ${e.target.replace(/\.$/, '')}.`,
+          coreFact: `${e.hallmark.replace(/\.$/, '')}. ${e.pearl}`,
+          examComparison: `Tanı & Yaklaşım: ${e.management} • Ayırıcı kardeş antite (${sib.name}): ${sib.hallmark}`,
+          redFlagTrap: `ÖSYM Tuzağı: "${e.name} açısından ${e.trapFalse.replace(/\.$/, '')}" ifadesi YANLIŞTIR! (Hatalı kısım: ${e.trapHighlight}).`,
+        });
+      }
+
+      // Card B: First-Line vs Gold Standard & Clinical Clues Card
+      const titleB = `${e.name} — Tanı & Yönetim`;
+      result.push({
+        id: `exp-${nextIdNum++}`,
+        session: bMeta.session,
+        branchId: cluster.branchId,
+        branchShort: bMeta.shortName,
+        category:
+          cat1 === 'İlk Tercih & Altın Standart'
+            ? 'Acil Kırmızı Bayrak'
+            : 'İlk Tercih & Altın Standart',
+        shortTitle: titleB,
+        widgetSummary: `${e.name} yaklaşımı: ${e.management.replace(/\.$/, '')}.`,
+        coreFact: `Klinik Anahtarlar: ${e.clues.join(' • ')}. Temel mekanizma: ${e.target}`,
+        examComparison: `${e.name} karakteristik bulgusu: ${e.hallmark} • ${sib.name} bulgusu: ${sib.hallmark}`,
+        redFlagTrap: `${e.pearl}`,
+      });
+    });
+  });
+
+  // 2. Add Legacy ÖSYM Twin & High-Yield Entities
+  ALL_LEGACY_CLUSTERS.forEach((cluster, cIdx) => {
+    const bMeta = getBranchMeta(cluster.branchId);
+    cluster.entities.forEach((e, eIdx) => {
+      const shortT = cleanShortTitle(e.entityName);
+      if (seenTitles.has(shortT.toLowerCase())) return;
+      seenTitles.add(shortT.toLowerCase());
+      result.push({
+        id: `exp-${nextIdNum++}`,
+        session: bMeta.session,
+        branchId: cluster.branchId,
+        branchShort: bMeta.shortName,
+        category: inferPearlCategory(cluster.branchId, cluster.subTopic, cIdx + eIdx),
+        shortTitle: shortT,
+        widgetSummary: e.pearl,
+        coreFact: e.mechanism,
+        examComparison: e.firstVsGold,
+        redFlagTrap: `ÖSYM Tuzağı: "${e.falseStatement}" ifadesi YANLIŞTIR (${e.falseHighlight})! Doğrusu: ${e.trueStatement}`,
+      });
+    });
+  });
+
+  return result;
+}
+
+export const TUS_ALL_EXPECTED_PEARLS: TusExpectedPearl[] =
+  buildExpandedExpectedPearls();
 
 export interface TusCoreTopic {
   id: string;

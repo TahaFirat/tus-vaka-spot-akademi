@@ -827,48 +827,51 @@ const VakaTestScreenInner: React.FC<VakaTestScreenProps> = ({
                   className={`w-3.5 h-3.5 ${isBookmarked ? 'fill-current' : ''}`}
                 />
               </button>
-
-              {/* Question Counter Badge */}
-              <span
-                className={`px-2 py-0.5 rounded-lg text-[11px] font-extrabold tabular-nums border whitespace-nowrap ${
-                  isPro
-                    ? isLight
-                      ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
-                      : 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
-                    : isLight
-                    ? 'bg-slate-100 text-slate-700 border-slate-200'
-                    : 'bg-white/5 text-slate-300 border-white/10'
-                }`}
-              >
-                {safeIndex + 1}/{filteredQuestions.length}
-              </span>
             </div>
           </div>
 
-          {/* Row B: Dedicated Non-Colliding Concept Twin & Topic Tag Row */}
-          <div className="flex flex-wrap items-center gap-1.5">
-            {isOsymTwinQuestion(currentQuestion) && (
+          {/* Row B: Dedicated Non-Colliding Concept Twin, Topic Tag & Counter Row */}
+          <div className="flex items-center justify-between gap-2 flex-wrap">
+            <div className="flex flex-wrap items-center gap-1.5 min-w-0">
+              {isOsymTwinQuestion(currentQuestion) && (
+                <span
+                  className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10.5px] font-extrabold border ${
+                    isLight
+                      ? 'bg-amber-50 border-amber-300 text-amber-800'
+                      : 'bg-amber-500/15 border-amber-400/35 text-amber-300'
+                  }`}
+                >
+                  <Award className="w-3 h-3 shrink-0" />
+                  <span>
+                    {currentQuestion.osymYearTag
+                      ? currentQuestion.osymYearTag.replace(' Konsept İkizi', ' TUS İkizi')
+                      : 'ÖSYM TUS İkizi'}
+                  </span>
+                </span>
+              )}
               <span
-                className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10.5px] font-extrabold border ${
-                  isLight
-                    ? 'bg-amber-50 border-amber-300 text-amber-800'
-                    : 'bg-amber-500/15 border-amber-400/35 text-amber-300'
+                className={`px-2 py-0.5 rounded-md text-[10.5px] font-bold truncate max-w-[220px] sm:max-w-none ${
+                  isLight ? 'bg-slate-100 text-slate-600' : 'bg-white/5 text-slate-400'
                 }`}
               >
-                <Award className="w-3 h-3 shrink-0" />
-                <span>
-                  {currentQuestion.osymYearTag
-                    ? currentQuestion.osymYearTag.replace(' Konsept İkizi', ' TUS İkizi')
-                    : 'ÖSYM TUS İkizi'}
-                </span>
+                {currentQuestion.subTopic}
               </span>
-            )}
+            </div>
+
+            {/* Question Counter Badge (Moved to Row B so Row A never squeezes on 320px-375px screens) */}
             <span
-              className={`px-2 py-0.5 rounded-md text-[10.5px] font-bold ${
-                isLight ? 'bg-slate-100 text-slate-600' : 'bg-white/5 text-slate-400'
+              className={`px-2 py-0.5 rounded-lg text-[10.5px] font-extrabold tabular-nums border whitespace-nowrap shrink-0 ml-auto ${
+                isPro
+                  ? isLight
+                    ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
+                    : 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
+                  : isLight
+                  ? 'bg-slate-100 text-slate-700 border-slate-200'
+                  : 'bg-white/5 text-slate-300 border-white/10'
               }`}
             >
-              {currentQuestion.subTopic}
+              {(safeIndex + 1).toLocaleString('tr-TR')} /{' '}
+              {filteredQuestions.length.toLocaleString('tr-TR')}
             </span>
           </div>
 

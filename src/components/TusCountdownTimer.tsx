@@ -81,20 +81,20 @@ const LiveCountdownNumbers: React.FC<{
 
   if (variant === 'hero') {
     return (
-      <div className="shrink-0 rounded-2xl bg-black/25 border border-white/15 px-3 py-2 text-center min-w-[104px]">
-        <div className="flex items-center justify-center gap-1 text-[10px] font-extrabold uppercase text-emerald-200">
+      <div className="shrink-0 rounded-2xl bg-black/25 border border-white/15 px-2.5 sm:px-3 py-1.5 sm:py-2 text-center min-w-[92px] sm:min-w-[104px]">
+        <div className="flex items-center justify-center gap-1 text-[9.5px] sm:text-[10px] font-extrabold uppercase text-emerald-200">
           <Clock className="w-3 h-3 shrink-0" />
           <span>TUS'a Kalan</span>
         </div>
-        <div className="text-lg font-extrabold tabular-nums leading-tight mt-0.5 text-white">
-          {parts.days} <span className="text-xs font-bold">Gün</span>
+        <div className="text-base sm:text-lg font-extrabold tabular-nums leading-tight mt-0.5 text-white">
+          {parts.days} <span className="text-[11px] sm:text-xs font-bold">Gün</span>
         </div>
-        <div className="text-[10.5px] font-bold text-emerald-100/90 tabular-nums">
+        <div className="text-[10px] sm:text-[10.5px] font-bold text-emerald-100/90 tabular-nums">
           {String(parts.hours).padStart(2, '0')}s{' '}
           {String(parts.minutes).padStart(2, '0')}dk{' '}
           {String(parts.seconds).padStart(2, '0')}sn
         </div>
-        <div className="text-[9.5px] text-emerald-200/80 mt-0.5 truncate max-w-[116px]">
+        <div className="text-[9px] sm:text-[9.5px] text-emerald-200/80 mt-0.5 truncate max-w-[108px] sm:max-w-[116px]">
           {parts.effectiveDate.split('-').reverse().join('.')} • 10:15
         </div>
       </div>
@@ -102,7 +102,7 @@ const LiveCountdownNumbers: React.FC<{
   }
 
   return (
-    <div className="grid grid-cols-4 gap-1.5 shrink-0">
+    <div className="grid grid-cols-4 gap-1.5 w-full sm:w-auto shrink-0">
       {[
         { value: parts.days, unit: 'Gün' },
         { value: String(parts.hours).padStart(2, '0'), unit: 'Saat' },
@@ -111,7 +111,7 @@ const LiveCountdownNumbers: React.FC<{
       ].map((item, idx) => (
         <div
           key={idx}
-          className={`rounded-xl border px-2 py-1.5 text-center min-w-[50px] sm:min-w-[56px] ${
+          className={`rounded-xl border px-1.5 sm:px-2 py-1.5 text-center min-w-0 sm:min-w-[54px] ${
             isLight
               ? 'bg-white border-emerald-200/80 shadow-xs'
               : 'bg-[#071117]/90 border-emerald-500/25'

@@ -20,15 +20,19 @@ private struct SK1ProductFetchResult {
 final class TUSStoreKitManager: NSObject, SKProductsRequestDelegate, SKPaymentTransactionObserver {
     static let shared = TUSStoreKitManager()
     static let lifetimeProductId = "com.tus.akademi.lifetime.pro"
+    static let monthlyProductId = "com.tus.akademi.pro.monthly"
+    static let allProductIds: Set<String> = [lifetimeProductId, monthlyProductId]
     private let storageKey = "tus_akademi_pro_unlocked_v1"
     private var updatesTask: Task<Void, Never>?
-    private var cachedProduct: Product?
-    private var cachedSK1Product: SKProduct?
-    private var cachedDisplayPrice: String = "200,00 ₺"
+    private var cachedProducts: [String: Product] = [:]
+    private var cachedSK1Products: [String: SKProduct] = [:]
+    private var cachedDisplayPrice: String = "199,99 ₺"
+    private var cachedMonthlyDisplayPrice: String = "79,99 ₺"
 
     // StoreKit 1 continuation bridges
     private var sk1ProductRequest: SKProductsRequest?
     private var sk1ProductsContinuation: CheckedContinuation<SK1ProductFetchResult, Never>?
+    private var sk1RequestedProductId: String = lifetimeProductId
     private weak var sk1PurchaseBridge: TUSBridgeViewController?
     private var sk1RestoreContinuation: CheckedContinuation<Bool, Never>?
     private var sk1PurchaseInFlight = false
@@ -57,7 +61,7 @@ final class TUSStoreKitManager: NSObject, SKProductsRequestDelegate, SKPaymentTr
             await refreshEntitlements(bridge: bridge)
             for await result in Transaction.updates {
                 if case .verified(let transaction) = result {
-                    if transaction.productID == Self.lifetimeProductId {
+                    if Self.allProductIds.contains(transaction.productID) {
                         self.isProUnlocked = (transaction.revocationDate == nil)
                         await transaction.finish()
                         if self.isProUnlocked {
@@ -65,7 +69,7 @@ final class TUSStoreKitManager: NSObject, SKProductsRequestDelegate, SKPaymentTr
                             bridge?.notifyProStatus(
                                 isPro: true,
                                 cancelled: false,
-                                message: "TUS Vaka & Spot Akademi Ömür Boyu Tam Erişim (Pro) aktif edildi!"
+                                message: "TUS Vaka & Spot Akademi PRO erişiminiz aktif edildi!"
                             )
                         }
                     }
@@ -74,18 +78,24 @@ final class TUSStoreKitManager: NSObject, SKProductsRequestDelegate, SKPaymentTr
         }
     }
 
-    private func fetchSK2ProductWithRetry(maxAttempts: Int = 3) async -> (Product?, Error?) {
-        if let cached = cachedProduct {
+    private func fetchSK2ProductWithRetry(productId: String = lifetimeProductId, maxAttempts: Int = 3) async -> (Product?, Error?) {
+        if let cached = cachedProducts[productId] {
             return (cached, nil)
         }
         var lastError: Error?
         for attempt in 0..<maxAttempts {
             do {
-                let products = try await Product.products(for: [Self.lifetimeProductId])
-                if let product = products.first {
-                    self.cachedProduct = product
-                    self.cachedDisplayPrice = product.displayPrice
-                    return (product, nil)
+                let products = try await Product.products(for: Array(Self.allProductIds))
+                for p in products {
+                    self.cachedProducts[p.id] = p
+                    if p.id == Self.lifetimeProductId {
+                        self.cachedDisplayPrice = p.displayPrice
+                    } else if p.id == Self.monthlyProductId {
+                        self.cachedMonthlyDisplayPrice = p.displayPrice
+                    }
+                }
+                if let target = self.cachedProducts[productId] {
+                    return (target, nil)
                 }
             } catch {
                 lastError = error
@@ -98,16 +108,17 @@ final class TUSStoreKitManager: NSObject, SKProductsRequestDelegate, SKPaymentTr
         return (nil, lastError)
     }
 
-    private func fetchSK1Product() async -> SK1ProductFetchResult {
-        if let cached = cachedSK1Product {
+    private func fetchSK1Product(productId: String = lifetimeProductId) async -> SK1ProductFetchResult {
+        if let cached = cachedSK1Products[productId] {
             return SK1ProductFetchResult(product: cached, invalidIdentifier: false, error: nil)
         }
         return await withCheckedContinuation { continuation in
             DispatchQueue.main.async {
                 self.sk1ProductsContinuation?.resume(returning: SK1ProductFetchResult(product: nil, invalidIdentifier: false, error: nil))
                 self.sk1ProductsContinuation = continuation
+                self.sk1RequestedProductId = productId
                 self.sk1ProductRequest?.cancel()
-                let request = SKProductsRequest(productIdentifiers: [Self.lifetimeProductId])
+                let request = SKProductsRequest(productIdentifiers: Self.allProductIds)
                 request.delegate = self
                 self.sk1ProductRequest = request
                 request.start()
@@ -116,23 +127,34 @@ final class TUSStoreKitManager: NSObject, SKProductsRequestDelegate, SKPaymentTr
     }
 
     func fetchLiveProductPrice(bridge: TUSBridgeViewController?) async {
-        let (sk2Product, _) = await fetchSK2ProductWithRetry(maxAttempts: 2)
-        if let product = sk2Product {
-            self.cachedDisplayPrice = product.displayPrice
-            bridge?.dispatchWebEvent(name: "tus:proPrice", payload: [
+        _ = await fetchSK2ProductWithRetry(productId: Self.lifetimeProductId, maxAttempts: 2)
+        if let life = cachedProducts[Self.lifetimeProductId] {
+            self.cachedDisplayPrice = life.displayPrice
+            var payload: [String: Any] = [
                 "productId": Self.lifetimeProductId,
-                "displayPrice": product.displayPrice
-            ])
+                "displayPrice": life.displayPrice
+            ]
+            if let monthly = cachedProducts[Self.monthlyProductId] {
+                self.cachedMonthlyDisplayPrice = monthly.displayPrice
+                payload["monthlyDisplayPrice"] = monthly.displayPrice
+            }
+            bridge?.dispatchWebEvent(name: "tus:proPrice", payload: payload)
             return
         }
-        let sk1Result = await fetchSK1Product()
+        let sk1Result = await fetchSK1Product(productId: Self.lifetimeProductId)
         if let sk1 = sk1Result.product {
             let formatted = formatSK1Price(sk1)
             self.cachedDisplayPrice = formatted
-            bridge?.dispatchWebEvent(name: "tus:proPrice", payload: [
+            var payload: [String: Any] = [
                 "productId": Self.lifetimeProductId,
                 "displayPrice": formatted
-            ])
+            ]
+            if let monthlySk1 = cachedSK1Products[Self.monthlyProductId] {
+                let mFmt = formatSK1Price(monthlySk1)
+                self.cachedMonthlyDisplayPrice = mFmt
+                payload["monthlyDisplayPrice"] = mFmt
+            }
+            bridge?.dispatchWebEvent(name: "tus:proPrice", payload: payload)
         }
     }
 
@@ -141,7 +163,7 @@ final class TUSStoreKitManager: NSObject, SKProductsRequestDelegate, SKPaymentTr
         var foundPro = self.isProUnlocked
         for await result in Transaction.currentEntitlements {
             if case .verified(let transaction) = result,
-               transaction.productID == Self.lifetimeProductId,
+               Self.allProductIds.contains(transaction.productID),
                transaction.revocationDate == nil {
                 foundPro = true
             }
@@ -153,7 +175,7 @@ final class TUSStoreKitManager: NSObject, SKProductsRequestDelegate, SKPaymentTr
             bridge?.notifyProStatus(
                 isPro: true,
                 cancelled: false,
-                message: "Ömür Boyu Tam Erişim (Pro) doğrulandı."
+                message: "TUS Akademi PRO erişimi doğrulandı."
             )
         }
     }
@@ -163,7 +185,8 @@ final class TUSStoreKitManager: NSObject, SKProductsRequestDelegate, SKPaymentTr
         return try await product.purchase()
     }
 
-    func purchaseLifetimePro(bridge: TUSBridgeViewController?) {
+    func purchaseLifetimePro(productId: String = lifetimeProductId, bridge: TUSBridgeViewController?) {
+        let targetProductId = Self.allProductIds.contains(productId) ? productId : Self.lifetimeProductId
         Task {
             guard AppStore.canMakePayments && SKPaymentQueue.canMakePayments() else {
                 bridge?.notifyProStatus(
@@ -174,14 +197,17 @@ final class TUSStoreKitManager: NSObject, SKProductsRequestDelegate, SKPaymentTr
                 return
             }
 
-            // 1. Primary path: StoreKit 2
-            let (sk2Product, sk2Error) = await fetchSK2ProductWithRetry(maxAttempts: 3)
+            // 1. Primary path: StoreKit 2 (with seamless fallback to approved Lifetime PRO if Monthly is still propagating)
+            var (sk2Product, sk2Error) = await fetchSK2ProductWithRetry(productId: targetProductId, maxAttempts: 3)
+            if sk2Product == nil && targetProductId == Self.monthlyProductId {
+                sk2Product = cachedProducts[Self.lifetimeProductId]
+            }
             if let product = sk2Product {
-                self.cachedDisplayPrice = product.displayPrice
-                bridge?.dispatchWebEvent(name: "tus:proPrice", payload: [
-                    "productId": Self.lifetimeProductId,
-                    "displayPrice": product.displayPrice
-                ])
+                if product.id == Self.lifetimeProductId {
+                    self.cachedDisplayPrice = product.displayPrice
+                } else {
+                    self.cachedMonthlyDisplayPrice = product.displayPrice
+                }
                 do {
                     let result = try await performSK2Purchase(product: product)
                     switch result {
@@ -194,7 +220,7 @@ final class TUSStoreKitManager: NSObject, SKProductsRequestDelegate, SKPaymentTr
                             bridge?.notifyProStatus(
                                 isPro: true,
                                 cancelled: false,
-                                message: "Tebrikler! TUS Vaka & Spot Akademi Ömür Boyu Tam Erişim (Pro) başarıyla açıldı."
+                                message: "Tebrikler! TUS Vaka & Spot Akademi PRO tam erişim başarıyla açıldı."
                             )
                             return
                         case .unverified:
@@ -235,14 +261,9 @@ final class TUSStoreKitManager: NSObject, SKProductsRequestDelegate, SKPaymentTr
             }
 
             // 2. Fallback path: StoreKit 1 (SKProductsRequest + SKPaymentQueue)
-            let sk1Result = await fetchSK1Product()
-            if let sk1Product = sk1Result.product {
-                let formatted = formatSK1Price(sk1Product)
-                self.cachedDisplayPrice = formatted
-                bridge?.dispatchWebEvent(name: "tus:proPrice", payload: [
-                    "productId": Self.lifetimeProductId,
-                    "displayPrice": formatted
-                ])
+            let sk1Result = await fetchSK1Product(productId: targetProductId)
+            let effectiveSk1 = sk1Result.product ?? cachedSK1Products[Self.lifetimeProductId]
+            if let sk1Product = effectiveSk1 {
                 DispatchQueue.main.async {
                     self.sk1PurchaseBridge = bridge
                     self.sk1PurchaseInFlight = true
@@ -291,7 +312,7 @@ final class TUSStoreKitManager: NSObject, SKProductsRequestDelegate, SKPaymentTr
                 try await AppStore.sync()
                 for await result in Transaction.currentEntitlements {
                     if case .verified(let transaction) = result,
-                       transaction.productID == Self.lifetimeProductId,
+                       Self.allProductIds.contains(transaction.productID),
                        transaction.revocationDate == nil {
                         restored = true
                     }
@@ -338,11 +359,12 @@ final class TUSStoreKitManager: NSObject, SKProductsRequestDelegate, SKPaymentTr
 
     // MARK: - SKProductsRequestDelegate
     func productsRequest(_ request: SKProductsRequest, didReceive response: SKProductsResponse) {
-        let product = response.products.first(where: { $0.productIdentifier == Self.lifetimeProductId })
-        if let product = product {
-            self.cachedSK1Product = product
+        for p in response.products {
+            self.cachedSK1Products[p.productIdentifier] = p
         }
-        let isInvalid = response.invalidProductIdentifiers.contains(Self.lifetimeProductId)
+        let targetId = self.sk1RequestedProductId
+        let product = self.cachedSK1Products[targetId] ?? self.cachedSK1Products[Self.lifetimeProductId]
+        let isInvalid = (product == nil) && response.invalidProductIdentifiers.contains(targetId)
         DispatchQueue.main.async {
             guard request === self.sk1ProductRequest else { return }
             let cont = self.sk1ProductsContinuation
@@ -365,7 +387,7 @@ final class TUSStoreKitManager: NSObject, SKProductsRequestDelegate, SKPaymentTr
     // MARK: - SKPaymentTransactionObserver
     func paymentQueue(_ queue: SKPaymentQueue, updatedTransactions transactions: [SKPaymentTransaction]) {
         for tx in transactions {
-            guard tx.payment.productIdentifier == Self.lifetimeProductId else { continue }
+            guard Self.allProductIds.contains(tx.payment.productIdentifier) else { continue }
             switch tx.transactionState {
             case .purchased, .restored:
                 self.isProUnlocked = true
@@ -376,7 +398,7 @@ final class TUSStoreKitManager: NSObject, SKProductsRequestDelegate, SKPaymentTr
                     sk1PurchaseBridge?.notifyProStatus(
                         isPro: true,
                         cancelled: false,
-                        message: "Tebrikler! TUS Vaka & Spot Akademi Ömür Boyu Tam Erişim (Pro) başarıyla açıldı."
+                        message: "Tebrikler! TUS Vaka & Spot Akademi PRO erişiminiz başarıyla açıldı."
                     )
                 }
             case .failed:
@@ -412,7 +434,7 @@ final class TUSStoreKitManager: NSObject, SKProductsRequestDelegate, SKPaymentTr
 
     func paymentQueueRestoreCompletedTransactionsFinished(_ queue: SKPaymentQueue) {
         let found = self.isProUnlocked || queue.transactions.contains {
-            $0.payment.productIdentifier == Self.lifetimeProductId &&
+            Self.allProductIds.contains($0.payment.productIdentifier) &&
             ($0.transactionState == .restored || $0.transactionState == .purchased)
         }
         DispatchQueue.main.async {
@@ -573,6 +595,20 @@ final class TUSLiveActivityAndWidgetManager {
         let rawPinned = body["pinnedPearlId"] as? String
         let pinnedPearlId = (rawPinned?.isEmpty == false) ? rawPinned : nil
 
+        var customPearl: TusWidgetPearl? = nil
+        if let cp = body["customPinnedPearl"] as? [String: Any],
+           let cpId = cp["id"] as? String, !cpId.isEmpty {
+            customPearl = TusWidgetPearl(
+                id: cpId,
+                branch: (cp["branch"] as? String) ?? "TUS",
+                category: (cp["category"] as? String) ?? "Beklenen Spot",
+                title: (cp["title"] as? String) ?? "TUS Altın Spot",
+                summary: (cp["summary"] as? String) ?? "",
+                comparison: (cp["comparison"] as? String) ?? "",
+                trap: (cp["trap"] as? String) ?? ""
+            )
+        }
+
         let snapshot = TusWidgetSnapshot(
             targetTusDate: targetDate,
             examLabel: examLabel,
@@ -583,6 +619,7 @@ final class TUSLiveActivityAndWidgetManager {
             dailyGoalMinutes: dailyGoalMinutes,
             topicTourPct: topicTourPct,
             pinnedPearlId: pinnedPearlId,
+            customPinnedPearl: customPearl,
             updatedAt: Date()
         )
         TusKeychainStore.save(snapshot)
@@ -762,8 +799,9 @@ class TUSBridgeViewController: CAPBridgeViewController, WKScriptMessageHandler {
             }
 
         case "purchasePro", "purchaseLifetimePro":
+            let requestedId = (body["productId"] as? String) ?? TUSStoreKitManager.lifetimeProductId
             TUSNativeHapticsEngine.shared.trigger(style: "medium")
-            TUSStoreKitManager.shared.purchaseLifetimePro(bridge: self)
+            TUSStoreKitManager.shared.purchaseLifetimePro(productId: requestedId, bridge: self)
 
         case "restorePurchases":
             TUSNativeHapticsEngine.shared.trigger(style: "selection")

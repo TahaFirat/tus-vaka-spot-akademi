@@ -14,11 +14,27 @@ import {
 } from 'lucide-react';
 import {
   ExpectedPearlCategory,
-  getActiveExpectedPearl,
   TUS_EXPECTED_PEARLS,
+  TusExpectedPearl,
 } from '../data/tusExpectedPearls';
-import { TUS_BRANCHES, TusBranchId } from '../data/tusMedicalRepository';
+import {
+  TUS_ALL_EXPECTED_PEARLS,
+  TUS_BRANCHES,
+  TusBranchId,
+} from '../data/tusMedicalRepository';
 import { shareClinicalSummary, triggerHaptic } from '../services/nativeBridge';
+
+export function getActiveFullExpectedPearl(
+  pinnedPearlId?: string | null,
+  nowMs = Date.now()
+): TusExpectedPearl {
+  if (pinnedPearlId) {
+    const found = TUS_ALL_EXPECTED_PEARLS.find((p) => p.id === pinnedPearlId);
+    if (found) return found;
+  }
+  const slot = Math.floor(nowMs / (2 * 3600 * 1000));
+  return TUS_EXPECTED_PEARLS[Math.abs(slot) % TUS_EXPECTED_PEARLS.length];
+}
 
 interface BeklenenSpotlarScreenProps {
   isLight: boolean;
@@ -54,7 +70,7 @@ export const BeklenenSpotlarScreen: React.FC<BeklenenSpotlarScreenProps> = React
     onJumpToBranchVaka,
   }) => {
     const defaultActive = useMemo(
-      () => getActiveExpectedPearl(pinnedWidgetPearlId),
+      () => getActiveFullExpectedPearl(pinnedWidgetPearlId),
       [pinnedWidgetPearlId]
     );
 
@@ -63,6 +79,7 @@ export const BeklenenSpotlarScreen: React.FC<BeklenenSpotlarScreenProps> = React
     >('ALL');
     const [selectedBranch, setSelectedBranch] = useState<'ALL' | TusBranchId>('ALL');
     const [searchQuery, setSearchQuery] = useState('');
+    const [visibleLimit, setVisibleLimit] = useState<number>(48);
     const [activePearlId, setActivePearlId] = useState<string>(
       () => focusedPearlId || defaultActive.id
     );
@@ -76,9 +93,13 @@ export const BeklenenSpotlarScreen: React.FC<BeklenenSpotlarScreenProps> = React
       }
     }, [focusedPearlId]);
 
+    useEffect(() => {
+      setVisibleLimit(48);
+    }, [selectedCategory, selectedBranch, searchQuery]);
+
     const filteredPearls = useMemo(() => {
       const q = searchQuery.trim().toLowerCase();
-      return TUS_EXPECTED_PEARLS.filter((p) => {
+      return TUS_ALL_EXPECTED_PEARLS.filter((p) => {
         if (selectedCategory === 'SAVED' && !savedPearlIds.includes(p.id)) {
           return false;
         }
@@ -138,7 +159,7 @@ export const BeklenenSpotlarScreen: React.FC<BeklenenSpotlarScreenProps> = React
               </h1>
             </div>
             <span className="px-2 py-0.5 rounded-lg bg-emerald-500/15 text-emerald-500 text-[10.5px] font-extrabold shrink-0 tabular-nums">
-              {filteredPearls.length} Altın Spot
+              {filteredPearls.length.toLocaleString('tr-TR')} Altın Spot
             </span>
           </div>
 
@@ -148,7 +169,7 @@ export const BeklenenSpotlarScreen: React.FC<BeklenenSpotlarScreenProps> = React
               const active = selectedCategory === cat;
               const label =
                 cat === 'ALL'
-                  ? `Tümü (${TUS_EXPECTED_PEARLS.length})`
+                  ? `Tümü (${TUS_ALL_EXPECTED_PEARLS.length.toLocaleString('tr-TR')})`
                   : cat === 'SAVED'
                   ? `Kayıtlı (${savedPearlIds.length})`
                   : cat;
@@ -419,14 +440,19 @@ export const BeklenenSpotlarScreen: React.FC<BeklenenSpotlarScreenProps> = React
           </div>
         )}
 
-        {/* Hızlı Taranabilir Tüm Beklenen Spotlar Listesi */}
+        {/* Hızlı Taranabilir Tüm Beklenen Spotlar Listesi (Sayfalanmış 60fps) */}
         {filteredPearls.length > 1 && (
-          <div className={`rounded-2xl border p-3.5 space-y-2 ${cardBg}`}>
-            <div className="text-xs font-extrabold text-slate-400">
-              Hızlı İndeks ({filteredPearls.length} Kart)
+          <div className={`rounded-2xl border p-3.5 space-y-2.5 ${cardBg}`}>
+            <div className="flex items-center justify-between text-xs font-extrabold text-slate-400">
+              <span>
+                Hızlı İndeks ({filteredPearls.length.toLocaleString('tr-TR')} Altın Spot & Tuzak)
+              </span>
+              <span className="text-emerald-500">
+                1–{Math.min(visibleLimit, filteredPearls.length)}
+              </span>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {filteredPearls.map((item) => {
+              {filteredPearls.slice(0, visibleLimit).map((item) => {
                 const selected = item.id === currentPearl.id;
                 return (
                   <button
@@ -444,7 +470,7 @@ export const BeklenenSpotlarScreen: React.FC<BeklenenSpotlarScreenProps> = React
                     }`}
                   >
                     <div className="flex items-center justify-between gap-1.5">
-                      <span className="text-[10px] font-extrabold text-emerald-500">
+                      <span className="text-[10px] font-extrabold text-emerald-500 truncate">
                         {item.branchShort} • {item.category}
                       </span>
                       {pinnedWidgetPearlId === item.id && (
@@ -461,6 +487,19 @@ export const BeklenenSpotlarScreen: React.FC<BeklenenSpotlarScreenProps> = React
                 );
               })}
             </div>
+            {filteredPearls.length > visibleLimit && (
+              <button
+                type="button"
+                onClick={() => {
+                  triggerHaptic('light');
+                  setVisibleLimit((l) => l + 60);
+                }}
+                className="w-full py-2.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-500 text-xs font-extrabold"
+              >
+                Daha Fazla Altın Spot Göster (
+                {(filteredPearls.length - visibleLimit).toLocaleString('tr-TR')} kalan)
+              </button>
+            )}
           </div>
         )}
 

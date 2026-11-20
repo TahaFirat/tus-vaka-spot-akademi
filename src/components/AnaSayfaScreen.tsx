@@ -15,16 +15,14 @@ import {
 import {
   STATIC_BRANCH_COUNTS,
   TOTAL_INTERACTIVE_TUS_ITEMS,
+  TUS_ALL_EXPECTED_PEARLS,
   TUS_BRANCHES,
   TUS_OSYM_TWIN_QUESTIONS,
   TUS_SPOT_CARDS,
   TUS_VAKA_QUESTIONS,
   TusBranchId,
 } from '../data/tusMedicalRepository';
-import {
-  getActiveExpectedPearl,
-  TUS_EXPECTED_PEARLS,
-} from '../data/tusExpectedPearls';
+import { getActiveFullExpectedPearl } from './BeklenenSpotlarScreen';
 import {
   FREE_QUESTION_LIMIT,
   PRO_PRICE_LABEL,
@@ -145,7 +143,7 @@ export const AnaSayfaScreen: React.FC<AnaSayfaScreenProps> = React.memo(
     const vakaTotalFmt = STATIC_BRANCH_COUNTS.ALL.vaka.toLocaleString('tr-TR');
     const spotTotalFmt = STATIC_BRANCH_COUNTS.ALL.spot.toLocaleString('tr-TR');
     const activeExpectedPearl = useMemo(
-      () => getActiveExpectedPearl(studyState.pinnedWidgetPearlId),
+      () => getActiveFullExpectedPearl(studyState.pinnedWidgetPearlId),
       [studyState.pinnedWidgetPearlId]
     );
 
@@ -253,7 +251,7 @@ export const AnaSayfaScreen: React.FC<AnaSayfaScreenProps> = React.memo(
               </span>
             </div>
             <span className="text-[10.5px] font-extrabold text-emerald-500 shrink-0 inline-flex items-center gap-0.5">
-              <span>{TUS_EXPECTED_PEARLS.length} Bilgi</span>
+              <span>{TUS_ALL_EXPECTED_PEARLS.length.toLocaleString('tr-TR')} Spot</span>
               <ChevronRight className="w-3.5 h-3.5" />
             </span>
           </div>
