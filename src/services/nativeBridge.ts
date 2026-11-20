@@ -100,6 +100,19 @@ export interface WidgetSnapshotPayload {
   dailyTarget: number;
   todayStudyMinutes: number;
   dailyGoalMinutes: number;
+  topicTourPct?: number;
+  pinnedPearlId?: string | null;
+}
+
+export function notifyNativeAppReady(): void {
+  try {
+    const handler = getNativeHandler();
+    if (handler) {
+      handler.postMessage({ action: 'appReady' });
+    }
+  } catch {
+    // Ignore on web
+  }
 }
 
 export function syncNativeWidgetSnapshot(payload: WidgetSnapshotPayload): void {

@@ -22,6 +22,10 @@ import {
   TusBranchId,
 } from '../data/tusMedicalRepository';
 import {
+  getActiveExpectedPearl,
+  TUS_EXPECTED_PEARLS,
+} from '../data/tusExpectedPearls';
+import {
   FREE_QUESTION_LIMIT,
   PRO_PRICE_LABEL,
   triggerHaptic,
@@ -40,10 +44,11 @@ interface AnaSayfaScreenProps {
   totalSolvedCount: number;
   priceLabel?: string;
   onNavigateTab: (
-    tab: 'vaka' | 'cikmis' | 'spot' | 'deneme' | 'analiz',
+    tab: 'vaka' | 'cikmis' | 'spot' | 'deneme' | 'analiz' | 'beklenen',
     options?: {
       basket?: 'all' | 'osym_twin' | 'unsolved' | 'wrong' | 'correct' | 'bookmarked';
       branchId?: 'ALL' | TusBranchId;
+      pearlId?: string;
     }
   ) => void;
   onOpenPaywall: (reason?: string) => void;
@@ -139,6 +144,10 @@ export const AnaSayfaScreen: React.FC<AnaSayfaScreenProps> = React.memo(
     const totalPoolFmt = TOTAL_INTERACTIVE_TUS_ITEMS.toLocaleString('tr-TR');
     const vakaTotalFmt = STATIC_BRANCH_COUNTS.ALL.vaka.toLocaleString('tr-TR');
     const spotTotalFmt = STATIC_BRANCH_COUNTS.ALL.spot.toLocaleString('tr-TR');
+    const activeExpectedPearl = useMemo(
+      () => getActiveExpectedPearl(studyState.pinnedWidgetPearlId),
+      [studyState.pinnedWidgetPearlId]
+    );
 
     return (
       <div className="space-y-3">
@@ -222,6 +231,44 @@ export const AnaSayfaScreen: React.FC<AnaSayfaScreenProps> = React.memo(
             </div>
           </div>
         </div>
+
+        {/* Widget ile %100 Senkronize "Sınavda Muhtemel Çıkacaklar & Günün Spot Köşesi" Kartı */}
+        <button
+          type="button"
+          onClick={() => {
+            triggerHaptic('medium');
+            onNavigateTab('beklenen', { pearlId: activeExpectedPearl.id });
+          }}
+          className={`w-full text-left rounded-2xl border p-3.5 space-y-1.5 transition active:scale-[0.99] ${
+            isLight
+              ? 'bg-gradient-to-r from-amber-50/90 via-white to-emerald-50/80 border-amber-200/90 shadow-xs'
+              : 'bg-gradient-to-r from-[#13222B] via-[#0C1B24] to-[#0E2429] border-emerald-500/30 shadow-md'
+          }`}
+        >
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-1.5 min-w-0">
+              <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+              <span className="text-[10.5px] font-extrabold uppercase tracking-wider text-amber-500 truncate">
+                Muhtemel Çıkacaklar Köşesi • {activeExpectedPearl.branchShort}
+              </span>
+            </div>
+            <span className="text-[10.5px] font-extrabold text-emerald-500 shrink-0 inline-flex items-center gap-0.5">
+              <span>{TUS_EXPECTED_PEARLS.length} Bilgi</span>
+              <ChevronRight className="w-3.5 h-3.5" />
+            </span>
+          </div>
+
+          <div className="text-xs sm:text-sm font-extrabold leading-snug">
+            {activeExpectedPearl.shortTitle}
+          </div>
+          <p
+            className={`text-[11.5px] leading-relaxed font-medium ${
+              isLight ? 'text-slate-600' : 'text-slate-300'
+            }`}
+          >
+            {activeExpectedPearl.widgetSummary}
+          </p>
+        </button>
 
         {/* 4 Saf Soru & Sınav Modülü (Mükerrer Odak Kartı Kaldırıldı) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">

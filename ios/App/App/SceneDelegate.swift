@@ -569,6 +569,9 @@ final class TUSLiveActivityAndWidgetManager {
         let dailyTarget = (body["dailyTarget"] as? Int) ?? 40
         let todayStudyMinutes = (body["todayStudyMinutes"] as? Int) ?? 0
         let dailyGoalMinutes = (body["dailyGoalMinutes"] as? Int) ?? 120
+        let topicTourPct = (body["topicTourPct"] as? Int) ?? 0
+        let rawPinned = body["pinnedPearlId"] as? String
+        let pinnedPearlId = (rawPinned?.isEmpty == false) ? rawPinned : nil
 
         let snapshot = TusWidgetSnapshot(
             targetTusDate: targetDate,
@@ -578,6 +581,8 @@ final class TUSLiveActivityAndWidgetManager {
             dailyTarget: dailyTarget,
             todayStudyMinutes: todayStudyMinutes,
             dailyGoalMinutes: dailyGoalMinutes,
+            topicTourPct: topicTourPct,
+            pinnedPearlId: pinnedPearlId,
             updatedAt: Date()
         )
         TusKeychainStore.save(snapshot)
@@ -655,6 +660,29 @@ final class TUSLiveActivityAndWidgetManager {
 // MARK: - Custom TUS Bridge View Controller (StoreKit 2 + Theme Sync + Spotlight + Share + WKScriptMessageHandler)
 class TUSBridgeViewController: CAPBridgeViewController, WKScriptMessageHandler {
     private var isLightTheme: Bool = false
+    private var isWebAppReady: Bool = false
+    private var pendingDeepLinkPayload: [String: Any]? = nil
+
+    func receiveDeepLink(url: URL) {
+        guard url.scheme?.lowercased() == "tusakademi" else { return }
+        let route = (url.host ?? "home").lowercased()
+        var itemId = ""
+        if let comps = URLComponents(url: url, resolvingAgainstBaseURL: false),
+           let qItem = comps.queryItems?.first(where: { $0.name == "id" }),
+           let val = qItem.value {
+            itemId = val
+        }
+        let payload: [String: Any] = [
+            "route": route,
+            "id": itemId,
+            "rawUrl": url.absoluteString
+        ]
+        if isWebAppReady {
+            dispatchWebEvent(name: "tus:deepLink", payload: payload)
+        } else {
+            pendingDeepLinkPayload = payload
+        }
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -725,6 +753,13 @@ class TUSBridgeViewController: CAPBridgeViewController, WKScriptMessageHandler {
         case "haptic":
             let style = (body["style"] as? String) ?? "light"
             TUSNativeHapticsEngine.shared.trigger(style: style)
+
+        case "appReady":
+            isWebAppReady = true
+            if let pending = pendingDeepLinkPayload {
+                pendingDeepLinkPayload = nil
+                dispatchWebEvent(name: "tus:deepLink", payload: pending)
+            }
 
         case "purchasePro", "purchaseLifetimePro":
             TUSNativeHapticsEngine.shared.trigger(style: "medium")
@@ -805,14 +840,26 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window?.rootViewController = rootVC
         window?.makeKeyAndVisible()
 
+        if let firstUrl = connectionOptions.urlContexts.first?.url {
+            rootVC.receiveDeepLink(url: firstUrl)
+        }
+
         SceneDelegateProxy.shared.scene(scene, willConnectTo: session, options: connectionOptions)
     }
 
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+        if let firstUrl = URLContexts.first?.url {
+            bridgeController?.receiveDeepLink(url: firstUrl)
+        }
         SceneDelegateProxy.shared.scene(scene, openURLContexts: URLContexts)
     }
 
     func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
+        if userActivity.activityType == CSSearchableItemActionType {
+            if let url = URL(string: "tusakademi://beklenen") {
+                bridgeController?.receiveDeepLink(url: url)
+            }
+        }
         SceneDelegateProxy.shared.scene(scene, continue: userActivity)
     }
 }

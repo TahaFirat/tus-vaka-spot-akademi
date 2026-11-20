@@ -6,6 +6,7 @@ import {
   CheckSquare,
   Compass,
   Crown,
+  Flame,
   Home,
   Layers,
   Moon,
@@ -19,11 +20,13 @@ import {
 import {
   OptionLetter,
   TOTAL_INTERACTIVE_TUS_ITEMS,
+  TUS_CORE_TOPICS,
   TusBranchId,
 } from './data/tusMedicalRepository';
 import {
   PRO_PRICE_LABEL,
   loadPersistedProStatus,
+  notifyNativeAppReady,
   requestNativeEntitlementCheck,
   savePersistedProStatus,
   syncNativeTheme,
@@ -48,11 +51,26 @@ import { DogruYanlisScreen } from './components/DogruYanlisScreen';
 import { DenemeRehberScreen } from './components/DenemeRehberScreen';
 import { AnalizScreen } from './components/AnalizScreen';
 import { OdakModuScreen, OdakSubTab } from './components/OdakModuScreen';
+import { BeklenenSpotlarScreen } from './components/BeklenenSpotlarScreen';
 import { PaywallModal } from './components/PaywallModal';
 import { OnboardingModal } from './components/OnboardingModal';
 
-type MainTabId = 'home' | 'odak' | 'vaka' | 'cikmis' | 'spot' | 'deneme' | 'analiz';
-type QueueBasket = 'all' | 'osym_twin' | 'unsolved' | 'wrong' | 'correct' | 'bookmarked';
+type MainTabId =
+  | 'home'
+  | 'odak'
+  | 'beklenen'
+  | 'vaka'
+  | 'cikmis'
+  | 'spot'
+  | 'deneme'
+  | 'analiz';
+type QueueBasket =
+  | 'all'
+  | 'osym_twin'
+  | 'unsolved'
+  | 'wrong'
+  | 'correct'
+  | 'bookmarked';
 
 export const App: React.FC = () => {
   const [studyState, setStudyState] = useState<TusStudyState>(() => loadStudyState());
@@ -60,6 +78,9 @@ export const App: React.FC = () => {
     loadStudyState().uiMode === 'odak' ? 'odak' : 'home'
   );
   const [odakSubTab, setOdakSubTab] = useState<OdakSubTab>('kronometre');
+  const [focusedPearlId, setFocusedPearlId] = useState<string | null>(null);
+  const [openedFromWidget, setOpenedFromWidget] = useState<boolean>(false);
+
   const [isPro, setIsPro] = useState<boolean>(false);
   const [proPriceLabel, setProPriceLabel] = useState<string>(PRO_PRICE_LABEL);
   const [paywallOpen, setPaywallOpen] = useState<boolean>(false);
@@ -111,7 +132,16 @@ export const App: React.FC = () => {
     syncNativeTheme(studyState.theme === 'light' ? 'light' : 'dark');
   }, [studyState.theme]);
 
-  // iOS Kilit Ekranı Widget anlık verisini 600ms debounce ile senkronize et
+  // 55 konu tur ilerlemesi % hesabı (Saf Odak Widget Halkası için)
+  const topicTourPct = useMemo(() => {
+    let total = 0;
+    for (const t of TUS_CORE_TOPICS) {
+      total += studyState.topicTours[t.id] || 0;
+    }
+    return Math.round((total / (TUS_CORE_TOPICS.length * 3)) * 100);
+  }, [studyState.topicTours]);
+
+  // iOS 4'lü Widget Ailesi anlık veri senkronizasyonu (Keychain + reloadAllTimelines)
   const todayKey = getLocalDateString();
   const todayStudyMinutes = Math.round(
     (studyState.studySecondsByDate[todayKey] || 0) / 60
@@ -127,8 +157,10 @@ export const App: React.FC = () => {
         dailyTarget: studyState.dailyTarget,
         todayStudyMinutes,
         dailyGoalMinutes: studyState.dailyGoalMinutes,
+        topicTourPct,
+        pinnedPearlId: studyState.pinnedWidgetPearlId,
       });
-    }, 600);
+    }, 450);
     return () => window.clearTimeout(t);
   }, [
     studyState.targetTusDate,
@@ -137,8 +169,11 @@ export const App: React.FC = () => {
     studyState.dailyTarget,
     todayStudyMinutes,
     studyState.dailyGoalMinutes,
+    topicTourPct,
+    studyState.pinnedWidgetPearlId,
   ]);
 
+  // Native StoreKit & Widget Deep-Link (`tusakademi://beklenen?id=exp-...`) Dinleyicisi
   useEffect(() => {
     let mounted = true;
     loadPersistedProStatus().then((persisted) => {
@@ -163,12 +198,50 @@ export const App: React.FC = () => {
       }
     };
 
+    const onNativeDeepLink = (e: Event) => {
+      const detail = (e as CustomEvent).detail || {};
+      const route = String(detail.route || '').toLowerCase();
+      const itemId = detail.id ? String(detail.id) : null;
+
+      if (route === 'odak') {
+        setStudyState((prev) => ({
+          ...prev,
+          uiMode: 'odak',
+          onboardingCompleted: true,
+        }));
+        setActiveTab('odak');
+      } else if (route === 'beklenen' || route === 'spot') {
+        setStudyState((prev) => ({
+          ...prev,
+          uiMode: 'akademi',
+          onboardingCompleted: true,
+        }));
+        setFocusedPearlId(itemId);
+        setOpenedFromWidget(true);
+        setActiveTab('beklenen');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else if (route === 'home') {
+        setStudyState((prev) => ({
+          ...prev,
+          uiMode: 'akademi',
+          onboardingCompleted: true,
+        }));
+        setActiveTab('home');
+      }
+    };
+
     window.addEventListener('tus:proStatus', onNativeProStatus as EventListener);
     window.addEventListener('tus:proPrice', onNativeProPrice as EventListener);
+    window.addEventListener('tus:deepLink', onNativeDeepLink as EventListener);
+
+    // Cold-boot sırasında kuyruğa alınan widget tıklamasını hemen al
+    notifyNativeAppReady();
+
     return () => {
       mounted = false;
       window.removeEventListener('tus:proStatus', onNativeProStatus as EventListener);
       window.removeEventListener('tus:proPrice', onNativeProPrice as EventListener);
+      window.removeEventListener('tus:deepLink', onNativeDeepLink as EventListener);
     };
   }, []);
 
@@ -281,6 +354,26 @@ export const App: React.FC = () => {
     });
   }, []);
 
+  const handleTogglePinPearl = useCallback((pearlId: string) => {
+    setStudyState((prev) => ({
+      ...prev,
+      pinnedWidgetPearlId:
+        prev.pinnedWidgetPearlId === pearlId ? null : pearlId,
+    }));
+  }, []);
+
+  const handleToggleSavePearl = useCallback((pearlId: string) => {
+    setStudyState((prev) => {
+      const exists = prev.savedExpectedPearlIds.includes(pearlId);
+      return {
+        ...prev,
+        savedExpectedPearlIds: exists
+          ? prev.savedExpectedPearlIds.filter((id) => id !== pearlId)
+          : [...prev.savedExpectedPearlIds, pearlId],
+      };
+    });
+  }, []);
+
   const handleRecordExamAttempt = useCallback((attempt: TusExamAttempt) => {
     setStudyState((prev) => ({
       ...prev,
@@ -311,19 +404,16 @@ export const App: React.FC = () => {
     }));
   }, []);
 
-  const handleSwitchMode = useCallback(
-    (nextMode: 'akademi' | 'odak') => {
-      triggerHaptic('medium');
-      setOdakHubOpen(false);
-      setStudyState((prev) => ({ ...prev, uiMode: nextMode }));
-      if (nextMode === 'odak') {
-        setActiveTab('odak');
-      } else {
-        setActiveTab((cur) => (cur === 'odak' ? 'home' : cur));
-      }
-    },
-    []
-  );
+  const handleSwitchMode = useCallback((nextMode: 'akademi' | 'odak') => {
+    triggerHaptic('medium');
+    setOdakHubOpen(false);
+    setStudyState((prev) => ({ ...prev, uiMode: nextMode }));
+    if (nextMode === 'odak') {
+      setActiveTab('odak');
+    } else {
+      setActiveTab((cur) => (cur === 'odak' ? 'home' : cur));
+    }
+  }, []);
 
   const handleCompleteOnboarding = useCallback((chosenMode: 'akademi' | 'odak') => {
     setReplayOnboardingOpen(false);
@@ -341,16 +431,27 @@ export const App: React.FC = () => {
 
   const handleNavigateTab = useCallback(
     (
-      tab: 'vaka' | 'cikmis' | 'spot' | 'deneme' | 'analiz',
+      tab: 'vaka' | 'cikmis' | 'spot' | 'deneme' | 'analiz' | 'beklenen',
       options?: {
         basket?: QueueBasket;
         branchId?: 'ALL' | TusBranchId;
+        pearlId?: string;
       }
     ) => {
       setOdakHubOpen(false);
       setStudyState((prev) =>
         prev.uiMode === 'odak' ? { ...prev, uiMode: 'akademi' } : prev
       );
+      if (tab === 'beklenen') {
+        if (options?.pearlId) {
+          setFocusedPearlId(options.pearlId);
+        }
+        setOpenedFromWidget(false);
+        setActiveTab('beklenen');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+
       const nextBasket = options?.basket ?? 'unsolved';
       if (tab === 'vaka') {
         setVakaBasketJump(nextBasket);
@@ -391,11 +492,12 @@ export const App: React.FC = () => {
     icon: React.ReactNode;
   }> = [
     { id: 'home', label: 'Ev', icon: <Home className="w-4 h-4" /> },
+    { id: 'beklenen', label: 'Beklenenler', icon: <Flame className="w-4 h-4" /> },
     { id: 'vaka', label: 'Vaka', icon: <CheckSquare className="w-4 h-4" /> },
     { id: 'cikmis', label: 'Çıkmış İkiz', icon: <Sparkles className="w-4 h-4" /> },
     { id: 'spot', label: 'D/Y Spot', icon: <Zap className="w-4 h-4" /> },
     { id: 'deneme', label: 'Deneme', icon: <Award className="w-4 h-4" /> },
-    { id: 'analiz', label: 'Karne & Ayarlar', icon: <BarChart3 className="w-4 h-4" /> },
+    { id: 'analiz', label: 'Karne', icon: <BarChart3 className="w-4 h-4" /> },
   ];
 
   const odakDesktopTabs: Array<{
@@ -411,29 +513,41 @@ export const App: React.FC = () => {
 
   const showOnboarding = !studyState.onboardingCompleted || replayOnboardingOpen;
 
+  const glassCapsuleClass = isLightMode
+    ? 'ios-liquid-glass-light'
+    : 'ios-liquid-glass-dark';
+
+  const glassOrbClass = isLightMode
+    ? 'ios-liquid-orb-light text-slate-700'
+    : 'ios-liquid-orb-dark text-slate-200';
+
+  const activeGlassPillClass = isLightMode
+    ? 'ios-liquid-pill-active-light text-white'
+    : 'ios-liquid-pill-active-dark text-emerald-200';
+
   return (
     <div
       className={`min-h-screen w-full overflow-x-hidden flex flex-col transition-colors duration-200 ${
         isLightMode
           ? isOdakMode
-            ? 'bg-[#F0F6F5] text-slate-900'
-            : 'bg-[#F3F7F9] text-slate-900'
+            ? 'bg-[#EEF6F5] text-slate-900'
+            : 'bg-[#F2F7F9] text-slate-900'
           : isOdakMode
           ? 'bg-[#061116] text-slate-100'
           : 'bg-[#071117] text-slate-100'
       }`}
     >
-      {/* Sade Üst Bar (Mükerrer Geri Sayım/Seri Kaldırıldı) */}
+      {/* iOS 26/27 Yüzen "Liquid Glass" Şeffaf Kırınımlı Üst Kapsül Bar */}
       <header
-        className={`sticky top-0 z-30 border-b pt-safe ${
-          isLightMode
-            ? 'ios-glass-header-light border-slate-200/80'
-            : 'ios-glass-header-dark border-white/10'
+        className={`sticky top-0 z-30 pt-safe px-2.5 sm:px-4 pb-1.5 pointer-events-none ${
+          isLightMode ? 'ios-scroll-veil-top-light' : 'ios-scroll-veil-top-dark'
         }`}
       >
-        <div className="max-w-4xl mx-auto px-3 sm:px-4 h-12 flex items-center justify-between gap-2">
-          {/* Sol: Marka İkonu + OKX TR / Binance Çift Mod Anahtarı */}
-          <div className="flex items-center gap-2 shrink-0">
+        <div
+          className={`pointer-events-auto max-w-4xl mx-auto h-12 rounded-full px-2 sm:px-3 flex items-center justify-between gap-1.5 ${glassCapsuleClass}`}
+        >
+          {/* Sol: İkon + Liquid Glass Mod Geçiş Kapsülü */}
+          <div className="flex items-center gap-1.5 shrink-0">
             <button
               type="button"
               onClick={() => {
@@ -450,15 +564,15 @@ export const App: React.FC = () => {
               <img
                 src="/icon-192.png"
                 alt="TUS Akademi"
-                className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl shadow-xs object-cover"
+                className="w-7 h-7 sm:w-8 sm:h-8 rounded-full shadow-xs object-cover"
               />
             </button>
 
             <div
-              className={`inline-flex rounded-xl p-0.5 border ${
+              className={`inline-flex rounded-full p-0.5 ${
                 isLightMode
-                  ? 'bg-slate-100 border-slate-200'
-                  : 'bg-[#0C1B24] border-white/10'
+                  ? 'bg-slate-900/6 border border-slate-900/8'
+                  : 'bg-black/28 border border-white/12'
               }`}
               role="group"
               aria-label="Çalışma Modu"
@@ -466,9 +580,9 @@ export const App: React.FC = () => {
               <button
                 type="button"
                 onClick={() => handleSwitchMode('akademi')}
-                className={`px-2 sm:px-2.5 py-1 rounded-lg text-[10.5px] sm:text-[11px] font-extrabold transition whitespace-nowrap ${
+                className={`px-2 sm:px-2.5 py-1 rounded-full text-[10.5px] sm:text-[11px] font-extrabold transition whitespace-nowrap ${
                   !isOdakMode
-                    ? 'bg-emerald-600 text-white shadow-xs'
+                    ? activeGlassPillClass
                     : isLightMode
                     ? 'text-slate-600 hover:text-slate-900'
                     : 'text-slate-400 hover:text-slate-200'
@@ -479,9 +593,9 @@ export const App: React.FC = () => {
               <button
                 type="button"
                 onClick={() => handleSwitchMode('odak')}
-                className={`px-2 sm:px-2.5 py-1 rounded-lg text-[10.5px] sm:text-[11px] font-extrabold inline-flex items-center gap-1 transition whitespace-nowrap ${
+                className={`px-2 sm:px-2.5 py-1 rounded-full text-[10.5px] sm:text-[11px] font-extrabold inline-flex items-center gap-1 transition whitespace-nowrap ${
                   isOdakMode
-                    ? 'bg-teal-600 text-white shadow-xs'
+                    ? activeGlassPillClass
                     : isLightMode
                     ? 'text-slate-600 hover:text-slate-900'
                     : 'text-slate-400 hover:text-slate-200'
@@ -509,12 +623,12 @@ export const App: React.FC = () => {
                         triggerHaptic('light');
                         setOdakSubTab(tab.id);
                       }}
-                      className={`px-2.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 transition whitespace-nowrap ${
+                      className={`px-2.5 py-1.5 rounded-full text-xs font-bold flex items-center gap-1 transition whitespace-nowrap ${
                         active
-                          ? 'bg-teal-600 text-white shadow-xs'
+                          ? activeGlassPillClass
                           : isLightMode
-                          ? 'text-slate-600 hover:bg-slate-200/70'
-                          : 'text-slate-400 hover:bg-white/5 hover:text-slate-200'
+                          ? 'text-slate-600 hover:bg-white/60'
+                          : 'text-slate-300 hover:bg-white/8'
                       }`}
                     >
                       {tab.icon}
@@ -536,16 +650,18 @@ export const App: React.FC = () => {
                           tab.id === 'spot'
                         ) {
                           handleNavigateTab(tab.id, { basket: 'unsolved' });
+                        } else if (tab.id === 'beklenen') {
+                          handleNavigateTab('beklenen');
                         } else {
                           setActiveTab(tab.id);
                         }
                       }}
-                      className={`px-2.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 transition whitespace-nowrap ${
+                      className={`px-2.5 py-1.5 rounded-full text-xs font-bold flex items-center gap-1 transition whitespace-nowrap ${
                         active
-                          ? 'bg-emerald-600 text-white shadow-xs'
+                          ? activeGlassPillClass
                           : isLightMode
-                          ? 'text-slate-600 hover:bg-slate-200/70'
-                          : 'text-slate-400 hover:bg-white/5 hover:text-slate-200'
+                          ? 'text-slate-600 hover:bg-white/60'
+                          : 'text-slate-300 hover:bg-white/8'
                       }`}
                     >
                       {tab.icon}
@@ -555,8 +671,8 @@ export const App: React.FC = () => {
                 })}
           </div>
 
-          {/* Sağ Araçlar: Karne/Ayarlar (Akademi) veya Rehber (Odak) + Tema + PRO */}
-          <div className="flex items-center gap-1.5 shrink-0">
+          {/* Sağ Liquid Glass Damlacıkları */}
+          <div className="flex items-center gap-1 shrink-0">
             {isOdakMode ? (
               <button
                 type="button"
@@ -566,38 +682,51 @@ export const App: React.FC = () => {
                 }}
                 aria-label="Uygulama Tanıtımı"
                 title="Uygulama Tanıtımı"
-                className={`w-8 h-8 rounded-xl border flex items-center justify-center transition ${
-                  isLightMode
-                    ? 'bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-700'
-                    : 'bg-white/5 hover:bg-white/10 border-white/10 text-slate-300'
-                }`}
+                className={`w-8 h-8 rounded-full flex items-center justify-center transition ${glassOrbClass}`}
               >
                 <Compass className="w-4 h-4 text-teal-500" />
               </button>
             ) : (
-              <button
-                type="button"
-                onClick={() => {
-                  triggerHaptic('light');
-                  setActiveTab('analiz');
-                }}
-                aria-label="Karne ve Ayarlar"
-                title="Karne ve Ayarlar"
-                className={`lg:hidden w-8 h-8 xs:w-auto xs:px-2 xs:py-1 rounded-xl border text-[11px] font-extrabold inline-flex items-center justify-center gap-1 transition ${
-                  activeTab === 'analiz'
-                    ? 'bg-emerald-600 border-emerald-500 text-white'
-                    : isLightMode
-                    ? 'bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-700'
-                    : 'bg-white/5 hover:bg-white/10 border-white/10 text-slate-300'
-                }`}
-              >
-                <BarChart3
-                  className={`w-3.5 h-3.5 ${
-                    activeTab === 'analiz' ? 'text-white' : 'text-emerald-500'
+              <>
+                <button
+                  type="button"
+                  onClick={() => {
+                    triggerHaptic('light');
+                    handleNavigateTab('beklenen');
+                  }}
+                  aria-label="Muhtemel Çıkacaklar Köşesi"
+                  title="Muhtemel Çıkacaklar Köşesi"
+                  className={`hidden xs:flex lg:hidden w-8 h-8 rounded-full items-center justify-center transition ${
+                    activeTab === 'beklenen' ? activeGlassPillClass : glassOrbClass
                   }`}
-                />
-                <span className="hidden xs:inline">Karne</span>
-              </button>
+                >
+                  <Sparkles
+                    className={`w-3.5 h-3.5 ${
+                      activeTab === 'beklenen' ? 'text-white' : 'text-amber-500'
+                    }`}
+                  />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    triggerHaptic('light');
+                    setActiveTab('analiz');
+                  }}
+                  aria-label="Karne ve Ayarlar"
+                  title="Karne ve Ayarlar"
+                  className={`lg:hidden w-8 h-8 xs:w-auto xs:px-2.5 rounded-full text-[11px] font-extrabold inline-flex items-center justify-center gap-1 transition ${
+                    activeTab === 'analiz' ? activeGlassPillClass : glassOrbClass
+                  }`}
+                >
+                  <BarChart3
+                    className={`w-3.5 h-3.5 ${
+                      activeTab === 'analiz' ? 'text-white' : 'text-emerald-500'
+                    }`}
+                  />
+                  <span className="hidden xs:inline">Karne</span>
+                </button>
+              </>
             )}
 
             <button
@@ -610,16 +739,12 @@ export const App: React.FC = () => {
                 }));
               }}
               aria-label="Tema Değiştir"
-              className={`w-8 h-8 rounded-xl border flex items-center justify-center transition ${
-                isLightMode
-                  ? 'bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-700'
-                  : 'bg-white/5 hover:bg-white/10 border-white/10 text-slate-300'
-              }`}
+              className={`w-8 h-8 rounded-full flex items-center justify-center transition ${glassOrbClass}`}
             >
               {isLightMode ? (
-                <Moon className="w-4 h-4 text-slate-700" />
+                <Moon className="w-3.5 h-3.5 text-slate-700" />
               ) : (
-                <Sun className="w-4 h-4 text-amber-300" />
+                <Sun className="w-3.5 h-3.5 text-amber-300" />
               )}
             </button>
 
@@ -631,13 +756,8 @@ export const App: React.FC = () => {
                     triggerHaptic('light');
                     setProBannerVisible((v) => !v);
                   }}
-                  className={`inline-flex items-center gap-1 px-2 py-1 rounded-xl border text-[11px] font-extrabold whitespace-nowrap transition ${
-                    isLightMode
-                      ? 'bg-emerald-50 border-emerald-300 text-emerald-700'
-                      : 'bg-emerald-500/20 border-emerald-400/40 text-emerald-300'
-                  }`}
+                  className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10.5px] font-extrabold whitespace-nowrap transition ${activeGlassPillClass}`}
                 >
-                  <Sparkles className="w-3 h-3 text-emerald-500" />
                   <span>PRO</span>
                 </button>
               ) : (
@@ -647,7 +767,7 @@ export const App: React.FC = () => {
                     triggerHaptic('medium');
                     handleOpenPaywall();
                   }}
-                  className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-[11px] font-extrabold whitespace-nowrap shadow-xs"
+                  className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-[10.5px] font-extrabold whitespace-nowrap shadow-xs"
                 >
                   <Crown className="w-3 h-3" />
                   <span>PRO</span>
@@ -657,8 +777,8 @@ export const App: React.FC = () => {
         </div>
       </header>
 
-      {/* Ana İçerik Alanı: Odak Modunda Yalnızca Saf Odak Ekranı Görünür */}
-      <main className="flex-1 max-w-4xl w-full mx-auto px-3 sm:px-4 pt-2.5 pb-24 lg:pb-8 space-y-2.5">
+      {/* Ana İçerik Alanı */}
+      <main className="flex-1 max-w-4xl w-full mx-auto px-3 sm:px-4 pt-1.5 pb-28 lg:pb-8 space-y-2.5">
         {!isOdakMode && isPro && proBannerVisible && (
           <div
             className={`rounded-2xl border px-3.5 py-2.5 flex items-center justify-between gap-2 text-xs ${
@@ -704,6 +824,21 @@ export const App: React.FC = () => {
                 priceLabel={proPriceLabel}
                 onNavigateTab={handleNavigateTab}
                 onOpenPaywall={handleOpenPaywall}
+              />
+            )}
+
+            {activeTab === 'beklenen' && (
+              <BeklenenSpotlarScreen
+                isLight={isLightMode}
+                focusedPearlId={focusedPearlId}
+                openedFromWidget={openedFromWidget}
+                pinnedWidgetPearlId={studyState.pinnedWidgetPearlId}
+                savedPearlIds={studyState.savedExpectedPearlIds}
+                onTogglePinPearl={handleTogglePinPearl}
+                onToggleSavePearl={handleToggleSavePearl}
+                onJumpToBranchVaka={(branchId) =>
+                  handleNavigateTab('vaka', { basket: 'unsolved', branchId })
+                }
               />
             )}
 
@@ -806,19 +941,15 @@ export const App: React.FC = () => {
         )}
       </main>
 
-      {/* Odak Modu Tek Merkez İkonlu Saf Etüt Menüsü (Sıfır Soru Unsuru) */}
+      {/* Odak Modu Liquid Glass Saf Etüt Menüsü */}
       {isOdakMode && odakHubOpen && (
         <div
-          className="lg:hidden fixed inset-0 z-40 bg-black/55 flex items-end justify-center p-3 pb-6"
+          className="lg:hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-xs flex items-end justify-center p-3 pb-8"
           onClick={() => setOdakHubOpen(false)}
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className={`w-full max-w-md rounded-3xl border p-4 space-y-3 shadow-2xl ${
-              isLightMode
-                ? 'bg-white border-slate-200 text-slate-900'
-                : 'bg-[#0B1820] border-teal-500/30 text-slate-100'
-            }`}
+            className={`w-full max-w-md rounded-3xl p-4 space-y-3 ${glassCapsuleClass}`}
           >
             <div className="flex items-center justify-between">
               <div className="text-xs font-extrabold uppercase tracking-wider text-teal-500">
@@ -827,7 +958,7 @@ export const App: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setOdakHubOpen(false)}
-                className="p-1 rounded-full bg-slate-500/15"
+                className={`p-1.5 rounded-full ${glassOrbClass}`}
                 aria-label="Kapat"
               >
                 <X className="w-4 h-4" />
@@ -871,18 +1002,14 @@ export const App: React.FC = () => {
                       setOdakSubTab(item.id);
                       setOdakHubOpen(false);
                     }}
-                    className={`text-left rounded-2xl border p-3 flex items-start gap-2.5 transition ${
-                      active
-                        ? 'bg-teal-600/15 border-teal-500'
-                        : isLightMode
-                        ? 'bg-slate-50 hover:bg-teal-50 border-slate-200'
-                        : 'bg-[#071117] hover:bg-teal-950/30 border-white/10'
+                    className={`text-left rounded-2xl p-3 flex items-start gap-2.5 transition ${
+                      active ? activeGlassPillClass : glassOrbClass
                     }`}
                   >
                     <div className="mt-0.5 shrink-0">{item.icon}</div>
                     <div className="min-w-0">
                       <div className="text-xs font-extrabold truncate">{item.label}</div>
-                      <div className="text-[10px] text-slate-400 truncate">{item.sub}</div>
+                      <div className="text-[10px] opacity-80 truncate">{item.sub}</div>
                     </div>
                   </button>
                 );
@@ -892,7 +1019,7 @@ export const App: React.FC = () => {
             <button
               type="button"
               onClick={() => handleSwitchMode('akademi')}
-              className="w-full py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold flex items-center justify-center gap-1.5"
+              className="w-full py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold flex items-center justify-center gap-1.5 shadow-sm"
             >
               <Zap className="w-4 h-4" />
               <span>Akademi Moduna Geç</span>
@@ -901,8 +1028,8 @@ export const App: React.FC = () => {
         </div>
       )}
 
-      {/* Alt Navigasyon Çubuğu: Odak = Tek Merkez İkon | Akademi = 5 Saf Sekme */}
-      <div className="lg:hidden fixed bottom-3 inset-x-2.5 z-30 pointer-events-none flex justify-center pb-safe">
+      {/* iOS 26/27 Yüzen "Liquid Glass" Şeffaf Alt Kapsül Navigasyon Çubuğu */}
+      <div className="lg:hidden fixed bottom-3 inset-x-3 z-30 pointer-events-none flex justify-center pb-safe">
         {isOdakMode ? (
           <button
             type="button"
@@ -911,20 +1038,20 @@ export const App: React.FC = () => {
               setOdakHubOpen((o) => !o);
             }}
             aria-label="Odak Menüsü"
-            className="pointer-events-auto inline-flex items-center gap-2 px-5 py-3 rounded-full bg-gradient-to-r from-teal-600 to-emerald-600 text-white font-extrabold text-xs shadow-xl border border-teal-400/40 active:scale-95 transition"
+            className={`pointer-events-auto inline-flex items-center gap-2 px-5 py-3 rounded-full font-extrabold text-xs active:scale-95 transition ${glassCapsuleClass}`}
           >
-            <Timer className="w-4 h-4" />
+            <span className="w-6 h-6 rounded-full bg-teal-500/20 border border-teal-400/40 flex items-center justify-center text-teal-400">
+              <Timer className="w-3.5 h-3.5" />
+            </span>
             <span>Odak Menüsü</span>
             {studyState.activeTimer.running && (
-              <span className="w-2 h-2 rounded-full bg-amber-300" />
+              <span className="w-2 h-2 rounded-full bg-amber-400" />
             )}
           </button>
         ) : (
           <nav
             aria-label="Ana Navigasyon"
-            className={`pointer-events-auto w-full max-w-md rounded-2xl p-1 transition-colors duration-150 ${
-              isLightMode ? 'ios-glass-dock-light' : 'ios-glass-dock-dark'
-            }`}
+            className={`pointer-events-auto w-full max-w-md rounded-full p-1.5 transition-all duration-150 ${glassCapsuleClass}`}
           >
             <div className="grid grid-cols-5 gap-1 items-center">
               {[
@@ -949,14 +1076,12 @@ export const App: React.FC = () => {
                         handleNavigateTab(tab.id, { basket: 'unsolved' });
                       }
                     }}
-                    className={`py-1.5 px-1 rounded-xl flex flex-col items-center justify-center gap-0.5 transition ${
+                    className={`py-1.5 px-1 rounded-full flex flex-col items-center justify-center gap-0.5 transition ${
                       active
-                        ? isLightMode
-                          ? 'bg-emerald-600 text-white font-bold shadow-xs'
-                          : 'bg-emerald-500/25 text-emerald-300 font-bold border border-emerald-400/25'
+                        ? `${activeGlassPillClass} font-extrabold`
                         : isLightMode
-                        ? 'text-slate-600 hover:text-slate-900 font-semibold'
-                        : 'text-slate-400 hover:text-slate-200 font-medium'
+                        ? 'text-slate-700 hover:text-slate-950 font-semibold'
+                        : 'text-slate-300 hover:text-white font-medium'
                     }`}
                   >
                     {tab.icon}
@@ -971,7 +1096,7 @@ export const App: React.FC = () => {
         )}
       </div>
 
-      {/* İlk Giriş Tanıtım & Kişiselleştirme Ekranı (veya Ayarlardan Tekrar İzleme) */}
+      {/* İlk Giriş Tanıtım & Kişiselleştirme Ekranı */}
       <OnboardingModal
         isOpen={showOnboarding}
         isReplay={replayOnboardingOpen}

@@ -73,6 +73,17 @@
 	<true/>
 	<key>NSSupportsLiveActivities</key>
 	<true/>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.tus.akademi.deeplink</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>tusakademi</string>
+			</array>
+		</dict>
+	</array>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 </dict>

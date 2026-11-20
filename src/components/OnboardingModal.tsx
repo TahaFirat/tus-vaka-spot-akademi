@@ -265,9 +265,9 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
             </div>
 
             <div className={`rounded-2xl border p-3 text-xs space-y-1.5 ${subBg}`}>
-              <div className="font-extrabold">5 Farklı iOS Widget Tasarımı</div>
+              <div className="font-extrabold">4 Ayrı Widget & Muhtemel Çıkacaklar Köşesi</div>
               <p className="text-[11px] text-slate-400 leading-relaxed">
-                Kilit ekranına ve ana ekrana <strong>TUS Geri Sayım</strong>, <strong>Etüt Halkası</strong> ve <strong>Günün Spot Bilgisi</strong> widgetlarını ekleyebilirsin.
+                <strong>Günün Çıkacak Spotu</strong>, <strong>İlk Tercih & Tuzak Kartı</strong>, <strong>TUS Sayacı</strong> ve <strong>Saf Odak Halkası</strong> widgetlarına dokunduğunda ilgili spot uygulama içinde doğrudan açılır.
               </p>
             </div>
           </div>

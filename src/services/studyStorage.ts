@@ -193,6 +193,8 @@ export interface TusStudyState {
   targetSpecialtyId: string;
   activeTimer: ActiveStudyTimerState;
   onboardingCompleted: boolean;
+  pinnedWidgetPearlId: string | null;
+  savedExpectedPearlIds: string[];
 }
 
 const STORAGE_KEY = 'tus_vaka_spot_akademi_state_v1';
@@ -238,6 +240,8 @@ export const DEFAULT_STUDY_STATE: TusStudyState = {
   targetSpecialtyId: 'kardiyoloji',
   activeTimer: DEFAULT_ACTIVE_TIMER,
   onboardingCompleted: false,
+  pinnedWidgetPearlId: null,
+  savedExpectedPearlIds: [],
 };
 
 export function loadStudyState(): TusStudyState {
@@ -303,6 +307,13 @@ export function loadStudyState(): TusStudyState {
           ? { ...DEFAULT_ACTIVE_TIMER, ...parsed.activeTimer }
           : DEFAULT_ACTIVE_TIMER,
       onboardingCompleted: Boolean(parsed.onboardingCompleted),
+      pinnedWidgetPearlId:
+        typeof parsed.pinnedWidgetPearlId === 'string'
+          ? parsed.pinnedWidgetPearlId
+          : null,
+      savedExpectedPearlIds: Array.isArray(parsed.savedExpectedPearlIds)
+        ? parsed.savedExpectedPearlIds
+        : [],
     };
   } catch {
     return DEFAULT_STUDY_STATE;
