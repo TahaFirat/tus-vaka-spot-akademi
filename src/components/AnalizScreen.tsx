@@ -3,8 +3,6 @@ import {
   Award,
   BarChart3,
   Bell,
-  Calendar,
-  Clock,
   Download,
   Flame,
   RotateCcw,
@@ -14,9 +12,8 @@ import {
   Upload,
 } from 'lucide-react';
 import {
+  STATIC_BRANCH_COUNTS,
   TUS_BRANCHES,
-  TUS_SPOT_CARDS,
-  TUS_VAKA_QUESTIONS,
 } from '../data/tusMedicalRepository';
 import {
   cancelDailyTusReminder,
@@ -29,8 +26,8 @@ import {
   calculateOsymNet,
   getTusCountdownParts,
   TusStudyState,
-  UPCOMING_TUS_EXAMS,
 } from '../services/studyStorage';
+import { TusDynamicCountdownCard } from './TusCountdownTimer';
 
 interface AnalizScreenProps {
   studyState: TusStudyState;
@@ -54,7 +51,6 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [importMessage, setImportMessage] = useState<string | null>(null);
   const [confirmReset, setConfirmReset] = useState(false);
-  const [nowMs, setNowMs] = useState<number>(() => Date.now());
   const [reminderHour, setReminderHour] = useState<number>(20);
   const [reminderStatusMsg, setReminderStatusMsg] = useState<string | null>(
     null
@@ -76,17 +72,9 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
     };
   }, []);
 
-  // Live 1-second timer for active TUS countdown
-  useEffect(() => {
-    const timer = window.setInterval(() => {
-      setNowMs(Date.now());
-    }, 1000);
-    return () => window.clearInterval(timer);
-  }, []);
-
-  const countdown = useMemo(
-    () => getTusCountdownParts(studyState.targetTusDate, nowMs),
-    [studyState.targetTusDate, nowMs]
+  const countdownDays = useMemo(
+    () => getTusCountdownParts(studyState.targetTusDate).days,
+    [studyState.targetTusDate]
   );
 
   const stats = useMemo(() => {
@@ -119,15 +107,12 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
     > = {};
 
     TUS_BRANCHES.forEach((b) => {
-      const poolCount =
-        TUS_VAKA_QUESTIONS.filter((q) => q.branchId === b.id).length +
-        TUS_SPOT_CARDS.filter((s) => s.branchId === b.id).length;
       perBranch[b.id] = {
         solved: 0,
         correct: 0,
         wrong: 0,
         net: 0,
-        totalPool: poolCount,
+        totalPool: STATIC_BRANCH_COUNTS[b.id]?.total || 120,
       };
     });
 
@@ -234,72 +219,15 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
 
   return (
     <div className="space-y-2.5">
-      {/* Live Active TUS Countdown Banner */}
-      <div
-        className={`rounded-2xl border p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
-          isLight
-            ? 'bg-gradient-to-r from-emerald-50 via-teal-50 to-cyan-50 border-emerald-200'
-            : 'bg-gradient-to-r from-emerald-950/60 via-[#0C1B24] to-cyan-950/50 border-emerald-500/30'
-        }`}
-      >
-        <div className="space-y-1">
-          <div className="flex items-center gap-1.5 text-xs font-extrabold text-emerald-500">
-            <Clock className="w-3.5 h-3.5 animate-pulse" />
-            <span>CANLI ÖSYM TUS GERİ SAYIMI</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-teal-500 shrink-0" />
-            <select
-              value={studyState.targetTusDate}
-              onChange={(e) => {
-                triggerHaptic('light');
-                onUpdateStudyState((prev) => ({
-                  ...prev,
-                  targetTusDate: e.target.value,
-                }));
-              }}
-              aria-label="Hedef TUS Dönemi"
-              className={`rounded-xl px-2.5 py-1 text-xs font-bold border outline-none ${
-                isLight
-                  ? 'bg-white border-emerald-200 text-slate-800'
-                  : 'bg-[#071117] border-white/15 text-slate-100'
-              }`}
-            >
-              {UPCOMING_TUS_EXAMS.map((exam) => (
-                <option key={exam.date} value={exam.date}>
-                  {exam.label} ({exam.date})
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        {/* Live Ticking Boxes: Gün / Saat / Dakika / Saniye */}
-        <div className="grid grid-cols-4 gap-1.5 shrink-0">
-          {[
-            { value: countdown.days, unit: 'Gün' },
-            { value: String(countdown.hours).padStart(2, '0'), unit: 'Saat' },
-            { value: String(countdown.minutes).padStart(2, '0'), unit: 'Dk' },
-            { value: String(countdown.seconds).padStart(2, '0'), unit: 'Sn' },
-          ].map((item, idx) => (
-            <div
-              key={idx}
-              className={`rounded-xl border px-2.5 py-1.5 text-center min-w-[54px] ${
-                isLight
-                  ? 'bg-white border-emerald-200/80 shadow-xs'
-                  : 'bg-[#071117]/90 border-emerald-500/25'
-              }`}
-            >
-              <div className="text-sm sm:text-base font-extrabold tabular-nums text-emerald-500 leading-tight">
-                {item.value}
-              </div>
-              <div className="text-[10px] font-bold text-slate-400 uppercase">
-                {item.unit}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      {/* Live Isolated ÖSYM TUS Countdown Card */}
+      <TusDynamicCountdownCard
+        targetDate={studyState.targetTusDate}
+        isLight={isLight}
+        variant="panel"
+        onChangeTargetDate={(newDate) =>
+          onUpdateStudyState((prev) => ({ ...prev, targetTusDate: newDate }))
+        }
+      />
 
       {/* 4 Compact Stat Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -454,7 +382,7 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
             </div>
           </div>
 
-          <div className="pt-2 border-t border-slate-500/15 flex items-center justify-between gap-2">
+          <div className="pt-2 border-t border-slate-500/15 flex flex-wrap items-center justify-between gap-2">
             <span className="text-[11px] font-semibold text-slate-400">
               Çalışma Verisi Yedekleme
             </span>
@@ -535,15 +463,15 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
                     : 'bg-[#071117] border-white/6'
                 }`}
               >
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold truncate">
+                <div className="flex items-center justify-between gap-2 text-xs">
+                  <span className="font-bold truncate min-w-0">
                     <span className="text-[10px] font-extrabold text-emerald-500 mr-1">
                       [{branch.session}]
                     </span>
                     {branch.shortName}
                   </span>
-                  <span className="text-[11px] text-slate-400 tabular-nums">
-                    {bStat.solved}/{bStat.totalPool} Soru • Net:{' '}
+                  <span className="text-[11px] text-slate-400 tabular-nums shrink-0">
+                    {bStat.solved}/{bStat.totalPool} • Net:{' '}
                     <strong className="text-emerald-500">{bStat.net}</strong>
                   </span>
                 </div>
@@ -562,7 +490,7 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
 
       {/* Exam History & Reset */}
       <div className={`rounded-2xl border p-3.5 space-y-2.5 ${cardClass}`}>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <span className="text-xs font-extrabold flex items-center gap-1.5">
             <Award className="w-4 h-4 text-teal-500" />
             <span>Tamamlanan Denemeler ({studyState.examHistory.length})</span>
@@ -645,7 +573,7 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
             onClick={() => {
               triggerHaptic('light');
               shareClinicalSummary(
-                `TUS Vaka & Spot Akademi Karnem • Çözülen: ${stats.totalSolved} Soru • ÖSYM Netim: ${stats.overallNet} • Tahmini TUS Puanım: ${stats.estimatedScore} • TUS'a Kalan: ${countdown.days} Gün`
+                `TUS Vaka & Spot Akademi Karnem • Çözülen: ${stats.totalSolved} Soru • ÖSYM Netim: ${stats.overallNet} • Tahmini TUS Puanım: ${stats.estimatedScore} • TUS'a Kalan: ${countdownDays} Gün`
               );
             }}
             className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-emerald-600 text-white text-xs font-bold"
@@ -680,7 +608,7 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
               scheduleDailyTusReminder(
                 reminderHour,
                 0,
-                countdown.days,
+                countdownDays,
                 studyState.dailyTarget
               );
             }}

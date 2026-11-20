@@ -4,6 +4,10 @@ import Capacitor
 import CoreSpotlight
 import StoreKit
 import UserNotifications
+import WidgetKit
+#if canImport(ActivityKit)
+import ActivityKit
+#endif
 
 // MARK: - Native StoreKit 2 + StoreKit 1 Fallback Lifetime Pro Manager (com.tus.akademi.lifetime.pro)
 private struct SK1ProductFetchResult {
@@ -552,6 +556,102 @@ final class TUSClinicalReminderEngine {
     }
 }
 
+// MARK: - Native WidgetKit Timeline Sync & ActivityKit Live Activity Engine (Lock Screen + Dynamic Island)
+final class TUSLiveActivityAndWidgetManager {
+    static let shared = TUSLiveActivityAndWidgetManager()
+    private let pomodoroDoneNotificationId = "com.tus.akademi.pomodoro.done"
+
+    func syncWidgetSnapshot(from body: [String: Any]) {
+        let targetDate = (body["targetTusDate"] as? String) ?? "2027-03-27"
+        let examLabel = (body["examLabel"] as? String) ?? "2027-TUS 1. Dönem"
+        let streakDays = (body["streakDays"] as? Int) ?? 1
+        let todaySolved = (body["todaySolved"] as? Int) ?? 0
+        let dailyTarget = (body["dailyTarget"] as? Int) ?? 40
+        let todayStudyMinutes = (body["todayStudyMinutes"] as? Int) ?? 0
+        let dailyGoalMinutes = (body["dailyGoalMinutes"] as? Int) ?? 120
+
+        let snapshot = TusWidgetSnapshot(
+            targetTusDate: targetDate,
+            examLabel: examLabel,
+            streakDays: streakDays,
+            todaySolved: todaySolved,
+            dailyTarget: dailyTarget,
+            todayStudyMinutes: todayStudyMinutes,
+            dailyGoalMinutes: dailyGoalMinutes,
+            updatedAt: Date()
+        )
+        TusKeychainStore.save(snapshot)
+        if #available(iOS 14.0, *) {
+            WidgetCenter.shared.reloadAllTimelines()
+        }
+    }
+
+    func startLiveActivity(from body: [String: Any]) {
+        let branchName = (body["branchName"] as? String) ?? "Genel TUS"
+        let modeTitle = (body["modeTitle"] as? String) ?? "TUS Kronometre"
+        let durationSeconds = (body["durationSeconds"] as? Int) ?? 0
+        let elapsedSeconds = (body["elapsedSeconds"] as? Int) ?? 0
+        let todaySolved = (body["todaySolved"] as? Int) ?? 0
+        let dailyTarget = (body["dailyTarget"] as? Int) ?? 40
+
+        let now = Date()
+        let effectiveStart = now.addingTimeInterval(-Double(max(0, elapsedSeconds)))
+        let remainingSec = durationSeconds > 0 ? max(1, durationSeconds - elapsedSeconds) : 0
+        let endDate: Date? = durationSeconds > 0 ? now.addingTimeInterval(Double(remainingSec)) : nil
+
+        // Süreli Pomodoro ise kilit ekranında süre bittiğinde bildirim düşür
+        let center = UNUserNotificationCenter.current()
+        center.removePendingNotificationRequests(withIdentifiers: [pomodoroDoneNotificationId])
+        if remainingSec > 5 {
+            center.requestAuthorization(options: [.alert, .sound]) { granted, _ in
+                guard granted else { return }
+                let content = UNMutableNotificationContent()
+                content.title = "TUS Etüt Seansı Tamamlandı!"
+                content.body = "\(branchName) • \(modeTitle) süreniz doldu. Süreyi kaydetmek için dokunun."
+                content.sound = .default
+                let trigger = UNTimeIntervalNotificationTrigger(timeInterval: Double(remainingSec), repeats: false)
+                let req = UNNotificationRequest(identifier: self.pomodoroDoneNotificationId, content: content, trigger: trigger)
+                center.add(req, withCompletionHandler: nil)
+            }
+        }
+
+        #if canImport(ActivityKit)
+        if #available(iOS 16.2, *) {
+            guard ActivityAuthorizationInfo().areActivitiesEnabled else { return }
+            Task {
+                for existing in Activity<TusStudyActivityAttributes>.activities {
+                    await existing.end(nil, dismissalPolicy: .immediate)
+                }
+                let attrs = TusStudyActivityAttributes()
+                let state = TusStudyActivityAttributes.ContentState(
+                    timerStart: effectiveStart,
+                    timerEnd: endDate,
+                    branchName: branchName,
+                    modeTitle: modeTitle,
+                    todaySolved: todaySolved,
+                    dailyTarget: dailyTarget
+                )
+                let content = ActivityContent(state: state, staleDate: nil)
+                _ = try? Activity.request(attributes: attrs, content: content, pushType: nil)
+            }
+        }
+        #endif
+    }
+
+    func stopLiveActivity() {
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [pomodoroDoneNotificationId])
+        #if canImport(ActivityKit)
+        if #available(iOS 16.2, *) {
+            Task {
+                for existing in Activity<TusStudyActivityAttributes>.activities {
+                    await existing.end(nil, dismissalPolicy: .immediate)
+                }
+            }
+        }
+        #endif
+    }
+}
+
 // MARK: - Custom TUS Bridge View Controller (StoreKit 2 + Theme Sync + Spotlight + Share + WKScriptMessageHandler)
 class TUSBridgeViewController: CAPBridgeViewController, WKScriptMessageHandler {
     private var isLightTheme: Bool = false
@@ -663,6 +763,15 @@ class TUSBridgeViewController: CAPBridgeViewController, WKScriptMessageHandler {
 
         case "cancelReminder":
             TUSClinicalReminderEngine.shared.cancelDailyReminder(bridge: self)
+
+        case "syncWidgetData":
+            TUSLiveActivityAndWidgetManager.shared.syncWidgetSnapshot(from: body)
+
+        case "startStudyLiveActivity":
+            TUSLiveActivityAndWidgetManager.shared.startLiveActivity(from: body)
+
+        case "stopStudyLiveActivity":
+            TUSLiveActivityAndWidgetManager.shared.stopLiveActivity()
 
         case "shareClinicalText":
             let text = (body["text"] as? String) ?? "TUS Vaka & Spot Akademi"

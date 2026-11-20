@@ -38,7 +38,7 @@ jobs:
           npx cap sync ios
           cat > ios/App/App/config.xml << 'EOF'
           <?xml version='1.0' encoding='utf-8'?>
-          <widget version="1.3.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+          <widget version="1.4.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
           </widget>
           EOF
 
@@ -69,9 +69,8 @@ jobs:
             export APP_STORE_CONNECT_API_KEY="$(cat apple_certs/AuthKey_N7XD86ZSMH.p8)"
           fi
 
-          PROFILE_FILE=$(ls ios/App/*.mobileprovision apple_certs/*.mobileprovision 2>/dev/null | head -n 1 || true)
-          if [ -z "$PROFILE_FILE" ] && [ -n "$APP_STORE_CONNECT_API_KEY" ] && [ -n "$APP_STORE_CONNECT_ISSUER_ID" ]; then
-            echo "Auto-provisioning Bundle ID & App Store Profile via App Store Connect API..."
+          if [ -n "$APP_STORE_CONNECT_API_KEY" ] && [ -n "$APP_STORE_CONNECT_ISSUER_ID" ]; then
+            echo "Auto-provisioning Main & Widget Bundle IDs and App Store Profiles via App Store Connect API..."
             pip3 install --break-system-packages --quiet pyjwt cryptography requests || pip3 install --user --quiet pyjwt cryptography requests
             python3 - << 'PYEOF'
           import os, re, time, base64, jwt, requests
@@ -83,70 +82,66 @@ jobs:
           lines = [b64[i:i+64] for i in range(0, len(b64), 64)]
           pem = '-----BEGIN PRIVATE KEY-----\n' + '\n'.join(lines) + '\n-----END PRIVATE KEY-----\n'
 
+          now = int(time.time()) - 30
           token = jwt.encode(
-              {'iss': issuer_id, 'iat': int(time.time()), 'exp': int(time.time()) + 1100, 'aud': 'appstoreconnect-v1'},
+              {'iss': issuer_id, 'iat': now, 'exp': now + 1100, 'aud': 'appstoreconnect-v1'},
               pem, algorithm='ES256', headers={'kid': key_id, 'typ': 'JWT'}
           )
           headers = {'Authorization': f'Bearer {token}', 'Content-Type': 'application/json'}
-          target_bundle = 'com.tus.akademi'
 
-          # 1. Find or register Bundle ID
-          r = requests.get('https://api.appstoreconnect.apple.com/v1/bundleIds', headers=headers, params={'filter[identifier]': target_bundle})
-          data = r.json().get('data', [])
-          bundle_id_res = None
-          for b in data:
-              if b['attributes']['identifier'] == target_bundle:
-                  bundle_id_res = b['id']
-                  break
-          if not bundle_id_res:
-              print(f"Registering Bundle ID {target_bundle}...")
-              cr = requests.post('https://api.appstoreconnect.apple.com/v1/bundleIds', headers=headers, json={
-                  'data': {
-                      'type': 'bundleIds',
-                      'attributes': {'identifier': target_bundle, 'name': 'TUS Vaka Spot Akademi', 'platform': 'IOS'}
-                  }
-              })
-              if cr.status_code in (200, 201):
-                  bundle_id_res = cr.json()['data']['id']
-                  print("Bundle ID registered:", bundle_id_res)
-
-          # 2. Find Distribution Certificate
           cr = requests.get('https://api.appstoreconnect.apple.com/v1/certificates', headers=headers)
           certs = cr.json().get('data', [])
           dist_certs = [c['id'] for c in certs if 'DISTRIBUTION' in c['attributes'].get('certificateType', '')]
 
-          # 3. Find or create IOS_APP_STORE Profile
-          if bundle_id_res and dist_certs:
-              pr = requests.get('https://api.appstoreconnect.apple.com/v1/profiles', headers=headers, params={'filter[name]': 'TUSVakaSpotAkademi AppStore Profile'})
-              prof_content = None
-              for p in pr.json().get('data', []):
-                  if p['attributes'].get('profileState') == 'ACTIVE':
-                      prof_content = p['attributes']['profileContent']
+          def ensure_bundle_and_profile(bundle_ident, bundle_name, prof_name, out_filename):
+              r = requests.get('https://api.appstoreconnect.apple.com/v1/bundleIds', headers=headers, params={'filter[identifier]': bundle_ident})
+              bid = None
+              for b in r.json().get('data', []):
+                  if b['attributes']['identifier'] == bundle_ident:
+                      bid = b['id']
                       break
-              if not prof_content:
-                  cpr = requests.post('https://api.appstoreconnect.apple.com/v1/profiles', headers=headers, json={
-                      'data': {
-                          'type': 'profiles',
-                          'attributes': {'name': 'TUSVakaSpotAkademi AppStore Profile', 'profileType': 'IOS_APP_STORE'},
-                          'relationships': {
-                              'bundleId': {'data': {'type': 'bundleIds', 'id': bundle_id_res}},
-                              'certificates': {'data': [{'type': 'certificates', 'id': cid} for cid in dist_certs]}
-                          }
-                      }
+              if not bid:
+                  cr_b = requests.post('https://api.appstoreconnect.apple.com/v1/bundleIds', headers=headers, json={
+                      'data': {'type': 'bundleIds', 'attributes': {'identifier': bundle_ident, 'name': bundle_name, 'platform': 'IOS'}}
                   })
-                  if cpr.status_code in (200, 201):
-                      prof_content = cpr.json()['data']['attributes']['profileContent']
-              if prof_content:
-                  os.makedirs('ios/App', exist_ok=True)
-                  with open('ios/App/TUSVakaSpotAkademi.mobileprovision', 'wb') as f:
-                      f.write(base64.b64decode(prof_content))
-                  print("Saved ios/App/TUSVakaSpotAkademi.mobileprovision via API!")
+                  if cr_b.status_code in (200, 201):
+                      bid = cr_b.json()['data']['id']
+              if bid and dist_certs:
+                  pr = requests.get('https://api.appstoreconnect.apple.com/v1/profiles', headers=headers, params={'filter[name]': prof_name})
+                  prof_content = None
+                  for p in pr.json().get('data', []):
+                      if p['attributes'].get('profileState') == 'ACTIVE':
+                          prof_content = p['attributes']['profileContent']
+                          break
+                  if not prof_content:
+                      cpr = requests.post('https://api.appstoreconnect.apple.com/v1/profiles', headers=headers, json={
+                          'data': {
+                              'type': 'profiles',
+                              'attributes': {'name': prof_name, 'profileType': 'IOS_APP_STORE'},
+                              'relationships': {
+                                  'bundleId': {'data': {'type': 'bundleIds', 'id': bid}},
+                                  'certificates': {'data': [{'type': 'certificates', 'id': cid} for cid in dist_certs]}
+                              }
+                          }
+                      })
+                      if cpr.status_code in (200, 201):
+                          prof_content = cpr.json()['data']['attributes']['profileContent']
+                  if prof_content:
+                      os.makedirs('ios/App', exist_ok=True)
+                      with open(out_filename, 'wb') as f:
+                          f.write(base64.b64decode(prof_content))
+                      print("Saved", out_filename)
+
+          ensure_bundle_and_profile('com.tus.akademi', 'TUS Vaka Spot Akademi', 'TUSVakaSpotAkademi AppStore Profile', 'ios/App/TUSVakaSpotAkademi.mobileprovision')
+          ensure_bundle_and_profile('com.tus.akademi.widget', 'TUS Vaka Spot Widget', 'TUSVakaSpotAkademi Widget Profile', 'ios/App/TUSVakaSpotWidget.mobileprovision')
           PYEOF
-            PROFILE_FILE=$(ls ios/App/*.mobileprovision apple_certs/*.mobileprovision 2>/dev/null | head -n 1 || true)
           fi
 
-          if [ -n "$PROFILE_FILE" ] && [ -f "$PROFILE_FILE" ]; then
-            echo "Installing Provisioning Profile: $PROFILE_FILE"
+          PROFILE_FILE="ios/App/TUSVakaSpotAkademi.mobileprovision"
+          WIDGET_PROFILE_FILE="ios/App/TUSVakaSpotWidget.mobileprovision"
+
+          if [ -f "$PROFILE_FILE" ]; then
+            echo "Installing Main Provisioning Profile: $PROFILE_FILE"
             security cms -D -i "$PROFILE_FILE" > $RUNNER_TEMP/profile.plist
             PROFILE_UUID=$(/usr/libexec/PlistBuddy -c "Print UUID" $RUNNER_TEMP/profile.plist)
             PROFILE_NAME=$(/usr/libexec/PlistBuddy -c "Print Name" $RUNNER_TEMP/profile.plist)
@@ -156,7 +151,17 @@ jobs:
 
             cp "$PROFILE_FILE" ~/Library/MobileDevice/Provisioning\ Profiles/${PROFILE_UUID}.mobileprovision
 
+            WIDGET_PROFILE_NAME=""
+            if [ -f "$WIDGET_PROFILE_FILE" ]; then
+              echo "Installing Widget Provisioning Profile: $WIDGET_PROFILE_FILE"
+              security cms -D -i "$WIDGET_PROFILE_FILE" > $RUNNER_TEMP/widget_profile.plist
+              WIDGET_UUID=$(/usr/libexec/PlistBuddy -c "Print UUID" $RUNNER_TEMP/widget_profile.plist)
+              WIDGET_PROFILE_NAME=$(/usr/libexec/PlistBuddy -c "Print Name" $RUNNER_TEMP/widget_profile.plist)
+              cp "$WIDGET_PROFILE_FILE" ~/Library/MobileDevice/Provisioning\ Profiles/${WIDGET_UUID}.mobileprovision
+            fi
+
             echo "PROFILE_NAME=$PROFILE_NAME" >> $GITHUB_ENV
+            echo "WIDGET_PROFILE_NAME=$WIDGET_PROFILE_NAME" >> $GITHUB_ENV
             echo "TEAM_ID=$TEAM_ID" >> $GITHUB_ENV
             echo "BUNDLE_ID=$BUNDLE_ID" >> $GITHUB_ENV
 
@@ -171,8 +176,10 @@ jobs:
               <string>${TEAM_ID}</string>
               <key>provisioningProfiles</key>
               <dict>
-                  <key>${BUNDLE_ID}</key>
+                  <key>com.tus.akademi</key>
                   <string>${PROFILE_NAME}</string>
+                  <key>com.tus.akademi.widget</key>
+                  <string>${WIDGET_PROFILE_NAME}</string>
               </dict>
               <key>signingCertificate</key>
               <string>Apple Distribution</string>
@@ -185,6 +192,12 @@ jobs:
           EOF
           fi
 
+      - name: 6.5. Wire TusWidgetExtension Target into Xcode Project
+        run: |
+          gem list -i xcodeproj >/dev/null 2>&1 || gem install xcodeproj --no-document --user-install
+          export GEM_PATH="$(ruby -r rubygems -e 'puts Gem.path.join(":")'):$(ruby -r rubygems -e 'puts Gem.user_dir')"
+          BUILD_NUMBER="${{ github.run_number }}" ruby ios/App/setup_widget_target.rb
+
       - name: 7. Build Xcode Project Archive
         run: |
           cd ios/App
@@ -192,17 +205,13 @@ jobs:
             xcodebuild -project App.xcodeproj -scheme App -resolvePackageDependencies && break || sleep 5
           done
           if [ "$HAS_CERT" = "true" ] && [ -n "$PROFILE_NAME" ]; then
-            echo "Building with official Apple Code Signing (Build #${{ github.run_number }})..."
+            echo "Building multi-target App + TusWidgetExtension with official Apple Code Signing (Build #${{ github.run_number }})..."
             xcodebuild -project App.xcodeproj \
                        -scheme App \
                        -destination 'generic/platform=iOS' \
                        -configuration Release \
                        CURRENT_PROJECT_VERSION="${{ github.run_number }}" \
-                       PRODUCT_BUNDLE_IDENTIFIER="${BUNDLE_ID:-com.tus.akademi}" \
-                       DEVELOPMENT_TEAM="${TEAM_ID:-U3YT2CXH58}" \
-                       CODE_SIGN_STYLE="Manual" \
-                       PROVISIONING_PROFILE_SPECIFIER="${PROFILE_NAME}" \
-                       CODE_SIGN_IDENTITY="Apple Distribution" \
+                       MARKETING_VERSION="1.4" \
                        clean archive \
                        -archivePath ./build/App.xcarchive
           else

@@ -578,3 +578,146 @@ export const TUS_SPOT_CARDS: TusSpotCard[] = REPOSITORY.spotCards;
 
 export const TOTAL_INTERACTIVE_TUS_ITEMS =
   TUS_VAKA_QUESTIONS.length + TUS_SPOT_CARDS.length;
+
+export interface StaticBranchCounts {
+  vaka: number;
+  twin: number;
+  spot: number;
+  total: number;
+}
+
+function computeStaticBranchCounts(): Record<TusBranchId | 'ALL', StaticBranchCounts> {
+  const counts = {
+    ALL: {
+      vaka: TUS_VAKA_QUESTIONS.length,
+      twin: TUS_OSYM_TWIN_QUESTIONS.length,
+      spot: TUS_SPOT_CARDS.length,
+      total: TOTAL_INTERACTIVE_TUS_ITEMS,
+    },
+  } as Record<TusBranchId | 'ALL', StaticBranchCounts>;
+
+  for (const b of TUS_BRANCHES) {
+    counts[b.id] = { vaka: 0, twin: 0, spot: 0, total: 0 };
+  }
+  for (const q of TUS_VAKA_QUESTIONS) {
+    const entry = counts[q.branchId];
+    if (entry) {
+      entry.vaka += 1;
+      entry.total += 1;
+      if (q.isOsymTwin) entry.twin += 1;
+    }
+  }
+  for (const s of TUS_SPOT_CARDS) {
+    const entry = counts[s.branchId];
+    if (entry) {
+      entry.spot += 1;
+      entry.total += 1;
+    }
+  }
+  return counts;
+}
+
+export const STATIC_BRANCH_COUNTS = computeStaticBranchCounts();
+
+export interface TusCoreTopic {
+  id: string;
+  branchId: TusBranchId;
+  title: string;
+  weight: 'Çok Yüksek' | 'Yüksek';
+}
+
+export const TUS_CORE_TOPICS: TusCoreTopic[] = [
+  // Biyokimya
+  { id: 'bio-1', branchId: 'biyokimya', title: 'Aminoasit & Protein Metabolizması', weight: 'Çok Yüksek' },
+  { id: 'bio-2', branchId: 'biyokimya', title: 'Karbonhidrat & Biyoenerjetik', weight: 'Çok Yüksek' },
+  { id: 'bio-3', branchId: 'biyokimya', title: 'Lipid & Lipoprotein Metabolizması', weight: 'Çok Yüksek' },
+  { id: 'bio-4', branchId: 'biyokimya', title: 'Enzim Kinetiği & Vitaminler', weight: 'Yüksek' },
+  { id: 'bio-5', branchId: 'biyokimya', title: 'Moleküler Biyoloji & Hormon Sinyali', weight: 'Yüksek' },
+  // Mikrobiyoloji
+  { id: 'mik-1', branchId: 'mikrobiyoloji', title: 'Gram (+) & (-) Bakteriyoloji', weight: 'Çok Yüksek' },
+  { id: 'mik-2', branchId: 'mikrobiyoloji', title: 'Özel Boyananlar & Zorunlu Hücre İçi', weight: 'Çok Yüksek' },
+  { id: 'mik-3', branchId: 'mikrobiyoloji', title: 'Klinik Viroloji (DNA/RNA & Hepatit)', weight: 'Çok Yüksek' },
+  { id: 'mik-4', branchId: 'mikrobiyoloji', title: 'Tıbbi Mikoloji & Parazitoloji', weight: 'Yüksek' },
+  { id: 'mik-5', branchId: 'mikrobiyoloji', title: 'Temel & Klinik İmmünoloji', weight: 'Yüksek' },
+  // Patoloji
+  { id: 'pat-1', branchId: 'patoloji', title: 'Hücre Hasarı, Nekroz & İnflamasyon', weight: 'Çok Yüksek' },
+  { id: 'pat-2', branchId: 'patoloji', title: 'Hemodinamik & İmmünopatoloji', weight: 'Çok Yüksek' },
+  { id: 'pat-3', branchId: 'patoloji', title: 'Neoplazi & Tümör Biyolojisi', weight: 'Çok Yüksek' },
+  { id: 'pat-4', branchId: 'patoloji', title: 'Hematopatoloji & GİS Tümörleri', weight: 'Yüksek' },
+  { id: 'pat-5', branchId: 'patoloji', title: 'Böbrek, Endokrin & SSS Patolojisi', weight: 'Yüksek' },
+  // Farmakoloji
+  { id: 'far-1', branchId: 'farmakoloji', title: 'Otonom Sinir Sistemi İlaçları', weight: 'Çok Yüksek' },
+  { id: 'far-2', branchId: 'farmakoloji', title: 'Kardiyovasküler & Renal Farmakoloji', weight: 'Çok Yüksek' },
+  { id: 'far-3', branchId: 'farmakoloji', title: 'SSS & Anestezik Farmakoloji', weight: 'Yüksek' },
+  { id: 'far-4', branchId: 'farmakoloji', title: 'Antibiyotikler & Antiviraller', weight: 'Çok Yüksek' },
+  { id: 'far-5', branchId: 'farmakoloji', title: 'Antineoplastikler & Spesifik Antidotlar', weight: 'Çok Yüksek' },
+  // Anatomi
+  { id: 'ana-1', branchId: 'anatomi', title: 'Üst & Alt Ekstremite Pleksusları', weight: 'Çok Yüksek' },
+  { id: 'ana-2', branchId: 'anatomi', title: 'Kraniyal Sinirler & Foramenler', weight: 'Çok Yüksek' },
+  { id: 'ana-3', branchId: 'anatomi', title: 'Nöroanatomi & Beyin Yolları', weight: 'Çok Yüksek' },
+  { id: 'ana-4', branchId: 'anatomi', title: 'Toraks & Mediasten Damarları', weight: 'Yüksek' },
+  { id: 'ana-5', branchId: 'anatomi', title: 'Abdomen, Pelvis & Portal Sistem', weight: 'Yüksek' },
+  // Fizyoloji
+  { id: 'fiz-1', branchId: 'fizyoloji', title: 'Aksiyon Potansiyeli & Kas Fizyolojisi', weight: 'Yüksek' },
+  { id: 'fiz-2', branchId: 'fizyoloji', title: 'Kardiyak Siklus & Basınç Eğrileri', weight: 'Çok Yüksek' },
+  { id: 'fiz-3', branchId: 'fizyoloji', title: 'Solunum Mekanikleri & O2-Hb Eğrisi', weight: 'Çok Yüksek' },
+  { id: 'fiz-4', branchId: 'fizyoloji', title: 'Renal Klirens & Nefron Transportu', weight: 'Çok Yüksek' },
+  { id: 'fiz-5', branchId: 'fizyoloji', title: 'Endokrin, GİS & Sinir Fizyolojisi', weight: 'Yüksek' },
+  // Histoloji & Embriyoloji
+  { id: 'his-1', branchId: 'histoloji', title: 'Epitel, Hücre Bağlantıları & Konnektif Doku', weight: 'Çok Yüksek' },
+  { id: 'his-2', branchId: 'histoloji', title: 'Gametogenez, Plasenta & Teratoloji', weight: 'Yüksek' },
+  { id: 'his-3', branchId: 'histoloji', title: 'Farengeal Arkus, Kese & Yarık Türevleri', weight: 'Çok Yüksek' },
+  { id: 'his-4', branchId: 'histoloji', title: 'Nöral Krest & Organogenez', weight: 'Çok Yüksek' },
+  { id: 'his-5', branchId: 'histoloji', title: 'Kardiyovasküler & Ürogenital Embriyoloji', weight: 'Yüksek' },
+  // Dahiliye Grubu
+  { id: 'dah-1', branchId: 'dahiliye', title: 'Kardiyoloji & Göğüs Hastalıkları', weight: 'Çok Yüksek' },
+  { id: 'dah-2', branchId: 'dahiliye', title: 'Nefroloji & Asit-Baz Bozuklukları', weight: 'Çok Yüksek' },
+  { id: 'dah-3', branchId: 'dahiliye', title: 'Endokrinoloji & Romatoloji', weight: 'Çok Yüksek' },
+  { id: 'dah-4', branchId: 'dahiliye', title: 'Hematoloji, Onkoloji & GİS', weight: 'Çok Yüksek' },
+  { id: 'dah-5', branchId: 'dahiliye', title: 'Nöroloji, Enfeksiyon, Derma & Psikiyatri', weight: 'Çok Yüksek' },
+  // Pediatri
+  { id: 'ped-1', branchId: 'pediatri', title: 'Yenidoğan Resüsitasyon & Acilleri', weight: 'Çok Yüksek' },
+  { id: 'ped-2', branchId: 'pediatri', title: 'Çocuk Kardiyoloji & Konjenital Kalp', weight: 'Çok Yüksek' },
+  { id: 'ped-3', branchId: 'pediatri', title: 'Kalıtsal Metabolik & Endokrin', weight: 'Yüksek' },
+  { id: 'ped-4', branchId: 'pediatri', title: 'Aşılama, Döküntülü & Enfeksiyon', weight: 'Çok Yüksek' },
+  { id: 'ped-5', branchId: 'pediatri', title: 'Pediatrik Nefroloji, İmmün & Hemato-Onkoloji', weight: 'Yüksek' },
+  // Cerrahi Grubu
+  { id: 'cer-1', branchId: 'cerrahi', title: 'Travma, Şok, Yanık & Sıvı-Elektrolit', weight: 'Çok Yüksek' },
+  { id: 'cer-2', branchId: 'cerrahi', title: 'Hepatobiliyer, Pankreas & Akut Karın', weight: 'Çok Yüksek' },
+  { id: 'cer-3', branchId: 'cerrahi', title: 'Meme, Tiroid-Paratiroid & GİS Cerrahisi', weight: 'Çok Yüksek' },
+  { id: 'cer-4', branchId: 'cerrahi', title: 'Çocuk Cerrahisi & Üroloji', weight: 'Yüksek' },
+  { id: 'cer-5', branchId: 'cerrahi', title: 'KBB, Göz, Ortopedi & Beyin Cerrahisi', weight: 'Yüksek' },
+  // Kadın Doğum
+  { id: 'kad-1', branchId: 'kadindogum', title: 'Obstetrik Kanamalar & Hipertansif Gebelik', weight: 'Çok Yüksek' },
+  { id: 'kad-2', branchId: 'kadindogum', title: 'Prenatal Tanı, İntrapartum Takip & Pelvis', weight: 'Yüksek' },
+  { id: 'kad-3', branchId: 'kadindogum', title: 'Jinekolojik Onkoloji & Tarama', weight: 'Çok Yüksek' },
+  { id: 'kad-4', branchId: 'kadindogum', title: 'Endokrin, Amenore, PKOS & İnfertilite', weight: 'Çok Yüksek' },
+  { id: 'kad-5', branchId: 'kadindogum', title: 'Ektopik Gebelik, Mol & Pelvik Enfeksiyonlar', weight: 'Yüksek' },
+];
+
+export interface TusSpecialtyTarget {
+  id: string;
+  name: string;
+  targetScore: number;
+  sessionFocus: 'KTBT' | 'Dengeli';
+}
+
+export const TUS_SPECIALTY_TARGETS: TusSpecialtyTarget[] = [
+  { id: 'dermatoloji', name: 'Dermatoloji', targetScore: 71.0, sessionFocus: 'KTBT' },
+  { id: 'plastik', name: 'Plastik Cerrahi', targetScore: 70.0, sessionFocus: 'KTBT' },
+  { id: 'radyoloji', name: 'Radyoloji', targetScore: 68.5, sessionFocus: 'Dengeli' },
+  { id: 'goz', name: 'Göz Hastalıkları', targetScore: 67.5, sessionFocus: 'KTBT' },
+  { id: 'ftr', name: 'Fiziksel Tıp ve Reh.', targetScore: 66.0, sessionFocus: 'KTBT' },
+  { id: 'kardiyoloji', name: 'Kardiyoloji', targetScore: 65.5, sessionFocus: 'KTBT' },
+  { id: 'kbb', name: 'Kulak Burun Boğaz', targetScore: 65.0, sessionFocus: 'KTBT' },
+  { id: 'cocuk-psik', name: 'Çocuk ve Ergen Psikiyatrisi', targetScore: 64.5, sessionFocus: 'KTBT' },
+  { id: 'psikiyatri', name: 'Psikiyatri', targetScore: 63.5, sessionFocus: 'KTBT' },
+  { id: 'noroloji', name: 'Nöroloji', targetScore: 61.0, sessionFocus: 'KTBT' },
+  { id: 'ortopedi', name: 'Ortopedi ve Travmatoloji', targetScore: 60.5, sessionFocus: 'KTBT' },
+  { id: 'kadin-dogum', name: 'Kadın Hastalıkları ve Doğum', targetScore: 59.0, sessionFocus: 'KTBT' },
+  { id: 'dahiliye', name: 'İç Hastalıkları', targetScore: 57.5, sessionFocus: 'KTBT' },
+  { id: 'anestezi', name: 'Anesteziyoloji ve Rean.', targetScore: 56.5, sessionFocus: 'Dengeli' },
+  { id: 'pediatri', name: 'Çocuk Sağlığı ve Hast.', targetScore: 56.0, sessionFocus: 'KTBT' },
+  { id: 'genel-cerrahi', name: 'Genel Cerrahi', targetScore: 55.0, sessionFocus: 'KTBT' },
+  { id: 'acil-tip', name: 'Acil Tıp', targetScore: 52.5, sessionFocus: 'Dengeli' },
+];

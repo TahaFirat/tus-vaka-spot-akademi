@@ -92,6 +92,66 @@ export function syncNativeTheme(theme: 'light' | 'dark'): void {
   }
 }
 
+export interface WidgetSnapshotPayload {
+  targetTusDate: string;
+  examLabel: string;
+  streakDays: number;
+  todaySolved: number;
+  dailyTarget: number;
+  todayStudyMinutes: number;
+  dailyGoalMinutes: number;
+}
+
+export function syncNativeWidgetSnapshot(payload: WidgetSnapshotPayload): void {
+  try {
+    const handler = getNativeHandler();
+    if (handler) {
+      handler.postMessage({
+        action: 'syncWidgetData',
+        ...payload,
+      });
+    }
+  } catch {
+    // Ignore on non-iOS environments
+  }
+}
+
+export interface StudyLiveActivityPayload {
+  branchName: string;
+  modeTitle: string;
+  durationSeconds: number;
+  elapsedSeconds: number;
+  todaySolved: number;
+  dailyTarget: number;
+}
+
+export function startNativeStudyLiveActivity(payload: StudyLiveActivityPayload): void {
+  try {
+    const handler = getNativeHandler();
+    if (handler) {
+      handler.postMessage({
+        action: 'startStudyLiveActivity',
+        ...payload,
+      });
+    }
+  } catch {
+    // Ignore on non-iOS environments
+  }
+}
+
+export function stopNativeStudyLiveActivity(): void {
+  try {
+    const handler = getNativeHandler();
+    if (handler) {
+      handler.postMessage({
+        action: 'stopStudyLiveActivity',
+      });
+    }
+  } catch {
+    // Ignore
+  }
+}
+
 export function scheduleDailyTusReminder(
   hour: number,
   minute: number,

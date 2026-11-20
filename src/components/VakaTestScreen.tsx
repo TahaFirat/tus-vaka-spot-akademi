@@ -26,11 +26,8 @@ import {
   TusBranchId,
   TusSessionType,
 } from '../data/tusMedicalRepository';
-import {
-  FREE_QUESTION_LIMIT,
-  triggerHaptic,
-} from '../services/nativeBridge';
-import { VakaAnswerRecord } from '../services/studyStorage';
+import { FREE_QUESTION_LIMIT, triggerHaptic } from '../services/nativeBridge';
+import { TwinYearFilter, VakaAnswerRecord } from '../services/studyStorage';
 
 interface VakaTestScreenProps {
   isPro: boolean;
@@ -48,10 +45,12 @@ interface VakaTestScreenProps {
   onOpenPaywall: (reason?: string) => void;
   initialBasket?: 'all' | 'osym_twin' | 'unsolved' | 'wrong' | 'correct' | 'bookmarked';
   initialBranch?: 'ALL' | TusBranchId;
+  initialYear?: TwinYearFilter;
+  onPrefChange?: (prefs: { branchId?: 'ALL' | TusBranchId; year?: TwinYearFilter }) => void;
   mode?: 'standard' | 'osym_twin';
 }
 
-export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
+const VakaTestScreenInner: React.FC<VakaTestScreenProps> = ({
   isPro,
   isLight,
   totalSolvedCount,
@@ -60,8 +59,10 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
   onRecordVakaAnswer,
   onToggleBookmarkVaka,
   onOpenPaywall,
-  initialBasket = 'all',
+  initialBasket = 'unsolved',
   initialBranch = 'ALL',
+  initialYear = 'ALL',
+  onPrefChange,
   mode = 'standard',
 }) => {
   const isDedicatedTwinTab = mode === 'osym_twin';
@@ -71,10 +72,16 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
 
   const [sessionFilter, setSessionFilter] = useState<'ALL' | TusSessionType>('ALL');
   const [branchFilter, setBranchFilter] = useState<'ALL' | TusBranchId>(initialBranch);
-  const [yearFilter, setYearFilter] = useState<'ALL' | '2025' | '2024' | '2023' | '2022' | '2021' | '2020' | '2019'>('ALL');
+  const [yearFilter, setYearFilter] = useState<TwinYearFilter>(initialYear);
+  const resolvedDefaultBasket = useMemo(() => {
+    if (initialBasket !== 'all' && initialBasket !== 'unsolved') return initialBasket;
+    const basePool = isPro ? sourcePool : sourcePool.slice(0, FREE_QUESTION_LIMIT);
+    const hasUnsolved = basePool.some((q) => !vakaAnswers[q.id]);
+    return hasUnsolved ? 'unsolved' : 'all';
+  }, [initialBasket, isPro, sourcePool]);
   const [basketFilter, setBasketFilter] = useState<
     'all' | 'osym_twin' | 'unsolved' | 'wrong' | 'correct' | 'bookmarked'
-  >(isDedicatedTwinTab ? 'all' : initialBasket);
+  >(resolvedDefaultBasket);
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
   const [smartFocusMode, setSmartFocusMode] = useState(false);
@@ -87,7 +94,12 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
   >({});
 
   useEffect(() => {
-    setBasketFilter(isDedicatedTwinTab ? 'all' : initialBasket);
+    if (initialBasket === 'wrong' || initialBasket === 'correct' || initialBasket === 'bookmarked' || initialBasket === 'osym_twin') {
+      setBasketFilter(initialBasket);
+    } else if (initialBasket === 'unsolved') {
+      const basePool = isPro ? sourcePool : sourcePool.slice(0, FREE_QUESTION_LIMIT);
+      setBasketFilter(basePool.some((q) => !vakaAnswers[q.id]) ? 'unsolved' : 'all');
+    }
     setBranchFilter(initialBranch);
     setPinnedQuestionId(null);
   }, [initialBasket, initialBranch, isDedicatedTwinTab]);
@@ -134,14 +146,23 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
     return TUS_BRANCHES.filter((b) => b.session === sessionFilter);
   }, [sessionFilter]);
 
+  const effectivePool = useMemo(
+    () => (isPro ? sourcePool : sourcePool.slice(0, FREE_QUESTION_LIMIT)),
+    [isPro, sourcePool]
+  );
+
+  const sourceIdSet = useMemo(
+    () => new Set(effectivePool.map((q) => q.id)),
+    [effectivePool]
+  );
+
   const isOsymTwinQuestion = (q: (typeof TUS_VAKA_QUESTIONS)[number]) =>
     Boolean(q.isOsymTwin) || q.subTopic.startsWith('ÖSYM İkizi');
 
-  // Full matched questions before Freemium slicing
   // Keeps pinnedQuestionId in the list so answering a question in "Yeni" or "Yanlışlar" never makes it vanish before clicking Sonraki!
-  const allMatchedQuestions = useMemo(() => {
+  const filteredQuestions = useMemo(() => {
     const qLower = searchQuery.trim().toLowerCase();
-    const matched = sourcePool.filter((q) => {
+    const matched = effectivePool.filter((q) => {
       if (sessionFilter !== 'ALL' && q.session !== sessionFilter) return false;
       if (branchFilter !== 'ALL' && q.branchId !== branchFilter) return false;
       if (
@@ -194,7 +215,7 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
       return scoreB - scoreA;
     });
   }, [
-    sourcePool,
+    effectivePool,
     isDedicatedTwinTab,
     sessionFilter,
     branchFilter,
@@ -207,11 +228,6 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
     branchWeaknessScore,
     pinnedQuestionId,
   ]);
-
-  const filteredQuestions = useMemo(() => {
-    if (isPro) return allMatchedQuestions;
-    return allMatchedQuestions.slice(0, FREE_QUESTION_LIMIT);
-  }, [isPro, allMatchedQuestions]);
 
   useEffect(() => {
     setCurrentIndex(0);
@@ -240,11 +256,8 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
     let wrong = 0;
     let correct = 0;
     let osymTwin = 0;
-    const basePool = isPro
-      ? sourcePool
-      : sourcePool.slice(0, FREE_QUESTION_LIMIT);
 
-    basePool.forEach((q) => {
+    effectivePool.forEach((q) => {
       if (isOsymTwinQuestion(q)) osymTwin++;
       const rec = vakaAnswers[q.id];
       if (!rec) unsolved++;
@@ -252,16 +265,14 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
       else wrong++;
     });
     return {
-      all: basePool.length,
+      all: effectivePool.length,
       osymTwin,
       unsolved,
       wrong,
       correct,
-      bookmarked: bookmarkedVakaIds.filter((id) =>
-        sourcePool.some((q) => q.id === id)
-      ).length,
+      bookmarked: bookmarkedVakaIds.filter((id) => sourceIdSet.has(id)).length,
     };
-  }, [isPro, sourcePool, vakaAnswers, bookmarkedVakaIds]);
+  }, [effectivePool, sourceIdSet, vakaAnswers, bookmarkedVakaIds]);
 
   const handleSelectOption = async (letter: OptionLetter) => {
     if (!currentQuestion) return;
@@ -439,25 +450,18 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
               : 'bg-gradient-to-r from-amber-950/60 via-[#0C1B24] to-emerald-950/50 border-amber-500/35 text-slate-100'
           }`}
         >
-          <div className="flex items-center gap-2 min-w-0">
-            <div className="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center shrink-0 text-amber-500">
-              <Sparkles className="w-4 h-4" />
-            </div>
-            <div className="min-w-0">
-              <div className="text-xs font-extrabold truncate flex items-center gap-1.5">
-                <span>ÖSYM Çıkmış TUS Konsept İkizleri</span>
-                <span className="px-1.5 py-0.5 rounded text-[10px] font-extrabold bg-amber-500/20 text-amber-500">
-                  2019–2025
-                </span>
+          <div className="flex items-center justify-between gap-2 min-w-0">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="w-7 h-7 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center shrink-0 text-amber-500">
+                <Sparkles className="w-3.5 h-3.5" />
               </div>
-              <p
-                className={`text-[11px] truncate ${
-                  isLight ? 'text-slate-600' : 'text-slate-300'
-                }`}
-              >
-                Tüm 11 TUS branşında 2019–2025 çıkmış soru konseptlerinin özgün ikizleri ({sourcePool.length} soru)
-              </p>
+              <span className="text-xs font-extrabold truncate min-w-0">
+                ÖSYM Çıkmış Konsept İkizleri
+              </span>
             </div>
+            <span className="px-1.5 py-0.5 rounded text-[10px] font-extrabold bg-amber-500/20 text-amber-500 shrink-0">
+              {sourcePool.length} İkiz
+            </span>
           </div>
 
           <div className="flex items-center gap-1 overflow-x-auto no-scrollbar pb-0.5">
@@ -470,6 +474,7 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
                   onClick={() => {
                     triggerHaptic('light');
                     setYearFilter(yr);
+                    onPrefChange?.({ year: yr });
                   }}
                   className={`px-2.5 py-1 rounded-xl text-[11px] font-extrabold whitespace-nowrap border transition shrink-0 ${
                     active
@@ -489,8 +494,8 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
 
       {/* Modern Top Control Panel (Responsive Across All Phones & Tablets) */}
       <div className={`rounded-2xl border p-2.5 space-y-2 ${cardBg}`}>
-        {/* Row 1: Segmented Session Control + Smart Focus + Basket Selector + Search */}
-        <div className="flex flex-wrap items-center justify-between gap-1.5">
+        {/* Row 1: Segmented Session Control + Smart Focus + Search */}
+        <div className="flex items-center justify-between gap-1.5">
           {/* Segmented Session Control */}
           <div
             className={`inline-flex rounded-xl p-0.5 shrink-0 ${
@@ -509,6 +514,7 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
                     triggerHaptic('light');
                     setSessionFilter(sess);
                     setBranchFilter('ALL');
+                    onPrefChange?.({ branchId: 'ALL' });
                   }}
                   className={`px-2.5 py-1 rounded-lg text-[11px] font-extrabold transition whitespace-nowrap ${
                     active
@@ -524,63 +530,28 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
             })}
           </div>
 
-          {/* Right Controls: Smart Focus + Basket + Search */}
-          <div className="flex items-center gap-1.5 min-w-0 ml-auto">
-            {/* Smart Weak-Branch Focus Toggle */}
+          <div className="flex items-center gap-1.5 shrink-0">
             <button
               type="button"
               onClick={() => {
                 triggerHaptic('light');
                 setSmartFocusMode((m) => !m);
               }}
-              title="Zayıf olduğunuz branşları ve yüksek frekanslı soruları önceliklendirir"
+              title="Zayıf branşları önceliklendir"
               className={`inline-flex items-center gap-1 px-2 py-1 rounded-xl text-[11px] font-bold border transition shrink-0 ${
                 smartFocusMode
                   ? isLight
                     ? 'bg-emerald-100 border-emerald-400 text-emerald-800'
                     : 'bg-emerald-500/20 border-emerald-400/50 text-emerald-300'
                   : isLight
-                  ? 'bg-slate-100 border-slate-200 text-slate-600 hover:bg-slate-200/70'
-                  : 'bg-[#071117] border-white/10 text-slate-300 hover:border-white/20'
+                  ? 'bg-slate-100 border-slate-200 text-slate-600'
+                  : 'bg-[#071117] border-white/10 text-slate-300'
               }`}
             >
               <Brain className="w-3.5 h-3.5 text-emerald-500" />
-              <span className="hidden xs:inline">Akıllı Odak</span>
+              <span className="hidden sm:inline">Akıllı Odak</span>
             </button>
 
-            {/* Basket Selector */}
-            <select
-              value={basketFilter}
-              onChange={(e) => {
-                triggerHaptic('light');
-                setBasketFilter(e.target.value as typeof basketFilter);
-              }}
-              aria-label="Soru Sepeti"
-              className={`rounded-xl px-2 py-1 text-[11px] font-bold border outline-none transition max-w-[160px] sm:max-w-none ${
-                isLight
-                  ? 'bg-slate-100 border-slate-200 text-slate-800'
-                  : 'bg-[#071117] border-white/10 text-slate-200'
-              }`}
-            >
-              <option value="all">
-                {isPro
-                  ? `${isDedicatedTwinTab ? 'Tüm İkizler' : 'Tümü'} (${basketCounts.all})`
-                  : `Demo (${basketCounts.all}/${sourcePool.length})`}
-              </option>
-              {!isDedicatedTwinTab && (
-                <option value="osym_twin">
-                  ÖSYM İkizleri ({basketCounts.osymTwin})
-                </option>
-              )}
-              <option value="unsolved">Yeni ({basketCounts.unsolved})</option>
-              <option value="wrong">Yanlışlar ({basketCounts.wrong})</option>
-              <option value="correct">Doğrular ({basketCounts.correct})</option>
-              <option value="bookmarked">
-                Kaydedilen ({basketCounts.bookmarked})
-              </option>
-            </select>
-
-            {/* Search Toggle */}
             <button
               type="button"
               onClick={() => setShowSearch((s) => !s)}
@@ -600,13 +571,51 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
           </div>
         </div>
 
-        {/* Row 2: 1-Tap Scrollable Branch Pills with Varied Question Counts */}
+        {/* Row 1.5: Clean Scrollable Queue Pills (Unseen First) */}
+        <div className="flex items-center gap-1 overflow-x-auto no-scrollbar">
+          {[
+            { id: 'unsolved' as const, label: `Yeni (${basketCounts.unsolved})` },
+            { id: 'wrong' as const, label: `Yanlışlar (${basketCounts.wrong})` },
+            { id: 'bookmarked' as const, label: `Kayıtlı (${basketCounts.bookmarked})` },
+            {
+              id: 'all' as const,
+              label: isPro
+                ? `Tümü (${basketCounts.all})`
+                : `Demo (${basketCounts.all}/${sourcePool.length})`,
+            },
+            { id: 'correct' as const, label: `Doğrular (${basketCounts.correct})` },
+          ].map((q) => {
+            const active = basketFilter === q.id;
+            return (
+              <button
+                key={q.id}
+                type="button"
+                onClick={() => {
+                  triggerHaptic('light');
+                  setBasketFilter(q.id);
+                }}
+                className={`px-2.5 py-1 rounded-xl text-[11px] font-bold whitespace-nowrap border transition shrink-0 ${
+                  active
+                    ? 'bg-teal-600 border-teal-500 text-white'
+                    : isLight
+                    ? 'bg-slate-50 border-slate-200 text-slate-600'
+                    : 'bg-[#071117] border-white/10 text-slate-400'
+                }`}
+              >
+                {q.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Row 2: 1-Tap Scrollable Branch Pills */}
         <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5">
           <button
             type="button"
             onClick={() => {
               triggerHaptic('light');
               setBranchFilter('ALL');
+              onPrefChange?.({ branchId: 'ALL' });
             }}
             className={`px-2.5 py-1 rounded-xl text-[11px] font-bold whitespace-nowrap border transition shrink-0 ${
               branchFilter === 'ALL'
@@ -632,6 +641,7 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
                 onClick={() => {
                   triggerHaptic('light');
                   setBranchFilter(b.id);
+                  onPrefChange?.({ branchId: b.id });
                 }}
                 className={`px-2.5 py-1 rounded-xl text-[11px] font-bold whitespace-nowrap border transition shrink-0 flex items-center gap-1 ${
                   active
@@ -700,28 +710,45 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
 
       {/* Main Question Card */}
       {!currentQuestion ? (
-        <div className={`rounded-2xl border p-6 text-center space-y-2 ${cardBg}`}>
+        <div className={`rounded-2xl border p-6 text-center space-y-2.5 ${cardBg}`}>
           <Stethoscope className="w-7 h-7 text-emerald-500 mx-auto" />
-          <p className="text-xs font-semibold">Bu filtrede soru bulunamadı.</p>
-          <button
-            type="button"
-            onClick={() => {
-              setSessionFilter('ALL');
-              setBranchFilter('ALL');
-              setBasketFilter('all');
-              setSearchQuery('');
-              setSmartFocusMode(false);
-            }}
-            className="px-3 py-1.5 rounded-xl bg-emerald-600 text-white text-xs font-bold"
-          >
-            Filtreleri Sıfırla
-          </button>
+          <p className="text-xs font-bold">
+            {basketFilter === 'unsolved'
+              ? 'Bu filtredeki tüm yeni soruları çözdün!'
+              : 'Bu filtrede soru bulunamadı.'}
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            {basketFilter === 'unsolved' && (
+              <button
+                type="button"
+                onClick={() => setBasketFilter('all')}
+                className="px-3 py-1.5 rounded-xl bg-teal-600 text-white text-xs font-bold"
+              >
+                Tüm Soruları Gör
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => {
+                setSessionFilter('ALL');
+                setBranchFilter('ALL');
+                setYearFilter('ALL');
+                setBasketFilter('all');
+                setSearchQuery('');
+                setSmartFocusMode(false);
+                onPrefChange?.({ branchId: 'ALL', year: 'ALL' });
+              }}
+              className="px-3 py-1.5 rounded-xl bg-emerald-600 text-white text-xs font-bold"
+            >
+              Filtreleri Sıfırla
+            </button>
+          </div>
         </div>
       ) : (
-        <div className={`rounded-2xl border p-3.5 sm:p-4 space-y-3 ${cardBg}`}>
-          {/* Single-Line Compact Card Header */}
+        <div className={`rounded-2xl border p-3.5 sm:p-4 space-y-2.5 ${cardBg}`}>
+          {/* Row A: Zero-Collision Header (Left: Session + Truncated Branch | Right: Compact Toolbar) */}
           <div className="flex items-center justify-between gap-2 pb-2 border-b border-slate-500/15">
-            <div className="flex items-center gap-1.5 min-w-0">
+            <div className="flex items-center gap-1.5 min-w-0 flex-1">
               <span
                 className={`px-2 py-0.5 rounded-md text-[10px] font-extrabold shrink-0 border ${
                   currentQuestion.session === 'TTBT'
@@ -735,35 +762,13 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
               >
                 {currentQuestion.session}
               </span>
-              <span className="text-xs font-bold truncate">
-                <span className="sm:hidden">
-                  {TUS_BRANCHES.find((b) => b.id === currentQuestion.branchId)
-                    ?.shortName || currentQuestion.branchName}
-                </span>
-                <span className="hidden sm:inline">
-                  {currentQuestion.branchName}
-                </span>
+              <span className="text-xs font-extrabold truncate">
+                {TUS_BRANCHES.find((b) => b.id === currentQuestion.branchId)
+                  ?.shortName || currentQuestion.branchName}
               </span>
-
-              {isOsymTwinQuestion(currentQuestion) && (
-                <span
-                  className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-extrabold shrink-0 border ${
-                    isLight
-                      ? 'bg-amber-50 border-amber-300 text-amber-800'
-                      : 'bg-amber-500/15 border-amber-400/30 text-amber-300'
-                  }`}
-                >
-                  <Award className="w-2.5 h-2.5" />
-                  <span>
-                    {currentQuestion.osymYearTag
-                      ? currentQuestion.osymYearTag.replace(' Konsept İkizi', ' İkizi')
-                      : 'ÖSYM İkizi'}
-                  </span>
-                </span>
-              )}
             </div>
 
-            <div className="flex items-center gap-1.5 shrink-0">
+            <div className="flex items-center gap-1 shrink-0">
               {/* Clue Toggle */}
               <button
                 type="button"
@@ -771,7 +776,7 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
                   triggerHaptic('light');
                   setShowClues((prev) => !prev);
                 }}
-                className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold border transition ${
+                className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-bold border transition whitespace-nowrap ${
                   showClues
                     ? isLight
                       ? 'bg-amber-100 border-amber-400 text-amber-900'
@@ -781,7 +786,7 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
                     : 'bg-[#071117] border-white/10 text-slate-300 hover:border-white/20'
                 }`}
               >
-                <Lightbulb className="w-3 h-3 text-amber-500" />
+                <Lightbulb className="w-3 h-3 text-amber-500 shrink-0" />
                 <span>İpucu</span>
               </button>
 
@@ -826,7 +831,7 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
 
               {/* Question Counter Badge */}
               <span
-                className={`px-2 py-0.5 rounded-lg text-[11px] font-extrabold tabular-nums border ${
+                className={`px-2 py-0.5 rounded-lg text-[11px] font-extrabold tabular-nums border whitespace-nowrap ${
                   isPro
                     ? isLight
                       ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
@@ -839,6 +844,33 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
                 {safeIndex + 1}/{filteredQuestions.length}
               </span>
             </div>
+          </div>
+
+          {/* Row B: Dedicated Non-Colliding Concept Twin & Topic Tag Row */}
+          <div className="flex flex-wrap items-center gap-1.5">
+            {isOsymTwinQuestion(currentQuestion) && (
+              <span
+                className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10.5px] font-extrabold border ${
+                  isLight
+                    ? 'bg-amber-50 border-amber-300 text-amber-800'
+                    : 'bg-amber-500/15 border-amber-400/35 text-amber-300'
+                }`}
+              >
+                <Award className="w-3 h-3 shrink-0" />
+                <span>
+                  {currentQuestion.osymYearTag
+                    ? currentQuestion.osymYearTag.replace(' Konsept İkizi', ' TUS İkizi')
+                    : 'ÖSYM TUS İkizi'}
+                </span>
+              </span>
+            )}
+            <span
+              className={`px-2 py-0.5 rounded-md text-[10.5px] font-bold ${
+                isLight ? 'bg-slate-100 text-slate-600' : 'bg-white/5 text-slate-400'
+              }`}
+            >
+              {currentQuestion.subTopic}
+            </span>
           </div>
 
           {/* Extracted Clinical Clues Chips when İpucu is active */}
@@ -982,34 +1014,34 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
                 setShowClues(false);
                 setShowDiffDetails(false);
               }}
-              className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-xl border text-xs font-bold transition disabled:opacity-40 ${
+              className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl border text-xs font-bold shrink-0 transition disabled:opacity-40 ${
                 isLight
                   ? 'bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-700'
                   : 'bg-[#071117] hover:bg-white/5 border-white/10 text-slate-200'
               }`}
             >
-              <ChevronLeft className="w-3.5 h-3.5" />
+              <ChevronLeft className="w-3.5 h-3.5 shrink-0" />
               <span>Önceki</span>
             </button>
 
             {isPro ? (
-              <div className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-500 whitespace-nowrap">
+              <div className="min-w-0 inline-flex items-center gap-1 text-[10.5px] font-bold text-emerald-500 truncate">
                 <Crown className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                <span>PRO • {allMatchedQuestions.length} Soru</span>
+                <span className="truncate">PRO • {filteredQuestions.length}</span>
               </div>
             ) : (
               <button
                 type="button"
                 onClick={() =>
                   onOpenPaywall(
-                    `PRO pakete geçerek ${TUS_VAKA_QUESTIONS.length}+ vaka sorusunun tamamını sınırsız açabilirsiniz.`
+                    `PRO pakete geçerek ${sourcePool.length}+ sorunun tamamını sınırsız açabilirsiniz.`
                   )
                 }
-                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-500 text-[11px] font-extrabold hover:bg-amber-500/25 transition whitespace-nowrap"
+                className="min-w-0 inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-500 text-[10.5px] font-extrabold hover:bg-amber-500/25 transition truncate"
               >
                 <Lock className="w-3 h-3 shrink-0" />
-                <span>
-                  +{TUS_VAKA_QUESTIONS.length - FREE_QUESTION_LIMIT} PRO Soru
+                <span className="truncate">
+                  +{Math.max(0, sourcePool.length - FREE_QUESTION_LIMIT)} PRO
                 </span>
               </button>
             )}
@@ -1035,10 +1067,10 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
                 if (
                   !isPro &&
                   safeIndex >= filteredQuestions.length - 1 &&
-                  allMatchedQuestions.length > FREE_QUESTION_LIMIT
+                  sourcePool.length > FREE_QUESTION_LIMIT
                 ) {
                   onOpenPaywall(
-                    `Ücretsiz ${FREE_QUESTION_LIMIT} demo soruyu tamamladınız. ${TUS_VAKA_QUESTIONS.length}+ soruluk tam vaka bankasını açmak için PRO'ya geçin.`
+                    `Ücretsiz ${FREE_QUESTION_LIMIT} demo soruyu tamamladınız. ${sourcePool.length}+ soruluk tam havuzu açmak için PRO'ya geçin.`
                   );
                   return;
                 }
@@ -1049,11 +1081,20 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
                 setShowClues(false);
                 setShowDiffDetails(false);
               }}
-              disabled={isPro && safeIndex >= filteredQuestions.length - 1}
-              className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold transition disabled:opacity-40"
+              disabled={
+                isPro &&
+                safeIndex >= filteredQuestions.length - 1 &&
+                !(
+                  pinnedQuestionId === currentQuestion.id &&
+                  (basketFilter === 'unsolved' ||
+                    (basketFilter === 'wrong' && currentAnswer?.isCorrect) ||
+                    (basketFilter === 'bookmarked' && !isBookmarked))
+                )
+              }
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold shrink-0 transition disabled:opacity-40"
             >
               <span>Sonraki</span>
-              <ChevronRight className="w-3.5 h-3.5" />
+              <ChevronRight className="w-3.5 h-3.5 shrink-0" />
             </button>
           </div>
 
@@ -1173,3 +1214,5 @@ export const VakaTestScreen: React.FC<VakaTestScreenProps> = ({
     </div>
   );
 };
+
+export const VakaTestScreen = React.memo(VakaTestScreenInner);

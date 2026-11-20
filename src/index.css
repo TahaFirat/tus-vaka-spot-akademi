@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+@theme {
+  --breakpoint-xs: 23rem;
+}
+
 @layer base {
   :root {
     --safe-top: env(safe-area-inset-top, 0px);
@@ -35,37 +39,33 @@
   padding-bottom: max(0.65rem, env(safe-area-inset-bottom, 0px));
 }
 
-/* iOS 18 / iOS 26 Liquid Glass Translucent Dock */
+/* Termal Olarak Hafifletilmiş iOS Cam Yüzeyler */
 .ios-glass-dock-dark {
-  background: rgba(11, 25, 34, 0.91);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  background: rgba(11, 25, 34, 0.94);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.13);
-  box-shadow:
-    0 12px 34px -6px rgba(0, 0, 0, 0.72),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
+  box-shadow: 0 10px 28px -6px rgba(0, 0, 0, 0.65);
 }
 
 .ios-glass-dock-light {
-  background: rgba(255, 255, 255, 0.93);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border: 1px solid rgba(15, 23, 42, 0.11);
-  box-shadow:
-    0 12px 32px -6px rgba(15, 23, 42, 0.16),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
+  box-shadow: 0 10px 26px -6px rgba(15, 23, 42, 0.14);
 }
 
 .ios-glass-header-dark {
-  background: rgba(7, 17, 23, 0.78);
-  backdrop-filter: blur(18px) saturate(170%);
-  -webkit-backdrop-filter: blur(18px) saturate(170%);
+  background: rgba(7, 17, 23, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .ios-glass-header-light {
-  background: rgba(248, 250, 252, 0.82);
-  backdrop-filter: blur(18px) saturate(170%);
-  -webkit-backdrop-filter: blur(18px) saturate(170%);
+  background: rgba(248, 250, 252, 0.93);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .no-scrollbar::-webkit-scrollbar {

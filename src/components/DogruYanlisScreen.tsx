@@ -42,9 +42,11 @@ interface DogruYanlisScreenProps {
   onToggleBookmarkSpot: (spotId: string) => void;
   onOpenPaywall: (reason?: string) => void;
   initialBasket?: 'all' | 'osym_twin' | 'unsolved' | 'wrong' | 'correct' | 'bookmarked';
+  initialBranch?: 'ALL' | TusBranchId;
+  onBranchChange?: (branchId: 'ALL' | TusBranchId) => void;
 }
 
-export const DogruYanlisScreen: React.FC<DogruYanlisScreenProps> = ({
+const DogruYanlisScreenInner: React.FC<DogruYanlisScreenProps> = ({
   isPro,
   isLight,
   totalSolvedCount,
@@ -53,13 +55,20 @@ export const DogruYanlisScreen: React.FC<DogruYanlisScreenProps> = ({
   onRecordSpotAnswer,
   onToggleBookmarkSpot,
   onOpenPaywall,
-  initialBasket = 'all',
+  initialBasket = 'unsolved',
+  initialBranch = 'ALL',
+  onBranchChange,
 }) => {
   const [sessionFilter, setSessionFilter] = useState<'ALL' | TusSessionType>('ALL');
-  const [branchFilter, setBranchFilter] = useState<'ALL' | TusBranchId>('ALL');
+  const [branchFilter, setBranchFilter] = useState<'ALL' | TusBranchId>(initialBranch);
+  const resolvedDefaultBasket = useMemo(() => {
+    if (initialBasket !== 'all' && initialBasket !== 'unsolved') return initialBasket;
+    const basePool = isPro ? TUS_SPOT_CARDS : TUS_SPOT_CARDS.slice(0, FREE_QUESTION_LIMIT);
+    return basePool.some((s) => !spotAnswers[s.id]) ? 'unsolved' : 'all';
+  }, [initialBasket, isPro]);
   const [basketFilter, setBasketFilter] = useState<
     'all' | 'osym_twin' | 'unsolved' | 'wrong' | 'correct' | 'bookmarked'
-  >(initialBasket);
+  >(resolvedDefaultBasket);
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
   const [smartFocusMode, setSmartFocusMode] = useState(false);
@@ -67,8 +76,15 @@ export const DogruYanlisScreen: React.FC<DogruYanlisScreenProps> = ({
   const [pinnedSpotId, setPinnedSpotId] = useState<string | null>(null);
 
   useEffect(() => {
-    setBasketFilter(initialBasket);
-  }, [initialBasket]);
+    if (initialBasket === 'wrong' || initialBasket === 'correct' || initialBasket === 'bookmarked' || initialBasket === 'osym_twin') {
+      setBasketFilter(initialBasket);
+    } else if (initialBasket === 'unsolved') {
+      const basePool = isPro ? TUS_SPOT_CARDS : TUS_SPOT_CARDS.slice(0, FREE_QUESTION_LIMIT);
+      setBasketFilter(basePool.some((s) => !spotAnswers[s.id]) ? 'unsolved' : 'all');
+    }
+    setBranchFilter(initialBranch);
+    setPinnedSpotId(null);
+  }, [initialBasket, initialBranch]);
 
   const branchSpotCounts = useMemo(() => {
     const counts: Record<string, number> = { ALL: TUS_SPOT_CARDS.length };
@@ -109,9 +125,14 @@ export const DogruYanlisScreen: React.FC<DogruYanlisScreenProps> = ({
     return TUS_BRANCHES.filter((b) => b.session === sessionFilter);
   }, [sessionFilter]);
 
-  const allMatchedSpots = useMemo(() => {
+  const effectivePool = useMemo(
+    () => (isPro ? TUS_SPOT_CARDS : TUS_SPOT_CARDS.slice(0, FREE_QUESTION_LIMIT)),
+    [isPro]
+  );
+
+  const filteredSpots = useMemo(() => {
     const qLower = searchQuery.trim().toLowerCase();
-    const matched = TUS_SPOT_CARDS.filter((s) => {
+    const matched = effectivePool.filter((s) => {
       if (sessionFilter !== 'ALL' && s.session !== sessionFilter) return false;
       if (branchFilter !== 'ALL' && s.branchId !== branchFilter) return false;
 
@@ -147,6 +168,8 @@ export const DogruYanlisScreen: React.FC<DogruYanlisScreenProps> = ({
     if (!smartFocusMode) return matched;
 
     return [...matched].sort((a, b) => {
+      if (a.id === pinnedSpotId) return -1;
+      if (b.id === pinnedSpotId) return 1;
       const recA = spotAnswers[a.id];
       const recB = spotAnswers[b.id];
       const statusA = !recA ? 2 : !recA.isCorrect ? 3 : 0;
@@ -155,6 +178,7 @@ export const DogruYanlisScreen: React.FC<DogruYanlisScreenProps> = ({
       return (branchWeaknessScore[b.branchId] || 50) - (branchWeaknessScore[a.branchId] || 50);
     });
   }, [
+    effectivePool,
     sessionFilter,
     branchFilter,
     basketFilter,
@@ -165,11 +189,6 @@ export const DogruYanlisScreen: React.FC<DogruYanlisScreenProps> = ({
     branchWeaknessScore,
     pinnedSpotId,
   ]);
-
-  const filteredSpots = useMemo(() => {
-    if (isPro) return allMatchedSpots;
-    return allMatchedSpots.slice(0, FREE_QUESTION_LIMIT);
-  }, [isPro, allMatchedSpots]);
 
   useEffect(() => {
     setCurrentIndex(0);
@@ -373,7 +392,7 @@ export const DogruYanlisScreen: React.FC<DogruYanlisScreenProps> = ({
     <div className="space-y-2">
       {/* Modern Top Control Panel */}
       <div className={`rounded-2xl border p-2.5 space-y-2 ${cardBg}`}>
-        <div className="flex flex-wrap items-center justify-between gap-1.5">
+        <div className="flex items-center justify-between gap-1.5">
           <div
             className={`inline-flex rounded-xl p-0.5 shrink-0 ${
               isLight
@@ -391,6 +410,7 @@ export const DogruYanlisScreen: React.FC<DogruYanlisScreenProps> = ({
                     triggerHaptic('light');
                     setSessionFilter(sess);
                     setBranchFilter('ALL');
+                    onBranchChange?.('ALL');
                   }}
                   className={`px-2.5 py-1 rounded-lg text-[11px] font-extrabold transition whitespace-nowrap ${
                     active
@@ -406,7 +426,7 @@ export const DogruYanlisScreen: React.FC<DogruYanlisScreenProps> = ({
             })}
           </div>
 
-          <div className="flex items-center gap-1.5 min-w-0 ml-auto">
+          <div className="flex items-center gap-1.5 shrink-0">
             <button
               type="button"
               onClick={() => {
@@ -420,42 +440,13 @@ export const DogruYanlisScreen: React.FC<DogruYanlisScreenProps> = ({
                     ? 'bg-emerald-100 border-emerald-400 text-emerald-800'
                     : 'bg-emerald-500/20 border-emerald-400/50 text-emerald-300'
                   : isLight
-                  ? 'bg-slate-100 border-slate-200 text-slate-600 hover:bg-slate-200/70'
-                  : 'bg-[#071117] border-white/10 text-slate-300 hover:border-white/20'
+                  ? 'bg-slate-100 border-slate-200 text-slate-600'
+                  : 'bg-[#071117] border-white/10 text-slate-300'
               }`}
             >
               <Brain className="w-3.5 h-3.5 text-emerald-500" />
-              <span className="hidden xs:inline">Akıllı Odak</span>
+              <span className="hidden sm:inline">Akıllı Odak</span>
             </button>
-
-            <select
-              value={basketFilter}
-              onChange={(e) => {
-                triggerHaptic('light');
-                setBasketFilter(e.target.value as typeof basketFilter);
-              }}
-              aria-label="Spot Sepeti"
-              className={`rounded-xl px-2 py-1 text-[11px] font-bold border outline-none transition max-w-[155px] sm:max-w-none ${
-                isLight
-                  ? 'bg-slate-100 border-slate-200 text-slate-800'
-                  : 'bg-[#071117] border-white/10 text-slate-200'
-              }`}
-            >
-              <option value="all">
-                {isPro
-                  ? `Tümü (${basketCounts.all})`
-                  : `Demo (${basketCounts.all}/${TUS_SPOT_CARDS.length})`}
-              </option>
-              <option value="osym_twin">
-                ÖSYM İkizleri ({basketCounts.osymTwin})
-              </option>
-              <option value="unsolved">Yeni ({basketCounts.unsolved})</option>
-              <option value="wrong">Yanlışlar ({basketCounts.wrong})</option>
-              <option value="correct">Doğrular ({basketCounts.correct})</option>
-              <option value="bookmarked">
-                Kaydedilen ({basketCounts.bookmarked})
-              </option>
-            </select>
 
             <button
               type="button"
@@ -476,6 +467,43 @@ export const DogruYanlisScreen: React.FC<DogruYanlisScreenProps> = ({
           </div>
         </div>
 
+        {/* Clean Scrollable Queue Pills */}
+        <div className="flex items-center gap-1 overflow-x-auto no-scrollbar">
+          {[
+            { id: 'unsolved' as const, label: `Yeni (${basketCounts.unsolved})` },
+            { id: 'wrong' as const, label: `Yanlışlar (${basketCounts.wrong})` },
+            { id: 'bookmarked' as const, label: `Kayıtlı (${basketCounts.bookmarked})` },
+            {
+              id: 'all' as const,
+              label: isPro
+                ? `Tümü (${basketCounts.all})`
+                : `Demo (${basketCounts.all}/${TUS_SPOT_CARDS.length})`,
+            },
+            { id: 'osym_twin' as const, label: `İkiz (${basketCounts.osymTwin})` },
+          ].map((q) => {
+            const active = basketFilter === q.id;
+            return (
+              <button
+                key={q.id}
+                type="button"
+                onClick={() => {
+                  triggerHaptic('light');
+                  setBasketFilter(q.id);
+                }}
+                className={`px-2.5 py-1 rounded-xl text-[11px] font-bold whitespace-nowrap border transition shrink-0 ${
+                  active
+                    ? 'bg-teal-600 border-teal-500 text-white'
+                    : isLight
+                    ? 'bg-slate-50 border-slate-200 text-slate-600'
+                    : 'bg-[#071117] border-white/10 text-slate-400'
+                }`}
+              >
+                {q.label}
+              </button>
+            );
+          })}
+        </div>
+
         {/* Row 2: 1-Tap Scrollable Branch Pills */}
         <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5">
           <button
@@ -483,6 +511,7 @@ export const DogruYanlisScreen: React.FC<DogruYanlisScreenProps> = ({
             onClick={() => {
               triggerHaptic('light');
               setBranchFilter('ALL');
+              onBranchChange?.('ALL');
             }}
             className={`px-2.5 py-1 rounded-xl text-[11px] font-bold whitespace-nowrap border transition shrink-0 ${
               branchFilter === 'ALL'
@@ -508,6 +537,7 @@ export const DogruYanlisScreen: React.FC<DogruYanlisScreenProps> = ({
                 onClick={() => {
                   triggerHaptic('light');
                   setBranchFilter(b.id);
+                  onBranchChange?.(b.id);
                 }}
                 className={`px-2.5 py-1 rounded-xl text-[11px] font-bold whitespace-nowrap border transition shrink-0 flex items-center gap-1 ${
                   active
@@ -575,28 +605,44 @@ export const DogruYanlisScreen: React.FC<DogruYanlisScreenProps> = ({
 
       {/* Main Spot Card */}
       {!currentSpot ? (
-        <div className={`rounded-2xl border p-6 text-center space-y-2 ${cardBg}`}>
+        <div className={`rounded-2xl border p-6 text-center space-y-2.5 ${cardBg}`}>
           <Zap className="w-7 h-7 text-emerald-500 mx-auto" />
-          <p className="text-xs font-semibold">Bu filtrede spot bulunamadı.</p>
-          <button
-            type="button"
-            onClick={() => {
-              setSessionFilter('ALL');
-              setBranchFilter('ALL');
-              setBasketFilter('all');
-              setSearchQuery('');
-              setSmartFocusMode(false);
-            }}
-            className="px-3 py-1.5 rounded-xl bg-emerald-600 text-white text-xs font-bold"
-          >
-            Filtreleri Sıfırla
-          </button>
+          <p className="text-xs font-bold">
+            {basketFilter === 'unsolved'
+              ? 'Bu filtredeki tüm yeni spotları çözdün!'
+              : 'Bu filtrede spot bulunamadı.'}
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            {basketFilter === 'unsolved' && (
+              <button
+                type="button"
+                onClick={() => setBasketFilter('all')}
+                className="px-3 py-1.5 rounded-xl bg-teal-600 text-white text-xs font-bold"
+              >
+                Tüm Spotları Gör
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => {
+                setSessionFilter('ALL');
+                setBranchFilter('ALL');
+                setBasketFilter('all');
+                setSearchQuery('');
+                setSmartFocusMode(false);
+                onBranchChange?.('ALL');
+              }}
+              className="px-3 py-1.5 rounded-xl bg-emerald-600 text-white text-xs font-bold"
+            >
+              Filtreleri Sıfırla
+            </button>
+          </div>
         </div>
       ) : (
-        <div className={`rounded-2xl border p-3.5 sm:p-4 space-y-3 ${cardBg}`}>
-          {/* Single-Line Header */}
+        <div className={`rounded-2xl border p-3.5 sm:p-4 space-y-2.5 ${cardBg}`}>
+          {/* Zero-Collision Row A Header */}
           <div className="flex items-center justify-between gap-2 pb-2 border-b border-slate-500/15">
-            <div className="flex items-center gap-1.5 min-w-0">
+            <div className="flex items-center gap-1.5 min-w-0 flex-1">
               <span
                 className={`px-2 py-0.5 rounded-md text-[10px] font-extrabold shrink-0 border ${
                   currentSpot.session === 'TTBT'
@@ -610,23 +656,13 @@ export const DogruYanlisScreen: React.FC<DogruYanlisScreenProps> = ({
               >
                 {currentSpot.session}
               </span>
-              <span className="text-xs font-bold truncate">
-                {currentSpot.branchName}
+              <span className="text-xs font-extrabold truncate">
+                {TUS_BRANCHES.find((b) => b.id === currentSpot.branchId)?.shortName ||
+                  currentSpot.branchName}
               </span>
-              {currentSpot.subTopic.includes('ÖSYM İkizi') && (
-                <span
-                  className={`px-1.5 py-0.5 rounded text-[10px] font-extrabold shrink-0 border ${
-                    isLight
-                      ? 'bg-amber-50 text-amber-800 border-amber-300'
-                      : 'bg-amber-500/15 text-amber-300 border-amber-400/35'
-                  }`}
-                >
-                  ÖSYM İkizi
-                </span>
-              )}
             </div>
 
-            <div className="flex items-center gap-1.5 shrink-0">
+            <div className="flex items-center gap-1 shrink-0">
               <button
                 type="button"
                 onClick={handleShuffleJump}
@@ -665,7 +701,7 @@ export const DogruYanlisScreen: React.FC<DogruYanlisScreenProps> = ({
               </button>
 
               <span
-                className={`px-2 py-0.5 rounded-lg text-[11px] font-extrabold tabular-nums border ${
+                className={`px-2 py-0.5 rounded-lg text-[11px] font-extrabold tabular-nums border whitespace-nowrap ${
                   isPro
                     ? isLight
                       ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
@@ -678,6 +714,28 @@ export const DogruYanlisScreen: React.FC<DogruYanlisScreenProps> = ({
                 {safeIndex + 1}/{filteredSpots.length}
               </span>
             </div>
+          </div>
+
+          {/* Row B: Dedicated Non-Colliding Badge Strip */}
+          <div className="flex flex-wrap items-center gap-1.5">
+            {currentSpot.subTopic.includes('ÖSYM İkizi') && (
+              <span
+                className={`px-2 py-0.5 rounded-md text-[10.5px] font-extrabold border ${
+                  isLight
+                    ? 'bg-amber-50 text-amber-800 border-amber-300'
+                    : 'bg-amber-500/15 text-amber-300 border-amber-400/35'
+                }`}
+              >
+                ★ ÖSYM İkizi
+              </span>
+            )}
+            <span
+              className={`px-2 py-0.5 rounded-md text-[10.5px] font-bold ${
+                isLight ? 'bg-slate-100 text-slate-600' : 'bg-white/5 text-slate-400'
+              }`}
+            >
+              {currentSpot.subTopic}
+            </span>
           </div>
 
           {/* Statement Box */}
@@ -749,20 +807,20 @@ export const DogruYanlisScreen: React.FC<DogruYanlisScreenProps> = ({
                 setPinnedSpotId(null);
                 setCurrentIndex(Math.max(0, safeIndex - 1));
               }}
-              className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-xl border text-xs font-bold transition disabled:opacity-40 ${
+              className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl border text-xs font-bold shrink-0 transition disabled:opacity-40 ${
                 isLight
                   ? 'bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-700'
                   : 'bg-[#071117] hover:bg-white/5 border-white/10 text-slate-200'
               }`}
             >
-              <ChevronLeft className="w-3.5 h-3.5" />
+              <ChevronLeft className="w-3.5 h-3.5 shrink-0" />
               <span>Önceki</span>
             </button>
 
             {isPro ? (
-              <div className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-500 whitespace-nowrap">
+              <div className="min-w-0 inline-flex items-center gap-1 text-[10.5px] font-bold text-emerald-500 truncate">
                 <Crown className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                <span>PRO • {allMatchedSpots.length} Spot</span>
+                <span className="truncate">PRO • {filteredSpots.length}</span>
               </div>
             ) : (
               <button
@@ -772,10 +830,10 @@ export const DogruYanlisScreen: React.FC<DogruYanlisScreenProps> = ({
                     `PRO pakete geçerek ${TUS_SPOT_CARDS.length}+ D/Y spot kartının tamamını sınırsız açabilirsiniz.`
                   )
                 }
-                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-500 text-[11px] font-extrabold hover:bg-amber-500/25 transition whitespace-nowrap"
+                className="min-w-0 inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-500 text-[10.5px] font-extrabold hover:bg-amber-500/25 transition truncate"
               >
                 <Lock className="w-3 h-3 shrink-0" />
-                <span>+{TUS_SPOT_CARDS.length - FREE_QUESTION_LIMIT} PRO Spot</span>
+                <span className="truncate">+{TUS_SPOT_CARDS.length - FREE_QUESTION_LIMIT} PRO</span>
               </button>
             )}
 
@@ -798,7 +856,7 @@ export const DogruYanlisScreen: React.FC<DogruYanlisScreenProps> = ({
                 if (
                   !isPro &&
                   safeIndex >= filteredSpots.length - 1 &&
-                  allMatchedSpots.length > FREE_QUESTION_LIMIT
+                  TUS_SPOT_CARDS.length > FREE_QUESTION_LIMIT
                 ) {
                   onOpenPaywall(
                     `Ücretsiz ${FREE_QUESTION_LIMIT} demo spotu tamamladınız. ${TUS_SPOT_CARDS.length}+ spotluk tam havuzu açmak için PRO'ya geçin.`
@@ -887,3 +945,5 @@ export const DogruYanlisScreen: React.FC<DogruYanlisScreenProps> = ({
     </div>
   );
 };
+
+export const DogruYanlisScreen = React.memo(DogruYanlisScreenInner);

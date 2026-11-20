@@ -101,13 +101,13 @@ export const PaywallModal: React.FC<PaywallModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-md p-3 sm:p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-3 sm:p-4"
       role="dialog"
       aria-modal="true"
       aria-labelledby="paywall-title"
     >
       <div
-        className={`w-full max-w-md rounded-3xl border shadow-2xl overflow-hidden flex flex-col justify-between p-4 sm:p-5 ${
+        className={`w-full max-w-md max-h-[92vh] overflow-y-auto rounded-3xl border shadow-2xl flex flex-col justify-between p-4 sm:p-5 ${
           isLight
             ? 'bg-white border-emerald-200 text-slate-900'
             : 'bg-[#0B1820] border-emerald-500/35 text-slate-100'
@@ -116,7 +116,7 @@ export const PaywallModal: React.FC<PaywallModalProps> = ({
         {/* Top Row: Flex between Badge and Close Button (Zero Overlap!) */}
         <div className="flex items-center justify-between gap-2 mb-2.5">
           <div
-            className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-bold ${
+            className={`min-w-0 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-bold ${
               isLight
                 ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
                 : 'bg-emerald-500/15 border-emerald-400/30 text-emerald-300'
@@ -259,10 +259,10 @@ export const PaywallModal: React.FC<PaywallModalProps> = ({
           disabled={loading !== null}
           onClick={handlePurchase}
           data-product-id={PRO_PRODUCT_ID}
-          className="w-full rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-500 hover:to-teal-500 active:scale-[0.99] text-white font-extrabold text-sm py-3 px-4 shadow-lg shadow-emerald-900/25 flex items-center justify-center gap-2 transition disabled:opacity-60"
+          className="w-full rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-500 hover:to-teal-500 active:scale-[0.99] text-white font-extrabold text-xs sm:text-sm py-3 px-3 shadow-lg shadow-emerald-900/25 flex items-center justify-center gap-2 transition disabled:opacity-60"
         >
           <Sparkles className="w-4 h-4 shrink-0" />
-          <span className="whitespace-nowrap">
+          <span className="text-center leading-tight">
             {loading === 'purchase'
               ? 'Apple StoreKit Onaylanıyor...'
               : `Ömür Boyu Tam Erişimi Aç • ${priceLabel}`}
@@ -279,22 +279,22 @@ export const PaywallModal: React.FC<PaywallModalProps> = ({
             type="button"
             disabled={loading !== null}
             onClick={handleRestore}
-            className={`inline-flex items-center gap-1.5 text-xs font-semibold transition py-0.5 ${
+            className={`inline-flex items-center gap-1.5 text-xs font-semibold transition py-0.5 text-center ${
               isLight
                 ? 'text-emerald-700 hover:text-emerald-800'
                 : 'text-emerald-300 hover:text-emerald-200'
             }`}
           >
-            <RotateCcw className="w-3.5 h-3.5" />
+            <RotateCcw className="w-3.5 h-3.5 shrink-0" />
             <span>
               {loading === 'restore'
                 ? 'Satın Alımlar Kontrol Ediliyor...'
-                : 'Satın Alımları Geri Yükle (Restore Purchases)'}
+                : 'Satın Alımları Geri Yükle'}
             </span>
           </button>
 
           <div
-            className={`flex items-center justify-center gap-2.5 text-[11px] ${
+            className={`flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[11px] ${
               isLight ? 'text-slate-500' : 'text-slate-400'
             }`}
           >

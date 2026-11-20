@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Activity,
   Award,
@@ -38,6 +38,7 @@ interface DenemeRehberScreenProps {
   isPro: boolean;
   isLight: boolean;
   totalSolvedCount: number;
+  vakaAnswers?: Record<string, unknown>;
   onRecordExamAttempt: (attempt: TusExamAttempt) => void;
   onRecordVakaAnswer: (
     questionId: string,
@@ -97,10 +98,68 @@ const EXAM_MODES: ExamModeConfig[] = [
   },
 ];
 
-export const DenemeRehberScreen: React.FC<DenemeRehberScreenProps> = ({
+// İzole duvar saati deneme sayacı: her saniye tüm DenemeRehberScreen'i yeniden çizmez
+const ExamTimerPill: React.FC<{
+  endAtMs: number;
+  onExpire: () => void;
+}> = React.memo(({ endAtMs, onExpire }) => {
+  const [secLeft, setSecLeft] = useState<number>(() =>
+    Math.max(0, Math.ceil((endAtMs - Date.now()) / 1000))
+  );
+  const expireRef = useRef(onExpire);
+  expireRef.current = onExpire;
+  const expiredTriggered = useRef(false);
+
+  useEffect(() => {
+    expiredTriggered.current = false;
+    let id: number | null = null;
+    const tick = () => {
+      const rem = Math.max(0, Math.ceil((endAtMs - Date.now()) / 1000));
+      setSecLeft(rem);
+      if (rem <= 0 && !expiredTriggered.current) {
+        expiredTriggered.current = true;
+        expireRef.current();
+      }
+    };
+    const start = () => {
+      if (id !== null || document.hidden) return;
+      tick();
+      id = window.setInterval(() => {
+        if (!document.hidden) tick();
+      }, 1000);
+    };
+    const stop = () => {
+      if (id !== null) {
+        window.clearInterval(id);
+        id = null;
+      }
+    };
+    const onVis = () => {
+      if (document.hidden) stop();
+      else start();
+    };
+    start();
+    document.addEventListener('visibilitychange', onVis);
+    return () => {
+      stop();
+      document.removeEventListener('visibilitychange', onVis);
+    };
+  }, [endAtMs]);
+
+  const m = Math.floor(secLeft / 60);
+  const s = secLeft % 60;
+  return (
+    <span className="px-2.5 py-1 rounded-lg bg-teal-500/15 text-teal-400 font-mono text-xs font-extrabold tabular-nums">
+      {String(m).padStart(2, '0')}:{String(s).padStart(2, '0')}
+    </span>
+  );
+});
+
+const DenemeRehberScreenInner: React.FC<DenemeRehberScreenProps> = ({
   isPro,
   isLight,
   totalSolvedCount,
+  vakaAnswers = {},
   onRecordExamAttempt,
   onRecordVakaAnswer,
   onOpenPaywall,
@@ -136,26 +195,13 @@ export const DenemeRehberScreen: React.FC<DenemeRehberScreenProps> = ({
   const [examSelections, setExamSelections] = useState<
     Record<string, OptionLetter | undefined>
   >({});
-  const [secondsLeft, setSecondsLeft] = useState(0);
+  const [examStartMs, setExamStartMs] = useState(0);
+  const [examEndMs, setExamEndMs] = useState(0);
   const [finishedResult, setFinishedResult] = useState<TusExamAttempt | null>(null);
   const [showExamReview, setShowExamReview] = useState(false);
 
   const [guideCategory, setGuideCategory] = useState<'ALL' | ClinicalGuideCategory>('ALL');
   const [guideSearch, setGuideSearch] = useState('');
-
-  useEffect(() => {
-    if (!activeMode || finishedResult) return;
-    const timer = window.setInterval(() => {
-      setSecondsLeft((prev) => Math.max(0, prev - 1));
-    }, 1000);
-    return () => window.clearInterval(timer);
-  }, [Boolean(activeMode), Boolean(finishedResult)]);
-
-  useEffect(() => {
-    if (activeMode && !finishedResult && secondsLeft <= 0) {
-      handleFinishExam();
-    }
-  }, [secondsLeft, activeMode, finishedResult]);
 
   const handleToggleBranch = (id: TusBranchId) => {
     triggerHaptic('light');
@@ -194,15 +240,22 @@ export const DenemeRehberScreen: React.FC<DenemeRehberScreenProps> = ({
       pool = pool.filter((q) => selectedBranches.includes(q.branchId));
     }
 
-    const shuffled = [...pool].sort(() => Math.random() - 0.5);
-    const picked = shuffled.slice(0, mode.questionCount);
+    const unseenPool = [...pool.filter((q) => !vakaAnswers[q.id])].sort(
+      () => Math.random() - 0.5
+    );
+    const seenPool = [...pool.filter((q) => Boolean(vakaAnswers[q.id]))].sort(
+      () => Math.random() - 0.5
+    );
+    const picked = [...unseenPool, ...seenPool].slice(0, mode.questionCount);
 
+    const now = Date.now();
     triggerHaptic('medium');
     setActiveMode(mode);
     setExamQuestions(picked);
     setExamIdx(0);
     setExamSelections({});
-    setSecondsLeft(mode.durationMinutes * 60);
+    setExamStartMs(now);
+    setExamEndMs(now + mode.durationMinutes * 60 * 1000);
     setFinishedResult(null);
     setShowExamReview(false);
   };
@@ -276,7 +329,7 @@ export const DenemeRehberScreen: React.FC<DenemeRehberScreenProps> = ({
       netScore,
       examQuestions.length
     );
-    const elapsed = Math.max(1, activeMode.durationMinutes * 60 - secondsLeft);
+    const elapsed = Math.max(1, Math.round((Date.now() - examStartMs) / 1000));
 
     const attempt: TusExamAttempt = {
       id: `exam-${Date.now()}`,
@@ -296,12 +349,6 @@ export const DenemeRehberScreen: React.FC<DenemeRehberScreenProps> = ({
     triggerHaptic('success');
     setFinishedResult(attempt);
     onRecordExamAttempt(attempt);
-  };
-
-  const formatTimer = (sec: number) => {
-    const m = Math.floor(sec / 60);
-    const s = sec % 60;
-    return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
   };
 
   const expandedGuideItems = useMemo(() => {
@@ -723,9 +770,7 @@ export const DenemeRehberScreen: React.FC<DenemeRehberScreenProps> = ({
                 </span>
 
                 <div className="flex items-center gap-1.5 shrink-0">
-                  <span className="px-2.5 py-1 rounded-lg bg-teal-500/15 text-teal-400 font-mono text-xs font-extrabold">
-                    {formatTimer(secondsLeft)}
-                  </span>
+                  <ExamTimerPill endAtMs={examEndMs} onExpire={handleFinishExam} />
                   <button
                     type="button"
                     onClick={handleFinishExam}
@@ -1309,77 +1354,75 @@ export const DenemeRehberScreen: React.FC<DenemeRehberScreenProps> = ({
         </div>
       )}
 
-      {/* Guideline 1.4.1 Medical Reference Citations & Clinical Disclaimer */}
-      <div
-        className={`rounded-2xl border p-3.5 space-y-2 text-xs ${
+      {/* Guideline 1.4.1 Medical Reference Citations & Clinical Disclaimer (Compact Accordion) */}
+      <details
+        className={`rounded-2xl border px-3.5 py-2.5 text-xs ${
           isLight
             ? 'bg-slate-50 border-slate-200 text-slate-700'
             : 'bg-[#08131A] border-white/10 text-slate-300'
         }`}
       >
-        <div className="flex items-center gap-1.5 font-extrabold text-amber-500">
-          <ShieldAlert className="w-4 h-4 shrink-0" />
-          <span>Tıbbi Sorumluluk Reddi & Akademik Kaynakça (Medical References)</span>
-        </div>
-        <p className="text-[11px] leading-relaxed">
-          Bu uygulamadaki tüm vaka soruları, klinik hesaplayıcılar ve spot bilgiler yalnızca{' '}
-          <strong>Tıpta Uzmanlık Eğitimi Giriş Sınavı (TUS)</strong> hazırlığı ve akademik tıp eğitimi amaçlıdır; doğrudan hasta tanı veya tedavi kararı yerine geçmez. Klinik uygulamada her zaman resmi kılavuzlara ve uzman hekim görüşüne başvurulmalıdır.
-        </p>
-        <div className="text-[11px] space-y-1">
-          <div className="font-bold">Temel Akademik Referans Kaynaklar:</div>
-          <div>
-            • İç Hastalıkları & Patoloji: <em>Harrison&apos;s Principles of Internal Medicine (21e)</em>,{' '}
-            <em>Robbins &amp; Cotran Pathologic Basis of Disease (10e)</em>
+        <summary className="cursor-pointer list-none flex items-center justify-between gap-2 font-extrabold text-amber-500">
+          <span className="flex items-center gap-1.5 min-w-0 truncate">
+            <ShieldAlert className="w-4 h-4 shrink-0" />
+            <span className="truncate">Tıbbi Kaynakça & Uyarı (NCBI / PubMed / WHO)</span>
+          </span>
+          <span className="text-[11px] shrink-0">Göster ▾</span>
+        </summary>
+        <div className="pt-2 space-y-2">
+          <p className="text-[11px] leading-relaxed">
+            Bu uygulamadaki tüm vaka soruları, klinik hesaplayıcılar ve spot bilgiler yalnızca{' '}
+            <strong>Tıpta Uzmanlık Eğitimi Giriş Sınavı (TUS)</strong> hazırlığı ve akademik tıp eğitimi amaçlıdır; doğrudan hasta tanı veya tedavi kararı yerine geçmez.
+          </p>
+          <div className="text-[11px] space-y-1">
+            <div>
+              • <em>Harrison&apos;s Internal Medicine (21e)</em>, <em>Robbins Pathologic Basis of Disease (10e)</em>,{' '}
+              <em>Nelson Pediatrics (21e)</em>, <em>Sabiston Surgery (21e)</em>, <em>Williams Obstetrics (26e)</em>,{' '}
+              <em>Harper&apos;s Biochemistry</em>, <em>Katzung Pharmacology</em>, <em>Guyton Physiology</em>.
+            </div>
           </div>
-          <div>
-            • Pediatri, Cerrahi & Kadın Doğum: <em>Nelson Textbook of Pediatrics (21e)</em>,{' '}
-            <em>Sabiston Textbook of Surgery (21e)</em>, <em>Williams Obstetrics (26e)</em>
-          </div>
-          <div>
-            • Temel Bilimler: <em>Harper&apos;s Illustrated Biochemistry</em>,{' '}
-            <em>Katzung Basic &amp; Clinical Pharmacology</em>, <em>Guyton &amp; Hall Medical Physiology</em>,{' '}
-            <em>Murray Medical Microbiology</em>
+          <div className="flex flex-wrap items-center gap-2 pt-0.5">
+            <a
+              href="https://www.ncbi.nlm.nih.gov/books/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-500 text-[11px] font-bold hover:underline"
+            >
+              <span>NCBI Bookshelf</span>
+              <ExternalLink className="w-3 h-3" />
+            </a>
+            <a
+              href="https://pubmed.ncbi.nlm.nih.gov/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-teal-500/30 bg-teal-500/10 text-teal-500 text-[11px] font-bold hover:underline"
+            >
+              <span>NIH PubMed</span>
+              <ExternalLink className="w-3 h-3" />
+            </a>
+            <a
+              href="https://www.who.int/publications/i"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-cyan-500/30 bg-cyan-500/10 text-cyan-500 text-[11px] font-bold hover:underline"
+            >
+              <span>WHO</span>
+              <ExternalLink className="w-3 h-3" />
+            </a>
+            <a
+              href="https://www.osym.gov.tr/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-500 text-[11px] font-bold hover:underline"
+            >
+              <span>ÖSYM</span>
+              <ExternalLink className="w-3 h-3" />
+            </a>
           </div>
         </div>
-        <div className="flex flex-wrap items-center gap-2 pt-1">
-          <a
-            href="https://www.ncbi.nlm.nih.gov/books/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-500 text-[11px] font-bold hover:underline"
-          >
-            <span>NCBI Bookshelf / StatPearls</span>
-            <ExternalLink className="w-3 h-3" />
-          </a>
-          <a
-            href="https://pubmed.ncbi.nlm.nih.gov/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-teal-500/30 bg-teal-500/10 text-teal-500 text-[11px] font-bold hover:underline"
-          >
-            <span>NIH PubMed</span>
-            <ExternalLink className="w-3 h-3" />
-          </a>
-          <a
-            href="https://www.who.int/publications/i"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-cyan-500/30 bg-cyan-500/10 text-cyan-500 text-[11px] font-bold hover:underline"
-          >
-            <span>WHO Clinical Guidelines</span>
-            <ExternalLink className="w-3 h-3" />
-          </a>
-          <a
-            href="https://www.osym.gov.tr/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-500 text-[11px] font-bold hover:underline"
-          >
-            <span>ÖSYM TUS Duyuruları</span>
-            <ExternalLink className="w-3 h-3" />
-          </a>
-        </div>
-      </div>
+      </details>
     </div>
   );
 };
+
+export const DenemeRehberScreen = React.memo(DenemeRehberScreenInner);
