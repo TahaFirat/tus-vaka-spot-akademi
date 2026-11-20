@@ -231,22 +231,42 @@ const DenemeRehberScreenInner: React.FC<DenemeRehberScreenProps> = ({
       return;
     }
 
-    let pool = [...TUS_VAKA_QUESTIONS];
+    const basePool = isPro
+      ? TUS_VAKA_QUESTIONS
+      : TUS_VAKA_QUESTIONS.slice(0, FREE_QUESTION_LIMIT);
+    let pool = basePool;
     if (mode.id === 'ttbt-25') {
-      pool = pool.filter((q) => q.session === 'TTBT');
+      pool = basePool.filter((q) => q.session === 'TTBT');
     } else if (mode.id === 'ktbt-25') {
-      pool = pool.filter((q) => q.session === 'KTBT');
+      pool = basePool.filter((q) => q.session === 'KTBT');
     } else if (mode.id === 'maraton-40') {
-      pool = pool.filter((q) => selectedBranches.includes(q.branchId));
+      pool = basePool.filter((q) => selectedBranches.includes(q.branchId));
     }
 
-    const unseenPool = [...pool.filter((q) => !vakaAnswers[q.id])].sort(
-      () => Math.random() - 0.5
-    );
-    const seenPool = [...pool.filter((q) => Boolean(vakaAnswers[q.id]))].sort(
-      () => Math.random() - 0.5
-    );
-    const picked = [...unseenPool, ...seenPool].slice(0, mode.questionCount);
+    const sampleRandom = <T,>(arr: T[], count: number): T[] => {
+      if (count <= 0 || arr.length === 0) return [];
+      const copy = [...arr];
+      const n = Math.min(count, copy.length);
+      for (let i = 0; i < n; i++) {
+        const j = i + Math.floor(Math.random() * (copy.length - i));
+        const tmp = copy[i];
+        copy[i] = copy[j];
+        copy[j] = tmp;
+      }
+      return copy.slice(0, n);
+    };
+
+    const unseen = pool.filter((q) => !vakaAnswers[q.id]);
+    const picked =
+      unseen.length >= mode.questionCount
+        ? sampleRandom(unseen, mode.questionCount)
+        : [
+            ...sampleRandom(unseen, unseen.length),
+            ...sampleRandom(
+              pool.filter((q) => Boolean(vakaAnswers[q.id])),
+              mode.questionCount - unseen.length
+            ),
+          ];
 
     const now = Date.now();
     triggerHaptic('medium');
@@ -351,9 +371,13 @@ const DenemeRehberScreenInner: React.FC<DenemeRehberScreenProps> = ({
     onRecordExamAttempt(attempt);
   };
 
+  const [guideLimit, setGuideLimit] = useState<number>(60);
+
   const expandedGuideItems = useMemo(() => {
-    const extraFromQuestions = TUS_VAKA_QUESTIONS.filter((_, idx) => idx % 6 === 0).map(
-      (q, i) => ({
+    if (subTab !== 'rehber') return TUS_CLINICAL_GUIDE_ENTRIES;
+    const extraFromQuestions = TUS_VAKA_QUESTIONS.slice(0, 720)
+      .filter((_, idx) => idx % 3 === 0)
+      .map((q, i) => ({
         id: `auto-guide-${i}`,
         category: (q.branchId === 'farmakoloji'
           ? 'Toksikoloji & Antidotlar'
@@ -369,10 +393,9 @@ const DenemeRehberScreenInner: React.FC<DenemeRehberScreenProps> = ({
         goldStandardOrTarget: `Klinik Anahtar: ${q.clinicalClues.join(' • ')}`,
         clinicalTrapNote: q.stepByStepMechanism,
         pearl: q.highYieldPearl,
-      })
-    );
+      }));
     return [...TUS_CLINICAL_GUIDE_ENTRIES, ...extraFromQuestions];
-  }, []);
+  }, [subTab]);
 
   const filteredGuideItems = useMemo(() => {
     const q = guideSearch.trim().toLowerCase();
@@ -1286,7 +1309,7 @@ const DenemeRehberScreenInner: React.FC<DenemeRehberScreenProps> = ({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
-            {filteredGuideItems.map((entry) => {
+            {filteredGuideItems.slice(0, guideLimit).map((entry) => {
               const highlightGuide = (str: string) => {
                 const q = guideSearch.trim();
                 if (q.length < 2) return <span>{str}</span>;
@@ -1351,6 +1374,15 @@ const DenemeRehberScreenInner: React.FC<DenemeRehberScreenProps> = ({
               );
             })}
           </div>
+          {filteredGuideItems.length > guideLimit && (
+            <button
+              type="button"
+              onClick={() => setGuideLimit((l) => l + 60)}
+              className="w-full py-2.5 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-500 text-xs font-extrabold"
+            >
+              Daha Fazla Rehber Kartı Göster ({filteredGuideItems.length - guideLimit} kalan)
+            </button>
+          )}
         </div>
       )}
 

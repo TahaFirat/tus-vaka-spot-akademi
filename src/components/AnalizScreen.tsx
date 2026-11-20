@@ -3,8 +3,10 @@ import {
   Award,
   BarChart3,
   Bell,
+  Compass,
   Download,
   Flame,
+  Layers,
   RotateCcw,
   Share2,
   Target,
@@ -37,6 +39,7 @@ interface AnalizScreenProps {
   onJumpToMistakes: (mode: 'vaka' | 'spot') => void;
   onOpenPaywall: (reason?: string) => void;
   onResetProgress: () => void;
+  onReplayOnboarding: () => void;
 }
 
 export const AnalizScreen: React.FC<AnalizScreenProps> = ({
@@ -47,14 +50,13 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
   onJumpToMistakes,
   onOpenPaywall,
   onResetProgress,
+  onReplayOnboarding,
 }) => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [importMessage, setImportMessage] = useState<string | null>(null);
   const [confirmReset, setConfirmReset] = useState(false);
   const [reminderHour, setReminderHour] = useState<number>(20);
-  const [reminderStatusMsg, setReminderStatusMsg] = useState<string | null>(
-    null
-  );
+  const [reminderStatusMsg, setReminderStatusMsg] = useState<string | null>(null);
 
   useEffect(() => {
     const onRemStatus = (e: Event) => {
@@ -65,10 +67,7 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
     };
     window.addEventListener('tus:reminderStatus', onRemStatus as EventListener);
     return () => {
-      window.removeEventListener(
-        'tus:reminderStatus',
-        onRemStatus as EventListener
-      );
+      window.removeEventListener('tus:reminderStatus', onRemStatus as EventListener);
     };
   }, []);
 
@@ -142,6 +141,18 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
     const ktbtPct =
       ktbtSolved > 0 ? Math.round((ktbtCorrect / ktbtSolved) * 100) : 0;
 
+    // Leitner 4-Kutu SRS özeti (Akademi Karne içinde)
+    let box1 = 0;
+    let box2 = 0;
+    let box3 = 0;
+    let box4 = 0;
+    for (const [, entry] of Object.entries(studyState.srsMap)) {
+      if (entry.box === 1) box1++;
+      else if (entry.box === 2) box2++;
+      else if (entry.box === 3) box3++;
+      else box4++;
+    }
+
     return {
       totalSolved,
       totalCorrect,
@@ -157,8 +168,9 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
       ktbtCorrect,
       ktbtPct,
       perBranch,
+      srs: { box1, box2, box3, box4 },
     };
-  }, [studyState.vakaAnswers, studyState.spotAnswers]);
+  }, [studyState.vakaAnswers, studyState.spotAnswers, studyState.srsMap]);
 
   const handleExportJson = () => {
     triggerHaptic('light');
@@ -178,9 +190,7 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
     const reader = new FileReader();
     reader.onload = () => {
       try {
-        const parsed = JSON.parse(
-          String(reader.result)
-        ) as Partial<TusStudyState>;
+        const parsed = JSON.parse(String(reader.result)) as Partial<TusStudyState>;
         if (parsed && typeof parsed === 'object') {
           onUpdateStudyState((prev) => ({
             ...prev,
@@ -202,9 +212,10 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
             examHistory: Array.isArray(parsed.examHistory)
               ? parsed.examHistory
               : prev.examHistory,
+            onboardingCompleted: true,
           }));
           triggerHaptic('success');
-          setImportMessage('Verileriniz başarıyla geri yüklendi!');
+          setImportMessage('Verileriniz başarıyla geri yüklendi.');
         }
       } catch {
         setImportMessage('Geçersiz yedek dosyası.');
@@ -214,12 +225,12 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
   };
 
   const cardClass = isLight
-    ? 'bg-white border-slate-200/90 shadow-sm'
+    ? 'bg-white border-slate-200/90 shadow-xs'
     : 'bg-[#0C1B24] border-white/10 shadow-md';
 
   return (
     <div className="space-y-2.5">
-      {/* Live Isolated ÖSYM TUS Countdown Card */}
+      {/* ÖSYM TUS Dönem Seçici & Canlı Geri Sayım */}
       <TusDynamicCountdownCard
         targetDate={studyState.targetTusDate}
         isLight={isLight}
@@ -229,14 +240,14 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
         }
       />
 
-      {/* 4 Compact Stat Cards */}
+      {/* 4 Özet İstatistik Kartı */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
         <div className={`rounded-2xl border p-3 ${cardClass}`}>
           <div className="text-[10px] font-extrabold uppercase text-emerald-500">
             TTBT (Temel)
           </div>
           <div className="text-xl font-extrabold mt-0.5">%{stats.ttbtPct}</div>
-          <div className="text-[11px] text-slate-400">
+          <div className="text-[11px] text-slate-400 tabular-nums">
             {stats.ttbtCorrect}/{stats.ttbtSolved} Doğru
           </div>
         </div>
@@ -246,7 +257,7 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
             KTBT (Klinik)
           </div>
           <div className="text-xl font-extrabold mt-0.5">%{stats.ktbtPct}</div>
-          <div className="text-[11px] text-slate-400">
+          <div className="text-[11px] text-slate-400 tabular-nums">
             {stats.ktbtCorrect}/{stats.ktbtSolved} Doğru
           </div>
         </div>
@@ -255,10 +266,10 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
           <div className="text-[10px] font-extrabold uppercase text-teal-500">
             ÖSYM Neti
           </div>
-          <div className="text-xl font-extrabold text-emerald-500 mt-0.5">
+          <div className="text-xl font-extrabold text-emerald-500 mt-0.5 tabular-nums">
             {stats.overallNet}
           </div>
-          <div className="text-[11px] text-slate-400">
+          <div className="text-[11px] text-slate-400 tabular-nums">
             {stats.totalCorrect} D • {stats.totalWrong} Y
           </div>
         </div>
@@ -267,14 +278,14 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
           <div className="text-[10px] font-extrabold uppercase text-amber-500">
             Tahmini TUS
           </div>
-          <div className="text-xl font-extrabold text-amber-500 mt-0.5">
+          <div className="text-xl font-extrabold text-amber-500 mt-0.5 tabular-nums">
             {stats.estimatedScore}
           </div>
           <div className="text-[11px] text-slate-400">45–85 Bandı</div>
         </div>
       </div>
 
-      {/* Daily Goal & Mistake Re-Test */}
+      {/* Günlük Soru Hedefi & Hata Defteri */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
         <div className={`rounded-2xl border p-3.5 space-y-2.5 ${cardClass}`}>
           <div className="flex items-center justify-between">
@@ -284,14 +295,14 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
             </div>
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-500 text-[11px] font-bold">
               <Flame className="w-3 h-3" />
-              {studyState.streakDays} Gün Seri
+              {studyState.streakDays} Gün
             </span>
           </div>
 
           <div className="space-y-1">
             <div className="flex items-center justify-between text-xs">
-              <span className="text-slate-400">Bugün Çözülen:</span>
-              <span className="font-bold text-emerald-500">
+              <span className="text-slate-400">Bugün:</span>
+              <span className="font-bold text-emerald-500 tabular-nums">
                 {studyState.todaySolvedCount} / {studyState.dailyTarget} Soru
               </span>
             </div>
@@ -339,95 +350,85 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
           </div>
         </div>
 
-        {/* Mistake Re-test & Backup (Audio Removed) */}
+        {/* Hata Defteri & 4-Kutu Leitner Hafıza Özeti */}
         <div
           className={`rounded-2xl border p-3.5 flex flex-col justify-between gap-2.5 ${cardClass}`}
         >
           <div className="space-y-2">
-            <div className="text-xs font-extrabold flex items-center gap-1.5">
-              <RotateCcw className="w-4 h-4 text-rose-500" />
-              <span>Hata Defteri • Tek Tıkla Tekrar Çöz</span>
+            <div className="flex items-center justify-between text-xs font-extrabold">
+              <span className="flex items-center gap-1.5">
+                <RotateCcw className="w-4 h-4 text-rose-500" />
+                <span>Hata Defteri & Hafıza Kutuları</span>
+              </span>
+              <span className="text-[10.5px] font-bold text-emerald-500 tabular-nums">
+                Kalıcı: {stats.srs.box4}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-4 gap-1.5 text-center">
+              {[
+                { label: 'Kutu 1', val: stats.srs.box1, cls: 'text-rose-500' },
+                { label: 'Kutu 2', val: stats.srs.box2, cls: 'text-amber-500' },
+                { label: 'Kutu 3', val: stats.srs.box3, cls: 'text-teal-500' },
+                { label: 'Kutu 4', val: stats.srs.box4, cls: 'text-emerald-500' },
+              ].map((b) => (
+                <div
+                  key={b.label}
+                  className={`rounded-xl border py-1.5 px-1 ${
+                    isLight ? 'bg-slate-50 border-slate-200' : 'bg-[#071117] border-white/8'
+                  }`}
+                >
+                  <div className="text-[9.5px] font-bold text-slate-400">{b.label}</div>
+                  <div className={`text-xs font-extrabold tabular-nums ${b.cls}`}>
+                    {b.val}
+                  </div>
+                </div>
+              ))}
             </div>
 
             <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
+                disabled={stats.vakaWrong === 0}
                 onClick={() => {
                   triggerHaptic('medium');
                   onJumpToMistakes('vaka');
                 }}
-                className={`py-2 px-2.5 rounded-xl border text-xs font-extrabold transition ${
+                className={`py-2 px-2.5 rounded-xl border text-xs font-extrabold transition disabled:opacity-45 ${
                   isLight
                     ? 'bg-rose-50 hover:bg-rose-100 border-rose-300 text-rose-700'
                     : 'bg-rose-500/15 hover:bg-rose-500/25 border-rose-500/30 text-rose-300'
                 }`}
               >
-                5 Şıklı Yanlışlar ({stats.vakaWrong})
+                Vaka Yanlış ({stats.vakaWrong})
               </button>
 
               <button
                 type="button"
+                disabled={stats.spotWrong === 0}
                 onClick={() => {
                   triggerHaptic('medium');
                   onJumpToMistakes('spot');
                 }}
-                className={`py-2 px-2.5 rounded-xl border text-xs font-extrabold transition ${
+                className={`py-2 px-2.5 rounded-xl border text-xs font-extrabold transition disabled:opacity-45 ${
                   isLight
                     ? 'bg-amber-50 hover:bg-amber-100 border-amber-300 text-amber-800'
                     : 'bg-amber-500/15 hover:bg-amber-500/25 border-amber-500/30 text-amber-300'
                 }`}
               >
-                D/Y Yanlışlar ({stats.spotWrong})
+                Spot Yanlış ({stats.spotWrong})
               </button>
             </div>
           </div>
-
-          <div className="pt-2 border-t border-slate-500/15 flex flex-wrap items-center justify-between gap-2">
-            <span className="text-[11px] font-semibold text-slate-400">
-              Çalışma Verisi Yedekleme
-            </span>
-
-            <div className="flex items-center gap-1.5">
-              <button
-                type="button"
-                onClick={handleExportJson}
-                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-slate-500/15 hover:bg-slate-500/25 text-xs font-bold transition"
-              >
-                <Download className="w-3.5 h-3.5" />
-                <span>Yedekle</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-slate-500/15 hover:bg-slate-500/25 text-xs font-bold transition"
-              >
-                <Upload className="w-3.5 h-3.5" />
-                <span>Yükle</span>
-              </button>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="application/json"
-                onChange={handleImportJson}
-                className="hidden"
-              />
-            </div>
-          </div>
-
-          {importMessage && (
-            <div className="text-xs text-emerald-500 text-center font-semibold">
-              {importMessage}
-            </div>
-          )}
         </div>
       </div>
 
-      {/* 11 TUS Branches Mastery */}
+      {/* 11 TUS Branşında Ustalık */}
       <div className={`rounded-2xl border p-3.5 space-y-2.5 ${cardClass}`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5 text-xs font-extrabold">
             <BarChart3 className="w-4 h-4 text-emerald-500" />
-            <span>11 TUS Branşında Ustalık & Soru Dağılımı</span>
+            <span>11 TUS Branşında Ustalık</span>
           </div>
           {!isPro && (
             <button
@@ -435,7 +436,7 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
               onClick={() => onOpenPaywall()}
               className="text-xs font-bold text-amber-500 hover:underline"
             >
-              PRO'ya Geç →
+              PRO’ya Geç →
             </button>
           )}
         </div>
@@ -471,7 +472,7 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
                     {branch.shortName}
                   </span>
                   <span className="text-[11px] text-slate-400 tabular-nums shrink-0">
-                    {bStat.solved}/{bStat.totalPool} • Net:{' '}
+                    {bStat.solved}/{bStat.totalPool.toLocaleString('tr-TR')} • Net:{' '}
                     <strong className="text-emerald-500">{bStat.net}</strong>
                   </span>
                 </div>
@@ -488,13 +489,128 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
         </div>
       </div>
 
-      {/* Exam History & Reset */}
-      <div className={`rounded-2xl border p-3.5 space-y-2.5 ${cardClass}`}>
+      {/* Uygulama Ayarları, Tanıtımı Tekrar İncele, Yedekleme & Bildirim */}
+      <div className={`rounded-2xl border p-3.5 space-y-3 ${cardClass}`}>
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <span className="text-xs font-extrabold flex items-center gap-1.5">
-            <Award className="w-4 h-4 text-teal-500" />
-            <span>Tamamlanan Denemeler ({studyState.examHistory.length})</span>
-          </span>
+          <div className="flex items-center gap-1.5 text-xs font-extrabold">
+            <Layers className="w-4 h-4 text-emerald-500" />
+            <span>Ayarlar, Uygulama Tanıtımı & Yedekleme</span>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              triggerHaptic('light');
+              onReplayOnboarding();
+            }}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold transition shadow-xs"
+          >
+            <Compass className="w-3.5 h-3.5" />
+            <span>Tanıtımı Tekrar İncele</span>
+          </button>
+        </div>
+
+        {/* Günlük Hatırlatıcı & Karne Paylaşımı */}
+        <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-500/15 text-xs">
+          <div className="flex flex-wrap items-center gap-1.5">
+            <Bell className="w-3.5 h-3.5 text-teal-500 shrink-0" />
+            <select
+              value={reminderHour}
+              onChange={(e) => setReminderHour(Number(e.target.value))}
+              aria-label="Hatırlatıcı Saati"
+              className={`rounded-xl px-2.5 py-1.5 text-xs font-bold border outline-none ${
+                isLight
+                  ? 'bg-slate-50 border-slate-200 text-slate-800'
+                  : 'bg-[#071117] border-white/10 text-slate-100'
+              }`}
+            >
+              {[9, 12, 18, 19, 20, 21, 22].map((h) => (
+                <option key={h} value={h}>
+                  Her Gün {String(h).padStart(2, '0')}:00
+                </option>
+              ))}
+            </select>
+
+            <button
+              type="button"
+              onClick={() => {
+                triggerHaptic('medium');
+                scheduleDailyTusReminder(
+                  reminderHour,
+                  0,
+                  countdownDays,
+                  studyState.dailyTarget
+                );
+              }}
+              className="px-2.5 py-1.5 rounded-xl bg-teal-600 text-white text-xs font-extrabold"
+            >
+              Hatırlatıcı Kur
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                triggerHaptic('light');
+                cancelDailyTusReminder();
+              }}
+              className={`px-2 py-1.5 rounded-xl border text-xs font-bold ${
+                isLight
+                  ? 'bg-slate-100 border-slate-200 text-slate-600'
+                  : 'bg-white/5 border-white/10 text-slate-300'
+              }`}
+            >
+              Kapat
+            </button>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              triggerHaptic('light');
+              shareClinicalSummary(
+                `TUS Vaka & Spot Akademi Karnem • Çözülen: ${stats.totalSolved} Soru • ÖSYM Netim: ${stats.overallNet} • Tahmini TUS: ${stats.estimatedScore} • TUS'a Kalan: ${countdownDays} Gün`
+              );
+            }}
+            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-slate-500/15 hover:bg-slate-500/25 text-xs font-bold"
+          >
+            <Share2 className="w-3.5 h-3.5" />
+            <span>Karnemi Paylaş</span>
+          </button>
+        </div>
+
+        {reminderStatusMsg && (
+          <div className="text-[11px] font-semibold text-emerald-500">
+            {reminderStatusMsg}
+          </div>
+        )}
+
+        {/* Yedekle / Yükle / Sıfırla */}
+        <div className="pt-2 border-t border-slate-500/15 flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={handleExportJson}
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-slate-500/15 hover:bg-slate-500/25 text-xs font-bold transition"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>Yedekle</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-slate-500/15 hover:bg-slate-500/25 text-xs font-bold transition"
+            >
+              <Upload className="w-3.5 h-3.5" />
+              <span>Yükle</span>
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="application/json"
+              onChange={handleImportJson}
+              className="hidden"
+            />
+          </div>
 
           {!confirmReset ? (
             <button
@@ -528,8 +644,21 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
           )}
         </div>
 
-        {studyState.examHistory.length > 0 && (
-          <div className="space-y-1.5 pt-1">
+        {importMessage && (
+          <div className="text-xs text-emerald-500 font-semibold">
+            {importMessage}
+          </div>
+        )}
+      </div>
+
+      {/* Tamamlanan Denemeler */}
+      {studyState.examHistory.length > 0 && (
+        <div className={`rounded-2xl border p-3.5 space-y-2 ${cardClass}`}>
+          <span className="text-xs font-extrabold flex items-center gap-1.5">
+            <Award className="w-4 h-4 text-teal-500" />
+            <span>Tamamlanan Denemeler ({studyState.examHistory.length})</span>
+          </span>
+          <div className="space-y-1.5">
             {studyState.examHistory.slice(0, 5).map((ex) => (
               <div
                 key={ex.id}
@@ -557,88 +686,8 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
               </div>
             ))}
           </div>
-        )}
-      </div>
-
-      {/* Native iOS Daily TUS Study Reminder & Scorecard Share */}
-      <div className={`rounded-2xl border p-3.5 space-y-2.5 ${cardClass}`}>
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-1.5 text-xs font-extrabold">
-            <Bell className="w-4 h-4 text-emerald-500" />
-            <span>iOS Günlük TUS Etüt Bildirimi & Karne Paylaşımı</span>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => {
-              triggerHaptic('light');
-              shareClinicalSummary(
-                `TUS Vaka & Spot Akademi Karnem • Çözülen: ${stats.totalSolved} Soru • ÖSYM Netim: ${stats.overallNet} • Tahmini TUS Puanım: ${stats.estimatedScore} • TUS'a Kalan: ${countdownDays} Gün`
-              );
-            }}
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-emerald-600 text-white text-xs font-bold"
-          >
-            <Share2 className="w-3.5 h-3.5" />
-            <span>Karnemi Paylaş</span>
-          </button>
         </div>
-
-        <div className="flex flex-wrap items-center gap-2 text-xs">
-          <select
-            value={reminderHour}
-            onChange={(e) => setReminderHour(Number(e.target.value))}
-            aria-label="Hatırlatıcı Saati"
-            className={`rounded-xl px-2.5 py-1.5 text-xs font-bold border outline-none ${
-              isLight
-                ? 'bg-slate-50 border-slate-200 text-slate-800'
-                : 'bg-[#071117] border-white/10 text-slate-100'
-            }`}
-          >
-            {[9, 12, 18, 19, 20, 21, 22].map((h) => (
-              <option key={h} value={h}>
-                Her Gün {String(h).padStart(2, '0')}:00
-              </option>
-            ))}
-          </select>
-
-          <button
-            type="button"
-            onClick={() => {
-              triggerHaptic('medium');
-              scheduleDailyTusReminder(
-                reminderHour,
-                0,
-                countdownDays,
-                studyState.dailyTarget
-              );
-            }}
-            className="px-3 py-1.5 rounded-xl bg-teal-600 text-white text-xs font-extrabold"
-          >
-            Hatırlatıcıyı Kur
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              triggerHaptic('light');
-              cancelDailyTusReminder();
-            }}
-            className={`px-2.5 py-1.5 rounded-xl border text-xs font-bold ${
-              isLight
-                ? 'bg-slate-100 border-slate-200 text-slate-600'
-                : 'bg-white/5 border-white/10 text-slate-300'
-            }`}
-          >
-            Kapat
-          </button>
-        </div>
-
-        {reminderStatusMsg && (
-          <div className="text-[11px] font-semibold text-emerald-500">
-            {reminderStatusMsg}
-          </div>
-        )}
-      </div>
+      )}
     </div>
   );
 };

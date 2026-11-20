@@ -16,6 +16,7 @@ import {
   Zap,
 } from 'lucide-react';
 import {
+  matchesSpotSearch,
   TUS_BRANCHES,
   TUS_SPOT_CARDS,
   TusBranchId,
@@ -138,13 +139,12 @@ const DogruYanlisScreenInner: React.FC<DogruYanlisScreenProps> = ({
 
       if (s.id === pinnedSpotId) {
         if (qLower) {
-          const hay = `${s.statement} ${s.correctMedicalFact} ${s.subTopic} ${s.branchName} ${s.highYieldPearl}`.toLowerCase();
-          return hay.includes(qLower);
+          return matchesSpotSearch(s, qLower);
         }
         return true;
       }
 
-      if (basketFilter === 'osym_twin' && !s.subTopic.includes('ÖSYM İkizi')) {
+      if (basketFilter === 'osym_twin' && !s.isOsymTwin) {
         return false;
       }
       const rec = spotAnswers[s.id];
@@ -158,9 +158,8 @@ const DogruYanlisScreenInner: React.FC<DogruYanlisScreenProps> = ({
         return false;
       }
 
-      if (qLower) {
-        const hay = `${s.statement} ${s.correctMedicalFact} ${s.subTopic} ${s.branchName} ${s.highYieldPearl}`.toLowerCase();
-        if (!hay.includes(qLower)) return false;
+      if (qLower && !matchesSpotSearch(s, qLower)) {
+        return false;
       }
       return true;
     });
@@ -215,7 +214,7 @@ const DogruYanlisScreenInner: React.FC<DogruYanlisScreenProps> = ({
       : TUS_SPOT_CARDS.slice(0, FREE_QUESTION_LIMIT);
 
     basePool.forEach((s) => {
-      if (s.subTopic.includes('ÖSYM İkizi')) osymTwin++;
+      if (s.isOsymTwin) osymTwin++;
       const rec = spotAnswers[s.id];
       if (!rec) unsolved++;
       else if (rec.isCorrect) correct++;

@@ -35,6 +35,10 @@
   padding-top: max(0.4rem, env(safe-area-inset-top, 0px));
 }
 
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
 .pb-safe-dock {
   padding-bottom: max(0.65rem, env(safe-area-inset-bottom, 0px));
 }

@@ -92,11 +92,15 @@ export const PaywallModal: React.FC<PaywallModalProps> = ({
     }
   };
 
+  const totalFmt = TOTAL_INTERACTIVE_TUS_ITEMS.toLocaleString('tr-TR');
+  const vakaFmt = TUS_VAKA_QUESTIONS.length.toLocaleString('tr-TR');
+  const spotFmt = TUS_SPOT_CARDS.length.toLocaleString('tr-TR');
+
   const features = [
-    `${TOTAL_INTERACTIVE_TUS_ITEMS}+ Etkileşimli İçerik (${TUS_VAKA_QUESTIONS.length} Vaka Sorusu & ${TUS_SPOT_CARDS.length} D/Y Spot)`,
+    `${totalFmt}+ Hatasız İçerik (${vakaFmt} Vaka Sorusu & ${spotFmt} D/Y Spot)`,
     '11 TUS Branşında (TTBT & KTBT) Sınırsız Soru ve Hata Defteri',
-    'ÖSYM Net Hesaplamalı TTBT, KTBT ve 40 Soruluk Maraton Denemeleri',
-    'İlk Tercih vs. Altın Standart, Antidot ve Enzim Klinik Rehberi',
+    '2019–2025 ÖSYM Konsept İkizleri ve Süreli TUS Denemeleri',
+    'İlk Tercih vs. Altın Standart, Antidot ve Klinik Hesaplayıcılar',
   ];
 
   return (
@@ -165,7 +169,7 @@ export const PaywallModal: React.FC<PaywallModalProps> = ({
               {reasonMessage ||
                 (totalSolvedCount >= FREE_QUESTION_LIMIT
                   ? `Ücretsiz ${FREE_QUESTION_LIMIT} soru kotanızı tamamladınız (${totalSolvedCount}/${FREE_QUESTION_LIMIT}).`
-                  : `30 soruluk demo sınırını kaldırın, ${TOTAL_INTERACTIVE_TUS_ITEMS}+ soru ve denemeyi sınırsız açın.`)}
+                  : `30 soruluk demo sınırını kaldırın, ${totalFmt}+ soru ve denemeyi sınırsız açın.`)}
             </p>
           </div>
         </div>

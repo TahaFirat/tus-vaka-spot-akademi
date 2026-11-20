@@ -114,3 +114,30 @@ export interface DifferentialClusterSeed {
     DifferentialEntitySeed
   ];
 }
+
+export interface StructuredEntitySeed {
+  name: string; // Concise entity/diagnosis/drug/nerve/pathogen name (no spoilers)
+  target: string; // Primary enzyme, gene, receptor, pathogen, nerve/vessel, or mechanism (never repeat `name`)
+  hallmark: string; // Pathognomonic clinical/lab/biopsy/imaging finding (never mention any entity `name`)
+  vignette: string; // Realistic patient case stem with age/sex/findings (never mention `name` or `target` verbatim)
+  clues: string[]; // 3 concise clinical clues from the vignette (never mention `name`)
+  management: string; // Diagnostic gold standard or first-line specific therapy (never mention any entity `name`)
+  pearl: string; // High-yield TUS golden rule sentence
+  trapFalse: string; // Plausible false predicate for classic TUS trap (without prefixing `name`, e.g. "otozomal dominant kalıtılır ve...")
+  trapHighlight: string; // Exact false substring inside `trapFalse`
+}
+
+export interface StructuredClusterSeed {
+  branchId: TusBranchId;
+  subTopic: string;
+  difficulty: 'Temel Spot' | 'Klinik Vaka' | 'İleri Ayırıcı Tanı';
+  examFrequency: 'Her TUS Sorulur' | 'Yüksek Verimli Vaka' | 'Altın Standart Spot';
+  osymTwinYear?: '2025' | '2024' | '2023' | '2022' | '2021' | '2020' | '2019';
+  entities: [
+    StructuredEntitySeed,
+    StructuredEntitySeed,
+    StructuredEntitySeed,
+    StructuredEntitySeed,
+    StructuredEntitySeed
+  ];
+}

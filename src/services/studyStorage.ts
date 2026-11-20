@@ -40,7 +40,7 @@ export interface TusSrsEntry {
 
 export interface ActiveStudyTimerState {
   running: boolean;
-  mode: 'stopwatch' | 'pomodoro25' | 'pomodoro50';
+  mode: 'stopwatch' | 'pomodoro25' | 'pomodoro50' | 'pomodoro90';
   branchId: TusBranchId | 'GENEL';
   startedAtMs: number | null;
   accumulatedSec: number;
@@ -192,6 +192,7 @@ export interface TusStudyState {
   dailyGoalMinutes: number;
   targetSpecialtyId: string;
   activeTimer: ActiveStudyTimerState;
+  onboardingCompleted: boolean;
 }
 
 const STORAGE_KEY = 'tus_vaka_spot_akademi_state_v1';
@@ -236,6 +237,7 @@ export const DEFAULT_STUDY_STATE: TusStudyState = {
   dailyGoalMinutes: 120,
   targetSpecialtyId: 'kardiyoloji',
   activeTimer: DEFAULT_ACTIVE_TIMER,
+  onboardingCompleted: false,
 };
 
 export function loadStudyState(): TusStudyState {
@@ -300,6 +302,7 @@ export function loadStudyState(): TusStudyState {
         parsed.activeTimer && typeof parsed.activeTimer === 'object'
           ? { ...DEFAULT_ACTIVE_TIMER, ...parsed.activeTimer }
           : DEFAULT_ACTIVE_TIMER,
+      onboardingCompleted: Boolean(parsed.onboardingCompleted),
     };
   } catch {
     return DEFAULT_STUDY_STATE;

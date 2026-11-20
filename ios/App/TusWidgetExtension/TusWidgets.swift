@@ -247,7 +247,7 @@ struct TusStudyLiveActivity: Widget {
                         .font(.system(size: 15, weight: .heavy, design: .rounded))
                         .foregroundColor(.white)
                         .lineLimit(1)
-                    Text("Hedef: \(context.state.todaySolved)/\(context.state.dailyTarget) Soru")
+                    Text("Hedef: \(context.state.todaySolved)/\(context.state.dailyTarget) dk Etüt")
                         .font(.system(size: 11, weight: .semibold))
                         .foregroundColor(.white.opacity(0.75))
                 }
@@ -295,7 +295,7 @@ struct TusStudyLiveActivity: Widget {
                     }
                 }
                 DynamicIslandExpandedRegion(.bottom) {
-                    Text("\(context.state.modeTitle) • Bugün: \(context.state.todaySolved)/\(context.state.dailyTarget) Soru")
+                    Text("\(context.state.modeTitle) • Hedef: \(context.state.todaySolved)/\(context.state.dailyTarget) dk")
                         .font(.system(size: 11, weight: .semibold))
                         .foregroundColor(.secondary)
                 }

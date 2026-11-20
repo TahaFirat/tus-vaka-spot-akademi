@@ -19,6 +19,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import {
+  matchesVakaSearch,
   OptionLetter,
   TUS_BRANCHES,
   TUS_OSYM_TWIN_QUESTIONS,
@@ -157,7 +158,7 @@ const VakaTestScreenInner: React.FC<VakaTestScreenProps> = ({
   );
 
   const isOsymTwinQuestion = (q: (typeof TUS_VAKA_QUESTIONS)[number]) =>
-    Boolean(q.isOsymTwin) || q.subTopic.startsWith('ÖSYM İkizi');
+    Boolean(q.isOsymTwin);
 
   // Keeps pinnedQuestionId in the list so answering a question in "Yeni" or "Yanlışlar" never makes it vanish before clicking Sonraki!
   const filteredQuestions = useMemo(() => {
@@ -189,10 +190,8 @@ const VakaTestScreenInner: React.FC<VakaTestScreenProps> = ({
         }
       }
 
-      if (qLower) {
-        const optText = q.options.map((o) => o.text).join(' ');
-        const hay = `${q.stem} ${optText} ${q.subTopic} ${q.branchName} ${q.highYieldPearl}`.toLowerCase();
-        if (!hay.includes(qLower)) return false;
+      if (qLower && !matchesVakaSearch(q, qLower)) {
+        return false;
       }
       return true;
     });
