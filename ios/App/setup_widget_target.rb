@@ -15,7 +15,7 @@ app_profile = ENV['PROFILE_NAME'].to_s.strip
 widget_profile = ENV['WIDGET_PROFILE_NAME'].to_s.strip
 build_num = ENV['BUILD_NUMBER'].to_s.strip
 build_num = '1' if build_num.empty?
-marketing_ver = '1.4'
+marketing_ver = '1.5'
 
 # 1. Shared group & TusSharedModels.swift
 shared_group = project.main_group.children.find { |g| g.display_name == 'Shared' } ||

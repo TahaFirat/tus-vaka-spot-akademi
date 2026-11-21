@@ -1,6 +1,6 @@
-# 10 — iOS Liquid Glass Navigasyon, Çoklu Widget Mimarisi ve "Sınavda Muhtemel Çıkacaklar" Köşesi
+# 10 — iOS Liquid Glass Navigasyon, 5 Canlı Renkli Widget Mimarisi, 2.751 Altın Spot Köşesi ve Çift Planlı PRO Fiyatlandırma
 
-Bu doküman; Apple'ın **Liquid Glass** şeffaf kırınımlı cam navigasyon tasarımının uygulanmasını, widget üzerindeki spot bilgilerin kesintisiz görünmesini, widget'a dokunulduğunda doğrudan ilgili bilginin uygulama içinde açılmasını (`tusakademi://` deep-link) ve 4 farklı iOS Widget çeşidiyle entegre çalışan **2027-TUS Muhtemel Çıkacaklar Köşesi** mimarisini tanımlar.
+Bu doküman; Apple'ın **Liquid Glass** şeffaf kırınımlı cam navigasyon tasarımının uygulanmasını, 5 canlı ve farklı renk paletine sahip native iOS Widget ailesini, **2.751 kartlık 2027-TUS Muhtemel Çıkacaklar & Altın Spot Köşesi**ni, `320px–1024px` sıfır taşmalı responsive üst bar / soru kartı mimarisini ve **Aylık (`79,99 ₺ / Ay`) + Ömür Boyu (`199,99 ₺` Tek Seferlik)** çift fiyatlandırma yapısını tanımlar.
 
 ---
 
@@ -8,41 +8,33 @@ Bu doküman; Apple'ın **Liquid Glass** şeffaf kırınımlı cam navigasyon tas
 
 | Sorun | Kök Neden | Uygulanan Mimari Çözüm |
 | :--- | :--- | :--- |
-| **Widget'ta günlük spot bilginin eksik/kesik görünmesi** | iOS 17+ `containerBackground` otomatik `16pt` kenar boşluğunun üstüne ekstra `.padding(12)` + `.padding(10)` binmesi ve `systemMedium` alanının ikiye bölünmesi | Çift iç boşluklar kaldırıldı (`contentMargins` uyumu); her widget boyutu için karakter bütçeli alanlar (`shortTitle`, `widgetSummary`) ve tam genişlikli özel **`Günün Çıkacak TUS Spotu`** widget'ı eklendi |
-| **Widget'a tıklayınca bilginin kaybolması** | Widget'larda `.widgetURL(...)` tanımlı olmaması, `SceneDelegate` URL yakalayıcısının bulunmaması ve uygulama içinde karşılık gelen bir ekranın olmaması | `Info.plist` içine `tusakademi://` şeması eklendi; `SceneDelegate` hem soğuk açılışta (`willConnectTo`) hem arka planda (`openURLContexts`) tıklanan `id`'yi yakalayıp doğrudan **Muhtemel Çıkacaklar Köşesi**nde o kartı odaklı açar |
-| **Widget çeşitliliğinin az olması** | Yalnızca tek bir `TusCountdownWidget` bulunması | `TusWidgetBundle` içine **4 ayrı iOS Widget ailesi** + Canlı Etkinlik eklendi |
-| **Nav bar'ın opak ve düz görünmesi** | `%94` opak arka plan nedeniyle altından geçen içeriğin kırınım oluşturmaması | Gerçek **Apple Liquid Glass** optik katmanı (`%44–%56` şeffaflık, `blur(18px) saturate(190%)`, üst/alt speküler cam parıltısı ve yüzen kapsül geometrisi) uygulandı |
+| **Üst bardaki `PRO` butonunun dar ekranlarda taşması** | `368px` (`xs:`) kırılımında hem `Sparkles` ikonu hem `"Karne"` metni aynı anda açıldığı için `375px` iPhone ekranında toplam genişliğin taşması | Mobil üst bardan mükerrer `Sparkles` kısayolu kaldırıldı, `Karne` mobilde ikon-odaklı (`w-7 h-7 sm:w-auto`) hale getirildi; üst kapsül genişliği `~245px` ile `320px` ekranlarda dahi sıfır taşmalı çalışır |
+| **Vaka ve D/Y Spot kartlarında ufak iç içe geçmeler** | 5 haneli soru sayacının (`1 / 16.123`) Row A'da branş adı + `İpucu` + `Rastgele` + `Kaydet` butonlarıyla aynı satırı paylaşması | Soru/Spot sayacı (`1 / 16.123`) **Row B**'nin sağ köşesine taşındı; Row A ve `TusCountdownTimer` dar ekranlarda tamamen ferahlatıldı |
+| **Spot bilgi köşesinin az görünmesi (60 kart)** | Yalnızca 60 sabit spot kartının listelenmesi | Tüm 11 branşın yapılandırılmış klinik çekirdek kümeleriyle birleştirilerek **2.751 adet 3 katmanlı Altın Spot Kartı** (`TUS_ALL_EXPECTED_PEARLS`) oluşturuldu ve 60fps sayfalama eklendi |
+| **Widget'ların tek renkli görünmesi** | Tüm widget'ların koyu lacivert arka plan paylaşması | **5 ayrı canlı mücevher tonlu (Jewel-Tone) modern renk paleti** ve branşa göre dinamik renk geçişi uygulandı |
+| **Yalnızca tek fiyat seçeneği bulunması** | Sadece Ömür Boyu (`com.tus.akademi.lifetime.pro`) planının yer alması | Hem **Aylık Plan (`79,99 ₺ / Ay` — `com.tus.akademi.pro.monthly`)** hem **Ömür Boyu Plan (`199,99 ₺` — `com.tus.akademi.lifetime.pro`)** StoreKit 2 + StoreKit 1 ve App Store Connect'e eklendi |
 
 ---
 
-## 2. 4 Ayrı Native iOS Widget Çeşidi (`TusWidgets.swift`)
+## 2. 5 Canlı Renkli Native iOS Widget Çeşidi (`TusWidgets.swift`)
 
-1. **Günün Çıkacak TUS Spotu (`TusDailySpotWidget` — `systemSmall`, `systemMedium`, `systemLarge`, `accessoryRectangular`):**
-   * Tamamen sınavda çıkması beklenen yüksek verimli bilgilere ayrılmıştır; sayaçla alan paylaşmadığı için cümleler hiçbir zaman yarıda kesilmez.
-   * `systemLarge` boyutunda ana spot + **ÖSYM Kırmızı Bayrak Tuzağı** + 2 ek beklenen spot birlikte görünür.
-   * Dokunulduğunda `tusakademi://beklenen?id=<spotId>` ile doğrudan o kartı uygulama içinde açar.
-2. **TUS Geri Sayım & Sınav Takvimi (`TusCountdownWidget` — `accessoryCircular`, `accessoryInline`, `accessoryRectangular`, `systemSmall`, `systemMedium`):**
-   * Resmi 2027–2028 ÖSYM TUS geri sayımı (`Gün / Saat`), günlük hedef çubuğu ve orta boyutta kesintisiz aktif spot özeti sunar.
-3. **Saf Odak & Etüt Halkası (`TusFocusRingWidget` — `accessoryCircular`, `systemSmall`, `systemMedium`):**
-   * Günlük etüt dakikası halkası, çalışma serisi (`🔥`) ve 55 çekirdek konu tur yüzdesini gösterir; dokunulduğunda `tusakademi://odak` ile doğrudan **Saf Odak Modu**nu açar.
-4. **İlk Tercih & Antidot Ezber Kartı (`TusRapidCompareWidget` — `systemMedium`, `systemLarge`):**
-   * TUS'ta en sık sorulan *"İlk Tercih vs Altın Standart"* ve *"Zehirlenme → Spesifik Antidot"* ayrımlarını şeffaf cam kart düzeninde gösterir.
+1. **Günün Çıkacak TUS Spotu (`TusDailySpotWidget` — Branşa Göre Canlı Mücevher Gradyanı):**
+   * `systemSmall`, `systemMedium`, `systemLarge`, `accessoryRectangular` boyutlarında tam metinli sınav spotu, ayırıcı karşılaştırma ve ÖSYM kırmızı bayrak tuzağı sunar.
+2. **TUS Geri Sayım & Sınav Takvimi (`TusCountdownWidget` — Elektrik Kobalt → İndigo → Mor):**
+   * Resmi 2027–2028 ÖSYM TUS geri sayımı (`Gün / Saat`), günlük hedef ilerlemesi ve kesintisiz spot özeti sunar.
+3. **Saf Odak & Etüt Halkası (`TusFocusRingWidget` — Apple Fitness Berry → Macenta → Mor):**
+   * Günlük etüt dakikası halkası, çalışma serisi (`🔥`) ve 55 çekirdek konu tur yüzdesini gösterir (`tusakademi://odak`).
+4. **İlk Tercih & Altın Standart (`TusRapidCompareWidget` — Gün Batımı Kehribar → Mercan → Kızıl):**
+   * TUS'ta en sık sorulan *"İlk Tercih vs Altın Standart"* ayrımlarını canlı mercan-kehribar kartta gösterir.
+5. **Toksikoloji & Antidot Köşesi (`TusAntidotePearlWidget` — Okyanus Camgöbeği → Safir Mavi):**
+   * Zehirlenmeler, spesifik antidotlar ve acil kırmızı bayrak tuzaklarını canlı okyanus mavisi temasıyla sunar.
 
 ---
 
-## 3. "2027-TUS Muhtemel Çıkacaklar & Günün Spot Köşesi" (`BeklenenSpotlarScreen.tsx`)
+## 3. "2.751 Kartlık Muhtemel Çıkacaklar & Altın Spot Köşesi" (`BeklenenSpotlarScreen.tsx`)
 
-* **60 Altın Bilgi Senkronizasyonu (`tusExpectedPearls.ts` ↔ `TusSharedModels.swift`):** Hem iOS Widget uzantısı hem de uygulama içi köşe aynı 60 yüksek verimli TUS spotunu (`exp-1` .. `exp-60`) ve aynı 2 saatlik deterministik zaman dilimi formülünü paylaşır.
-* **AMBOSS Tarzı 3 Katmanlı Kart Yapısı:**
-  1. **Net Sınav Bilgisi:** Doğrudan sorulan enzim, etken, reseptör veya bulgu.
-  2. **İlk Tercih vs. Altın Standart:** Ayırıcı tanı ve yönetim karşılaştırması.
+* **2.751 AMBOSS Tarzı 3 Katmanlı Kart (`TUS_ALL_EXPECTED_PEARLS`):**
+  1. **Net Sınav Bilgisi:** Doğrudan sorulan enzim, etken, reseptör veya patognomonik bulgu.
+  2. **İlk Tercih vs. Altın Standart:** Ayırıcı tanı ve klinik yönetim karşılaştırması.
   3. **ÖSYM Kırmızı Bayrak Tuzağı:** Adayların en sık düştüğü çeldirici uyarısı.
-* **Widget'a Sabitleme (`Pin to Widget`):** Kullanıcı beğendiği herhangi bir beklenen bilgiyi **"Widget'a Sabitle"** butonuyla iPhone ana ve kilit ekranına anında sabitleyebilir (`Keychain` + `WidgetCenter.reloadAllTimelines()`).
-
----
-
-## 4. iOS Liquid Glass Navigasyon & Yüzen Kapsül Mimarisi (`index.css` & `App.tsx`)
-
-* **Yüzen Üst ve Alt Kapsül:** Üst bar ve alt sekme çubuğu tam genişlikli düz şerit yerine kenarlardan ayrılmış, yuvarlatılmış **yüzen cam kapsül (`rounded-full / rounded-3xl`)** formundadır.
-* **Kırınım & Speküler Kenar Işığı:** `backdrop-filter: blur(18px) saturate(190%)` ile kayan içerik camın altından yumuşakça kırılır; `inset 0 1px 0.5px` üst speküler kenar çizgisi cam derinliği verir.
-* **Aktif Sekme Cam Damlası:** Seçili sekme opak yeşil kutu yerine içten aydınlatmalı şeffaf zümrüt cam kapsül (`.ios-liquid-pill-active`) olarak parlar; sürekli çalışan animasyon içermediği için telefonda sıfır ısınma yaratır.
+* **2.751 Kartın Tamamını Widget'a Sabitleme (`customPinnedPearl`):** Kullanıcı 2.751 karttan hangisini seçerse seçsin **"Widget'a Sabitle"** butonuyla kartın tam verisi (`TusWidgetPearl`) Keychain üzerinden anında iOS Widget'larına aktarılır.

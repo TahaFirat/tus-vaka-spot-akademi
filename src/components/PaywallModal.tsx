@@ -373,6 +373,15 @@ export const PaywallModal: React.FC<PaywallModalProps> = ({
         </button>
 
         {/* Restore + Legal Links Footer */}
+        {selectedPlan === 'monthly' && (
+          <p
+            className={`mt-2 text-[10px] leading-snug text-center ${
+              isLight ? 'text-slate-500' : 'text-slate-400'
+            }`}
+          >
+            Aylık abonelik ({monthlyPriceLabel}/ay), dönem bitiminden en az 24 saat önce iptal edilmedikçe otomatik yenilenir. Apple ID Ayarlarından istediğiniz an iptal edebilirsiniz.
+          </p>
+        )}
         <div
           className={`mt-2.5 pt-2 border-t flex flex-col items-center gap-1.5 ${
             isLight ? 'border-slate-200' : 'border-slate-800'
