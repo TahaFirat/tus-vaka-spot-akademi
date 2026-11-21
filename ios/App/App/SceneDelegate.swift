@@ -21,13 +21,15 @@ final class TUSStoreKitManager: NSObject, SKProductsRequestDelegate, SKPaymentTr
     static let shared = TUSStoreKitManager()
     static let lifetimeProductId = "com.tus.akademi.lifetime.pro"
     static let monthlyProductId = "com.tus.akademi.pro.monthly"
-    static let allProductIds: Set<String> = [lifetimeProductId, monthlyProductId]
+    static let sixMonthProductId = "com.tus.akademi.pro.sixmonths"
+    static let allProductIds: Set<String> = [lifetimeProductId, monthlyProductId, sixMonthProductId]
     private let storageKey = "tus_akademi_pro_unlocked_v1"
     private var updatesTask: Task<Void, Never>?
     private var cachedProducts: [String: Product] = [:]
     private var cachedSK1Products: [String: SKProduct] = [:]
-    private var cachedDisplayPrice: String = "199,99 ₺"
-    private var cachedMonthlyDisplayPrice: String = "79,99 ₺"
+    private var cachedDisplayPrice: String = "1.999,99 ₺"
+    private var cachedMonthlyDisplayPrice: String = "299,99 ₺"
+    private var cachedSixMonthDisplayPrice: String = "1.199,99 ₺"
 
     // StoreKit 1 continuation bridges
     private var sk1ProductRequest: SKProductsRequest?
@@ -92,6 +94,8 @@ final class TUSStoreKitManager: NSObject, SKProductsRequestDelegate, SKPaymentTr
                         self.cachedDisplayPrice = p.displayPrice
                     } else if p.id == Self.monthlyProductId {
                         self.cachedMonthlyDisplayPrice = p.displayPrice
+                    } else if p.id == Self.sixMonthProductId {
+                        self.cachedSixMonthDisplayPrice = p.displayPrice
                     }
                 }
                 if let target = self.cachedProducts[productId] {
@@ -128,31 +132,44 @@ final class TUSStoreKitManager: NSObject, SKProductsRequestDelegate, SKPaymentTr
 
     func fetchLiveProductPrice(bridge: TUSBridgeViewController?) async {
         _ = await fetchSK2ProductWithRetry(productId: Self.lifetimeProductId, maxAttempts: 2)
-        if let life = cachedProducts[Self.lifetimeProductId] {
-            self.cachedDisplayPrice = life.displayPrice
+        if !cachedProducts.isEmpty {
             var payload: [String: Any] = [
-                "productId": Self.lifetimeProductId,
-                "displayPrice": life.displayPrice
+                "productId": Self.lifetimeProductId
             ]
+            if let life = cachedProducts[Self.lifetimeProductId] {
+                self.cachedDisplayPrice = life.displayPrice
+                payload["displayPrice"] = life.displayPrice
+            }
             if let monthly = cachedProducts[Self.monthlyProductId] {
                 self.cachedMonthlyDisplayPrice = monthly.displayPrice
                 payload["monthlyDisplayPrice"] = monthly.displayPrice
+            }
+            if let sixM = cachedProducts[Self.sixMonthProductId] {
+                self.cachedSixMonthDisplayPrice = sixM.displayPrice
+                payload["sixMonthDisplayPrice"] = sixM.displayPrice
             }
             bridge?.dispatchWebEvent(name: "tus:proPrice", payload: payload)
             return
         }
         let sk1Result = await fetchSK1Product(productId: Self.lifetimeProductId)
-        if let sk1 = sk1Result.product {
-            let formatted = formatSK1Price(sk1)
-            self.cachedDisplayPrice = formatted
+        if sk1Result.product != nil || !cachedSK1Products.isEmpty {
             var payload: [String: Any] = [
-                "productId": Self.lifetimeProductId,
-                "displayPrice": formatted
+                "productId": Self.lifetimeProductId
             ]
+            if let sk1 = cachedSK1Products[Self.lifetimeProductId] {
+                let formatted = formatSK1Price(sk1)
+                self.cachedDisplayPrice = formatted
+                payload["displayPrice"] = formatted
+            }
             if let monthlySk1 = cachedSK1Products[Self.monthlyProductId] {
                 let mFmt = formatSK1Price(monthlySk1)
                 self.cachedMonthlyDisplayPrice = mFmt
                 payload["monthlyDisplayPrice"] = mFmt
+            }
+            if let sixSk1 = cachedSK1Products[Self.sixMonthProductId] {
+                let sFmt = formatSK1Price(sixSk1)
+                self.cachedSixMonthDisplayPrice = sFmt
+                payload["sixMonthDisplayPrice"] = sFmt
             }
             bridge?.dispatchWebEvent(name: "tus:proPrice", payload: payload)
         }
@@ -197,16 +214,18 @@ final class TUSStoreKitManager: NSObject, SKProductsRequestDelegate, SKPaymentTr
                 return
             }
 
-            // 1. Primary path: StoreKit 2 (with seamless fallback to approved Lifetime PRO if Monthly is still propagating)
+            // 1. Primary path: StoreKit 2 (with seamless fallback to approved Lifetime PRO if subscription is still propagating)
             var (sk2Product, sk2Error) = await fetchSK2ProductWithRetry(productId: targetProductId, maxAttempts: 3)
-            if sk2Product == nil && targetProductId == Self.monthlyProductId {
+            if sk2Product == nil && targetProductId != Self.lifetimeProductId {
                 sk2Product = cachedProducts[Self.lifetimeProductId]
             }
             if let product = sk2Product {
                 if product.id == Self.lifetimeProductId {
                     self.cachedDisplayPrice = product.displayPrice
-                } else {
+                } else if product.id == Self.monthlyProductId {
                     self.cachedMonthlyDisplayPrice = product.displayPrice
+                } else if product.id == Self.sixMonthProductId {
+                    self.cachedSixMonthDisplayPrice = product.displayPrice
                 }
                 do {
                     let result = try await performSK2Purchase(product: product)

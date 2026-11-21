@@ -19,6 +19,8 @@ import {
   PRO_MONTHLY_PRODUCT_ID,
   PRO_PRICE_LABEL,
   PRO_PRODUCT_ID,
+  PRO_SIXMONTH_PRICE_LABEL,
+  PRO_SIXMONTH_PRODUCT_ID,
   purchaseLifetimePro,
   refreshNativeProPrice,
   restoreLifetimePro,
@@ -33,6 +35,7 @@ interface PaywallModalProps {
   reasonMessage?: string;
   priceLabel?: string;
   monthlyPriceLabel?: string;
+  sixMonthPriceLabel?: string;
   isLight?: boolean;
 }
 
@@ -44,9 +47,12 @@ export const PaywallModal: React.FC<PaywallModalProps> = ({
   reasonMessage,
   priceLabel = PRO_PRICE_LABEL,
   monthlyPriceLabel = PRO_MONTHLY_PRICE_LABEL,
+  sixMonthPriceLabel = PRO_SIXMONTH_PRICE_LABEL,
   isLight = false,
 }) => {
-  const [selectedPlan, setSelectedPlan] = useState<'monthly' | 'lifetime'>('lifetime');
+  const [selectedPlan, setSelectedPlan] = useState<'sixmonths' | 'monthly' | 'lifetime'>(
+    'sixmonths'
+  );
   const [loading, setLoading] = useState<'purchase' | 'restore' | null>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [statusTone, setStatusTone] = useState<'success' | 'error'>('success');
@@ -61,9 +67,17 @@ export const PaywallModal: React.FC<PaywallModalProps> = ({
   if (!isOpen) return null;
 
   const activeProductId =
-    selectedPlan === 'monthly' ? PRO_MONTHLY_PRODUCT_ID : PRO_PRODUCT_ID;
+    selectedPlan === 'sixmonths'
+      ? PRO_SIXMONTH_PRODUCT_ID
+      : selectedPlan === 'monthly'
+      ? PRO_MONTHLY_PRODUCT_ID
+      : PRO_PRODUCT_ID;
   const activePriceDisplay =
-    selectedPlan === 'monthly' ? `${monthlyPriceLabel} / Ay` : priceLabel;
+    selectedPlan === 'sixmonths'
+      ? `${sixMonthPriceLabel} / 6 Ay`
+      : selectedPlan === 'monthly'
+      ? `${monthlyPriceLabel} / Ay`
+      : priceLabel;
 
   const handlePurchase = async () => {
     if (loading) return;
@@ -137,7 +151,7 @@ export const PaywallModal: React.FC<PaywallModalProps> = ({
             }`}
           >
             <Crown className="w-3.5 h-3.5 shrink-0" />
-            <span className="truncate">Aylık veya Ömür Boyu PRO Erişim</span>
+            <span className="truncate">TUS Dönem Paketi • Sınırsız PRO Erişim</span>
           </div>
 
           <button
@@ -209,16 +223,87 @@ export const PaywallModal: React.FC<PaywallModalProps> = ({
           ))}
         </div>
 
-        {/* Dual Plan Selector: Monthly (Aylık) & Lifetime (Ömür Boyu) */}
-        <div className="grid grid-cols-2 gap-2 mb-3">
-          {/* Plan 1: Monthly PRO */}
+        {/* 3-Tier Market-Researched Plan Selector (6 Aylık TUS Dönemi | Aylık | Ömür Boyu) */}
+        <div className="space-y-2 mb-3">
+          {/* Plan 1: 6 Aylık TUS Dönem Paketi (Default Recommended — %33 Tasarruf) */}
+          <button
+            type="button"
+            onClick={() => {
+              triggerHaptic('selection');
+              setSelectedPlan('sixmonths');
+            }}
+            className={`w-full rounded-2xl border p-3 text-left transition flex items-center justify-between gap-2.5 ${
+              selectedPlan === 'sixmonths'
+                ? isLight
+                  ? 'bg-emerald-50 border-emerald-500 ring-2 ring-emerald-500/25'
+                  : 'bg-gradient-to-r from-emerald-950/90 via-teal-950/80 to-cyan-950/80 border-emerald-400 ring-2 ring-emerald-400/25'
+                : isLight
+                ? 'bg-slate-50 border-slate-200 hover:border-slate-300'
+                : 'bg-[#071117] border-white/10 hover:border-white/20'
+            }`}
+          >
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-1.5 mb-0.5">
+                <span
+                  className={`text-xs font-extrabold ${
+                    isLight ? 'text-slate-900' : 'text-white'
+                  }`}
+                >
+                  6 Aylık TUS Dönem Paketi
+                </span>
+                <span className="px-1.5 py-0.5 rounded-md bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[9.5px] font-extrabold uppercase tracking-wider">
+                  ★ %33 İNDİRİM
+                </span>
+              </div>
+              <div
+                className={`text-[11px] font-semibold ${
+                  isLight ? 'text-emerald-700' : 'text-emerald-300'
+                }`}
+              >
+                Aylık yalnızca 199,99 ₺’ye gelir • 1 Tam TUS Sezonu
+              </div>
+            </div>
+            <div className="text-right shrink-0 flex items-center gap-2">
+              <div>
+                <div
+                  className={`text-sm sm:text-base font-extrabold whitespace-nowrap ${
+                    isLight ? 'text-slate-900' : 'text-white'
+                  }`}
+                >
+                  {sixMonthPriceLabel}
+                </div>
+                <div
+                  className={`text-[10px] font-semibold whitespace-nowrap ${
+                    isLight ? 'text-slate-500' : 'text-slate-400'
+                  }`}
+                >
+                  6 ayda bir
+                </div>
+              </div>
+              <span
+                className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
+                  selectedPlan === 'sixmonths'
+                    ? 'border-emerald-500 bg-emerald-500 text-white'
+                    : isLight
+                    ? 'border-slate-300'
+                    : 'border-slate-600'
+                }`}
+              >
+                {selectedPlan === 'sixmonths' && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-white" />
+                )}
+              </span>
+            </div>
+          </button>
+
+          {/* Plan 2: Aylık PRO (299,99 ₺ / ay) */}
           <button
             type="button"
             onClick={() => {
               triggerHaptic('selection');
               setSelectedPlan('monthly');
             }}
-            className={`relative rounded-2xl border p-3 text-left transition ${
+            className={`w-full rounded-2xl border p-2.5 px-3 text-left transition flex items-center justify-between gap-2.5 ${
               selectedPlan === 'monthly'
                 ? isLight
                   ? 'bg-emerald-50 border-emerald-500 ring-2 ring-emerald-500/20'
@@ -228,22 +313,41 @@ export const PaywallModal: React.FC<PaywallModalProps> = ({
                 : 'bg-[#071117] border-white/10 hover:border-white/20'
             }`}
           >
-            <div className="flex items-center justify-between gap-1 mb-1">
-              <span
-                className={`text-[10.5px] uppercase tracking-wider font-extrabold ${
-                  selectedPlan === 'monthly'
-                    ? isLight
-                      ? 'text-emerald-700'
-                      : 'text-emerald-300'
-                    : isLight
-                    ? 'text-slate-500'
-                    : 'text-slate-400'
+            <div className="min-w-0">
+              <div
+                className={`text-xs font-extrabold ${
+                  isLight ? 'text-slate-900' : 'text-white'
                 }`}
               >
-                Aylık Plan
-              </span>
+                Aylık Esnek Plan
+              </div>
+              <div
+                className={`text-[11px] ${
+                  isLight ? 'text-slate-600' : 'text-slate-400'
+                }`}
+              >
+                Taahhütsüz aylık • İstediğin an iptal
+              </div>
+            </div>
+            <div className="text-right shrink-0 flex items-center gap-2">
+              <div>
+                <div
+                  className={`text-sm sm:text-base font-extrabold whitespace-nowrap ${
+                    isLight ? 'text-slate-900' : 'text-white'
+                  }`}
+                >
+                  {monthlyPriceLabel}
+                </div>
+                <div
+                  className={`text-[10px] font-semibold whitespace-nowrap ${
+                    isLight ? 'text-slate-500' : 'text-slate-400'
+                  }`}
+                >
+                  her ay
+                </div>
+              </div>
               <span
-                className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center ${
+                className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
                   selectedPlan === 'monthly'
                     ? 'border-emerald-500 bg-emerald-500 text-white'
                     : isLight
@@ -256,59 +360,60 @@ export const PaywallModal: React.FC<PaywallModalProps> = ({
                 )}
               </span>
             </div>
-            <div
-              className={`text-base sm:text-lg font-extrabold leading-tight ${
-                isLight ? 'text-slate-900' : 'text-white'
-              }`}
-            >
-              {monthlyPriceLabel}
-              <span className="text-[11px] font-bold opacity-75"> / ay</span>
-            </div>
-            <div
-              className={`text-[10.5px] mt-0.5 leading-snug ${
-                isLight ? 'text-slate-600' : 'text-slate-400'
-              }`}
-            >
-              Esnek aylık • İstediğin an iptal
-            </div>
           </button>
 
-          {/* Plan 2: Lifetime PRO (Most Popular) */}
+          {/* Plan 3: Ömür Boyu Tam Paket (1.999,99 ₺ Tek Ödeme) */}
           <button
             type="button"
             onClick={() => {
               triggerHaptic('selection');
               setSelectedPlan('lifetime');
             }}
-            className={`relative rounded-2xl border p-3 text-left transition ${
+            className={`w-full rounded-2xl border p-2.5 px-3 text-left transition flex items-center justify-between gap-2.5 ${
               selectedPlan === 'lifetime'
                 ? isLight
-                  ? 'bg-emerald-50 border-emerald-500 ring-2 ring-emerald-500/25'
-                  : 'bg-gradient-to-br from-emerald-950/90 via-teal-950/80 to-cyan-950/80 border-emerald-400 ring-2 ring-emerald-400/25'
+                  ? 'bg-emerald-50 border-emerald-500 ring-2 ring-emerald-500/20'
+                  : 'bg-emerald-500/15 border-emerald-400 ring-2 ring-emerald-400/20'
                 : isLight
                 ? 'bg-slate-50 border-slate-200 hover:border-slate-300'
                 : 'bg-[#071117] border-white/10 hover:border-white/20'
             }`}
           >
-            <span className="inline-block mb-1 px-1.5 py-0.5 rounded-md bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[9px] font-extrabold uppercase tracking-wider">
-              ★ EN AVANTAJLI
-            </span>
-            <div className="flex items-center justify-between gap-1">
-              <span
-                className={`text-[10.5px] uppercase tracking-wider font-extrabold ${
-                  selectedPlan === 'lifetime'
-                    ? isLight
-                      ? 'text-emerald-800'
-                      : 'text-emerald-300'
-                    : isLight
-                    ? 'text-slate-500'
-                    : 'text-slate-400'
+            <div className="min-w-0">
+              <div
+                className={`text-xs font-extrabold ${
+                  isLight ? 'text-slate-900' : 'text-white'
                 }`}
               >
-                Ömür Boyu
-              </span>
+                Ömür Boyu Süresiz Paket
+              </div>
+              <div
+                className={`text-[11px] ${
+                  isLight ? 'text-slate-600' : 'text-slate-400'
+                }`}
+              >
+                Tek seferlik ödeme • Abonelik yok
+              </div>
+            </div>
+            <div className="text-right shrink-0 flex items-center gap-2">
+              <div>
+                <div
+                  className={`text-sm sm:text-base font-extrabold whitespace-nowrap ${
+                    isLight ? 'text-slate-900' : 'text-white'
+                  }`}
+                >
+                  {priceLabel}
+                </div>
+                <div
+                  className={`text-[10px] font-semibold whitespace-nowrap ${
+                    isLight ? 'text-emerald-700' : 'text-emerald-300'
+                  }`}
+                >
+                  tek ödeme
+                </div>
+              </div>
               <span
-                className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center ${
+                className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
                   selectedPlan === 'lifetime'
                     ? 'border-emerald-500 bg-emerald-500 text-white'
                     : isLight
@@ -320,20 +425,6 @@ export const PaywallModal: React.FC<PaywallModalProps> = ({
                   <span className="w-1.5 h-1.5 rounded-full bg-white" />
                 )}
               </span>
-            </div>
-            <div
-              className={`text-base sm:text-lg font-extrabold leading-tight ${
-                isLight ? 'text-slate-900' : 'text-white'
-              }`}
-            >
-              {priceLabel}
-            </div>
-            <div
-              className={`text-[10.5px] mt-0.5 leading-snug ${
-                isLight ? 'text-emerald-700' : 'text-emerald-300/90'
-              }`}
-            >
-              Tek ödeme • Süresiz erişim
             </div>
           </button>
         </div>
@@ -366,6 +457,8 @@ export const PaywallModal: React.FC<PaywallModalProps> = ({
           <span className="text-center leading-tight">
             {loading === 'purchase'
               ? 'Apple StoreKit Onaylanıyor...'
+              : selectedPlan === 'sixmonths'
+              ? `6 Aylık PRO Başlat • ${activePriceDisplay}`
               : selectedPlan === 'monthly'
               ? `Aylık PRO Başlat • ${activePriceDisplay}`
               : `Ömür Boyu PRO Aç • ${activePriceDisplay}`}
@@ -373,13 +466,15 @@ export const PaywallModal: React.FC<PaywallModalProps> = ({
         </button>
 
         {/* Restore + Legal Links Footer */}
-        {selectedPlan === 'monthly' && (
+        {selectedPlan !== 'lifetime' && (
           <p
             className={`mt-2 text-[10px] leading-snug text-center ${
               isLight ? 'text-slate-500' : 'text-slate-400'
             }`}
           >
-            Aylık abonelik ({monthlyPriceLabel}/ay), dönem bitiminden en az 24 saat önce iptal edilmedikçe otomatik yenilenir. Apple ID Ayarlarından istediğiniz an iptal edebilirsiniz.
+            {selectedPlan === 'sixmonths'
+              ? `6 aylık abonelik (${sixMonthPriceLabel}), dönem bitiminden en az 24 saat önce iptal edilmedikçe otomatik yenilenir. Apple ID Ayarlarından istediğiniz an iptal edebilirsiniz.`
+              : `Aylık abonelik (${monthlyPriceLabel}/ay), dönem bitiminden en az 24 saat önce iptal edilmedikçe otomatik yenilenir. Apple ID Ayarlarından istediğiniz an iptal edebilirsiniz.`}
           </p>
         )}
         <div

@@ -500,10 +500,10 @@ export const AnaSayfaScreen: React.FC<AnaSayfaScreenProps> = React.memo(
               <Crown className="w-5 h-5 text-amber-300 shrink-0" />
               <div className="min-w-0">
                 <div className="text-xs font-extrabold truncate">
-                  Ömür Boyu Tam Paket • {priceLabel}
+                  TUS Akademi PRO • Aylık 199,99 ₺’den Başlayan Planlar
                 </div>
                 <div className="text-[11px] text-emerald-100 truncate">
-                  Tek ödeme • Tüm {totalPoolFmt}+ vaka, ikiz ve spot sınırsız
+                  6 Aylık TUS Dönemi (%33 Avantaj) • Tüm {totalPoolFmt}+ soru sınırsız
                 </div>
               </div>
             </div>

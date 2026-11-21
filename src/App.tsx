@@ -29,6 +29,8 @@ import {
   PRO_MONTHLY_PRODUCT_ID,
   PRO_PRICE_LABEL,
   PRO_PRODUCT_ID,
+  PRO_SIXMONTH_PRICE_LABEL,
+  PRO_SIXMONTH_PRODUCT_ID,
   loadPersistedProStatus,
   notifyNativeAppReady,
   requestNativeEntitlementCheck,
@@ -89,6 +91,9 @@ export const App: React.FC = () => {
   const [proPriceLabel, setProPriceLabel] = useState<string>(PRO_PRICE_LABEL);
   const [proMonthlyPriceLabel, setProMonthlyPriceLabel] = useState<string>(
     PRO_MONTHLY_PRICE_LABEL
+  );
+  const [proSixMonthPriceLabel, setProSixMonthPriceLabel] = useState<string>(
+    PRO_SIXMONTH_PRICE_LABEL
   );
   const [paywallOpen, setPaywallOpen] = useState<boolean>(false);
   const [paywallReason, setPaywallReason] = useState<string | undefined>(undefined);
@@ -217,12 +222,17 @@ export const App: React.FC = () => {
       if (detail.displayPrice) {
         if (detail.productId === PRO_MONTHLY_PRODUCT_ID) {
           setProMonthlyPriceLabel(String(detail.displayPrice));
+        } else if (detail.productId === PRO_SIXMONTH_PRODUCT_ID) {
+          setProSixMonthPriceLabel(String(detail.displayPrice));
         } else if (!detail.productId || detail.productId === PRO_PRODUCT_ID) {
           setProPriceLabel(String(detail.displayPrice));
         }
       }
       if (detail.monthlyDisplayPrice) {
         setProMonthlyPriceLabel(String(detail.monthlyDisplayPrice));
+      }
+      if (detail.sixMonthDisplayPrice) {
+        setProSixMonthPriceLabel(String(detail.sixMonthDisplayPrice));
       }
     };
 
@@ -1126,6 +1136,7 @@ export const App: React.FC = () => {
         reasonMessage={paywallReason}
         priceLabel={proPriceLabel}
         monthlyPriceLabel={proMonthlyPriceLabel}
+        sixMonthPriceLabel={proSixMonthPriceLabel}
         isLight={isLightMode}
       />
     </div>
