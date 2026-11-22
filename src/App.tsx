@@ -95,6 +95,7 @@ export const App: React.FC = () => {
   const [proSixMonthPriceLabel, setProSixMonthPriceLabel] = useState<string>(
     PRO_SIXMONTH_PRICE_LABEL
   );
+  const [availableProductIds, setAvailableProductIds] = useState<string[] | null>(null);
   const [paywallOpen, setPaywallOpen] = useState<boolean>(false);
   const [paywallReason, setPaywallReason] = useState<string | undefined>(undefined);
   const [proBannerVisible, setProBannerVisible] = useState<boolean>(false);
@@ -233,6 +234,9 @@ export const App: React.FC = () => {
       }
       if (detail.sixMonthDisplayPrice) {
         setProSixMonthPriceLabel(String(detail.sixMonthDisplayPrice));
+      }
+      if (Array.isArray(detail.availableProductIds)) {
+        setAvailableProductIds(detail.availableProductIds.map(String));
       }
     };
 
@@ -453,19 +457,29 @@ export const App: React.FC = () => {
     }
   }, []);
 
-  const handleCompleteOnboarding = useCallback((chosenMode: 'akademi' | 'odak') => {
-    setReplayOnboardingOpen(false);
-    setStudyState((prev) => {
-      const next: TusStudyState = {
-        ...prev,
-        onboardingCompleted: true,
-        uiMode: chosenMode,
-      };
-      saveStudyState(next);
-      return next;
-    });
-    setActiveTab(chosenMode === 'odak' ? 'odak' : 'home');
-  }, []);
+  const handleCompleteOnboarding = useCallback(
+    (chosenMode: 'akademi' | 'odak', chosenBranchId?: TusBranchId) => {
+      setReplayOnboardingOpen(false);
+      setStudyState((prev) => {
+        const next: TusStudyState = {
+          ...prev,
+          onboardingCompleted: true,
+          uiMode: chosenMode,
+          ...(chosenBranchId ? { vakaBranchPref: chosenBranchId } : {}),
+        };
+        saveStudyState(next);
+        return next;
+      });
+      if (chosenBranchId) {
+        setVakaBasketJump('unsolved');
+        setVakaBranchJump(chosenBranchId);
+        setActiveTab('vaka');
+      } else {
+        setActiveTab(chosenMode === 'odak' ? 'odak' : 'home');
+      }
+    },
+    []
+  );
 
   const handleNavigateTab = useCallback(
     (
@@ -529,11 +543,11 @@ export const App: React.FC = () => {
     label: string;
     icon: React.ReactNode;
   }> = [
-    { id: 'home', label: 'Ev', icon: <Home className="w-4 h-4" /> },
-    { id: 'beklenen', label: 'Beklenenler', icon: <Flame className="w-4 h-4" /> },
+    { id: 'home', label: 'Dersler', icon: <Home className="w-4 h-4" /> },
+    { id: 'beklenen', label: 'Altın Spot', icon: <Flame className="w-4 h-4" /> },
     { id: 'vaka', label: 'Vaka', icon: <CheckSquare className="w-4 h-4" /> },
-    { id: 'cikmis', label: 'Çıkmış İkiz', icon: <Sparkles className="w-4 h-4" /> },
-    { id: 'spot', label: 'D/Y Spot', icon: <Zap className="w-4 h-4" /> },
+    { id: 'cikmis', label: 'İkiz', icon: <Sparkles className="w-4 h-4" /> },
+    { id: 'spot', label: 'Spot', icon: <Zap className="w-4 h-4" /> },
     { id: 'deneme', label: 'Deneme', icon: <Award className="w-4 h-4" /> },
     { id: 'analiz', label: 'Karne', icon: <BarChart3 className="w-4 h-4" /> },
   ];
@@ -561,18 +575,18 @@ export const App: React.FC = () => {
 
   const activeGlassPillClass = isLightMode
     ? 'ios-liquid-pill-active-light text-white'
-    : 'ios-liquid-pill-active-dark text-emerald-200';
+    : 'ios-liquid-pill-active-dark text-blue-200';
 
   return (
     <div
       className={`min-h-screen w-full overflow-x-hidden flex flex-col transition-colors duration-200 ${
         isLightMode
           ? isOdakMode
-            ? 'bg-[#EEF6F5] text-slate-900'
-            : 'bg-[#F2F7F9] text-slate-900'
+            ? 'bg-[#F3F6FB] text-slate-900'
+            : 'bg-[#F6F8FC] text-slate-900'
           : isOdakMode
-          ? 'bg-[#061116] text-slate-100'
-          : 'bg-[#071117] text-slate-100'
+          ? 'bg-[#090D16] text-slate-100'
+          : 'bg-[#0A0E17] text-slate-100'
       }`}
     >
       {/* iOS 26/27 Yüzen "Liquid Glass" Şeffaf Kırınımlı Üst Kapsül Bar */}
@@ -1072,9 +1086,9 @@ export const App: React.FC = () => {
           >
             <div className="grid grid-cols-5 gap-1 items-center">
               {[
-                { id: 'home' as const, label: 'Ev', icon: <Home className="w-4 h-4" /> },
+                { id: 'home' as const, label: 'Dersler', icon: <Home className="w-4 h-4" /> },
                 { id: 'vaka' as const, label: 'Vaka', icon: <CheckSquare className="w-4 h-4" /> },
-                { id: 'cikmis' as const, label: 'Çıkmış', icon: <Sparkles className="w-4 h-4" /> },
+                { id: 'cikmis' as const, label: 'İkiz', icon: <Sparkles className="w-4 h-4" /> },
                 { id: 'spot' as const, label: 'Spot', icon: <Zap className="w-4 h-4" /> },
                 { id: 'deneme' as const, label: 'Deneme', icon: <Award className="w-4 h-4" /> },
               ].map((tab) => {
@@ -1137,6 +1151,7 @@ export const App: React.FC = () => {
         priceLabel={proPriceLabel}
         monthlyPriceLabel={proMonthlyPriceLabel}
         sixMonthPriceLabel={proSixMonthPriceLabel}
+        availableProductIds={availableProductIds}
         isLight={isLightMode}
       />
     </div>

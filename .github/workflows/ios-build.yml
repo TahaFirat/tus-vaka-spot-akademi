@@ -38,7 +38,7 @@ jobs:
           npx cap sync ios
           cat > ios/App/App/config.xml << 'EOF'
           <?xml version='1.0' encoding='utf-8'?>
-          <widget version="1.5.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+          <widget version="1.6.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
           </widget>
           EOF
 
@@ -211,7 +211,7 @@ jobs:
                        -destination 'generic/platform=iOS' \
                        -configuration Release \
                        CURRENT_PROJECT_VERSION="${{ github.run_number }}" \
-                       MARKETING_VERSION="1.5" \
+                       MARKETING_VERSION="1.6" \
                        clean archive \
                        -archivePath ./build/App.xcarchive
           else

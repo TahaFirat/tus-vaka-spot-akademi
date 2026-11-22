@@ -134,7 +134,8 @@ final class TUSStoreKitManager: NSObject, SKProductsRequestDelegate, SKPaymentTr
         _ = await fetchSK2ProductWithRetry(productId: Self.lifetimeProductId, maxAttempts: 2)
         if !cachedProducts.isEmpty {
             var payload: [String: Any] = [
-                "productId": Self.lifetimeProductId
+                "productId": Self.lifetimeProductId,
+                "availableProductIds": Array(cachedProducts.keys)
             ]
             if let life = cachedProducts[Self.lifetimeProductId] {
                 self.cachedDisplayPrice = life.displayPrice
@@ -154,7 +155,8 @@ final class TUSStoreKitManager: NSObject, SKProductsRequestDelegate, SKPaymentTr
         let sk1Result = await fetchSK1Product(productId: Self.lifetimeProductId)
         if sk1Result.product != nil || !cachedSK1Products.isEmpty {
             var payload: [String: Any] = [
-                "productId": Self.lifetimeProductId
+                "productId": Self.lifetimeProductId,
+                "availableProductIds": Array(cachedSK1Products.keys)
             ]
             if let sk1 = cachedSK1Products[Self.lifetimeProductId] {
                 let formatted = formatSK1Price(sk1)
@@ -203,7 +205,15 @@ final class TUSStoreKitManager: NSObject, SKProductsRequestDelegate, SKPaymentTr
     }
 
     func purchaseLifetimePro(productId: String = lifetimeProductId, bridge: TUSBridgeViewController?) {
-        let targetProductId = Self.allProductIds.contains(productId) ? productId : Self.lifetimeProductId
+        guard Self.allProductIds.contains(productId) else {
+            bridge?.notifyProStatus(
+                isPro: self.isProUnlocked,
+                cancelled: false,
+                message: "Geçersiz paket seçimi. Lütfen tekrar deneyin."
+            )
+            return
+        }
+        let targetProductId = productId
         Task {
             guard AppStore.canMakePayments && SKPaymentQueue.canMakePayments() else {
                 bridge?.notifyProStatus(
@@ -214,12 +224,9 @@ final class TUSStoreKitManager: NSObject, SKProductsRequestDelegate, SKPaymentTr
                 return
             }
 
-            // 1. Primary path: StoreKit 2 (with seamless fallback to approved Lifetime PRO if subscription is still propagating)
-            var (sk2Product, sk2Error) = await fetchSK2ProductWithRetry(productId: targetProductId, maxAttempts: 3)
-            if sk2Product == nil && targetProductId != Self.lifetimeProductId {
-                sk2Product = cachedProducts[Self.lifetimeProductId]
-            }
-            if let product = sk2Product {
+            // 1. Primary path: StoreKit 2 — STRICT EXACT PRODUCT MATCH ONLY (NEVER substitute another product!)
+            let (sk2Product, sk2Error) = await fetchSK2ProductWithRetry(productId: targetProductId, maxAttempts: 3)
+            if let product = sk2Product, product.id == targetProductId {
                 if product.id == Self.lifetimeProductId {
                     self.cachedDisplayPrice = product.displayPrice
                 } else if product.id == Self.monthlyProductId {
@@ -275,14 +282,13 @@ final class TUSStoreKitManager: NSObject, SKProductsRequestDelegate, SKPaymentTr
                     )
                     return
                 } catch {
-                    // Fall through to StoreKit 1 fallback only if purchase invocation failed before sheet
+                    // Fall through to StoreKit 1 strictly for the SAME targetProductId
                 }
             }
 
-            // 2. Fallback path: StoreKit 1 (SKProductsRequest + SKPaymentQueue)
+            // 2. Fallback path: StoreKit 1 — STRICT EXACT PRODUCT MATCH ONLY (NEVER substitute another product!)
             let sk1Result = await fetchSK1Product(productId: targetProductId)
-            let effectiveSk1 = sk1Result.product ?? cachedSK1Products[Self.lifetimeProductId]
-            if let sk1Product = effectiveSk1 {
+            if let sk1Product = sk1Result.product, sk1Product.productIdentifier == targetProductId {
                 DispatchQueue.main.async {
                     self.sk1PurchaseBridge = bridge
                     self.sk1PurchaseInFlight = true
@@ -292,12 +298,12 @@ final class TUSStoreKitManager: NSObject, SKProductsRequestDelegate, SKPaymentTr
                 return
             }
 
-            // 3. Accurate, honest diagnostics when both StoreKit 2 and StoreKit 1 cannot load the product
-            if sk1Result.invalidIdentifier {
+            // 3. Honest error when the exact selected product is not yet live in Apple StoreKit
+            if sk1Result.invalidIdentifier || !self.cachedProducts.isEmpty || !self.cachedSK1Products.isEmpty {
                 bridge?.notifyProStatus(
                     isPro: self.isProUnlocked,
                     cancelled: false,
-                    message: "Ömür Boyu Pro ürünü şu anda App Store onay veya mağaza yayılımı aşamasındadır. Kısa süre sonra tekrar deneyin."
+                    message: "Seçtiğiniz paket şu anda App Store tarafından onay/yayılım aşamasında. Kısa süre sonra tekrar deneyin veya aktif başka bir plan seçin."
                 )
             } else if isNetworkError(sk1Result.error ?? sk2Error) {
                 bridge?.notifyProStatus(
@@ -382,7 +388,8 @@ final class TUSStoreKitManager: NSObject, SKProductsRequestDelegate, SKPaymentTr
             self.cachedSK1Products[p.productIdentifier] = p
         }
         let targetId = self.sk1RequestedProductId
-        let product = self.cachedSK1Products[targetId] ?? self.cachedSK1Products[Self.lifetimeProductId]
+        // STRICT EXACT PRODUCT MATCH ONLY — NEVER substitute another product!
+        let product = self.cachedSK1Products[targetId]
         let isInvalid = (product == nil) && response.invalidProductIdentifiers.contains(targetId)
         DispatchQueue.main.async {
             guard request === self.sk1ProductRequest else { return }

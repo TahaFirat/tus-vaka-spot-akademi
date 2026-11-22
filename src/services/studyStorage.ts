@@ -226,7 +226,7 @@ export const DEFAULT_STUDY_STATE: TusStudyState = {
   lastStudyDate: getLocalDateString(),
   streakDays: 1,
   targetTusDate: getNextActiveTusDate(),
-  theme: 'dark',
+  theme: 'light',
   uiMode: 'akademi',
   vakaBranchPref: 'ALL',
   twinBranchPref: 'ALL',
