@@ -171,12 +171,12 @@ export const OdakModuScreen: React.FC<OdakModuScreenProps> = React.memo(
     const [ktbtWrong, setKtbtWrong] = useState(14);
 
     const cardBg = isLight
-      ? 'bg-white border-slate-200/90 shadow-xs'
-      : 'bg-[#0B1922] border-white/10 shadow-md';
+      ? 'bg-white border-slate-200/85 shadow-[0_1px_3px_rgba(15,23,42,0.04)]'
+      : 'bg-[#121826] border-white/8 shadow-md';
 
     const subCardBg = isLight
       ? 'bg-slate-50 border-slate-200/80'
-      : 'bg-[#071117] border-white/8';
+      : 'bg-white/[0.04] border-white/8';
 
     const todayKey = getLocalDateString();
     const todayMinutes = Math.round((studyState.studySecondsByDate[todayKey] || 0) / 60);
@@ -349,41 +349,7 @@ export const OdakModuScreen: React.FC<OdakModuScreenProps> = React.memo(
 
     return (
       <div className="space-y-3">
-        {/* Saf Odak Alt Sekme Seçici (Sıfır Soru Unsuru, lg+ üst barda gösterilir) */}
-        <div className={`lg:hidden rounded-2xl border p-1 grid grid-cols-4 gap-1 ${cardBg}`}>
-          {(
-            [
-              { id: 'kronometre', label: 'Süre', icon: <Timer className="w-3.5 h-3.5" /> },
-              { id: 'konular', label: 'Konular', icon: <Layers className="w-3.5 h-3.5" /> },
-              { id: 'analiz', label: 'Analiz', icon: <BarChart3 className="w-3.5 h-3.5" /> },
-              { id: 'hedef', label: 'Hedef', icon: <Target className="w-3.5 h-3.5" /> },
-            ] as const
-          ).map((item) => {
-            const active = subTab === item.id;
-            return (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => {
-                  triggerHaptic('light');
-                  setSubTab(item.id);
-                }}
-                className={`py-2 px-1 rounded-xl text-[11px] font-extrabold flex items-center justify-center gap-1 transition whitespace-nowrap ${
-                  active
-                    ? 'bg-teal-600 text-white shadow-xs'
-                    : isLight
-                    ? 'text-slate-600 hover:text-slate-900'
-                    : 'text-slate-400 hover:text-slate-200'
-                }`}
-              >
-                <span className="shrink-0">{item.icon}</span>
-                <span className="truncate">{item.label}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* 1. SAF KRONOMETRE & POMODORO (SIFIR SORU UNSURU) */}
+        {/* 1. SAF KRONOMETRE & POMODORO (Alt Sabit Bar Üzerinden Sekme Geçişi — Sıfır Tekrar) */}
         {subTab === 'kronometre' && (
           <div className="space-y-3">
             <div className={`rounded-3xl border p-4 sm:p-5 space-y-3.5 ${cardBg}`}>

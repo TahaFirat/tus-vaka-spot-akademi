@@ -2,20 +2,16 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Award,
   BarChart3,
+  BookOpen,
   CheckCircle2,
-  CheckSquare,
-  Compass,
   Crown,
   Flame,
-  Home,
   Layers,
   Moon,
-  Sparkles,
   Sun,
   Target,
   Timer,
   X,
-  Zap,
 } from 'lucide-react';
 import {
   OptionLetter,
@@ -99,8 +95,23 @@ export const App: React.FC = () => {
   const [paywallOpen, setPaywallOpen] = useState<boolean>(false);
   const [paywallReason, setPaywallReason] = useState<string | undefined>(undefined);
   const [proBannerVisible, setProBannerVisible] = useState<boolean>(false);
-  const [odakHubOpen, setOdakHubOpen] = useState<boolean>(false);
   const [replayOnboardingOpen, setReplayOnboardingOpen] = useState<boolean>(false);
+
+  // Smoothly dissolve the native-style Launch Curtain after React hydrates (zero jarring pop-in!)
+  useEffect(() => {
+    const curtain = document.getElementById('tus-launch-curtain');
+    if (!curtain) return;
+    const t1 = window.setTimeout(() => {
+      curtain.classList.add('curtain-hidden');
+    }, 220);
+    const t2 = window.setTimeout(() => {
+      curtain.remove();
+    }, 620);
+    return () => {
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+    };
+  }, []);
 
   const [vakaBasketJump, setVakaBasketJump] = useState<QueueBasket>('unsolved');
   const [twinBasketJump, setTwinBasketJump] = useState<QueueBasket>('unsolved');
@@ -448,7 +459,6 @@ export const App: React.FC = () => {
 
   const handleSwitchMode = useCallback((nextMode: 'akademi' | 'odak') => {
     triggerHaptic('medium');
-    setOdakHubOpen(false);
     setStudyState((prev) => ({ ...prev, uiMode: nextMode }));
     if (nextMode === 'odak') {
       setActiveTab('odak');
@@ -490,7 +500,6 @@ export const App: React.FC = () => {
         pearlId?: string;
       }
     ) => {
-      setOdakHubOpen(false);
       setStudyState((prev) =>
         prev.uiMode === 'odak' ? { ...prev, uiMode: 'akademi' } : prev
       );
@@ -538,68 +547,55 @@ export const App: React.FC = () => {
   const isLightMode = studyState.theme === 'light';
   const isOdakMode = studyState.uiMode === 'odak';
 
-  const akademiDesktopTabs: Array<{
-    id: Exclude<MainTabId, 'odak'>;
+  const akademiPrimaryTabs: Array<{
+    id: 'home' | 'beklenen' | 'deneme' | 'analiz';
     label: string;
     icon: React.ReactNode;
   }> = [
-    { id: 'home', label: 'Dersler', icon: <Home className="w-4 h-4" /> },
-    { id: 'beklenen', label: 'Altın Spot', icon: <Flame className="w-4 h-4" /> },
-    { id: 'vaka', label: 'Vaka', icon: <CheckSquare className="w-4 h-4" /> },
-    { id: 'cikmis', label: 'İkiz', icon: <Sparkles className="w-4 h-4" /> },
-    { id: 'spot', label: 'Spot', icon: <Zap className="w-4 h-4" /> },
-    { id: 'deneme', label: 'Deneme', icon: <Award className="w-4 h-4" /> },
-    { id: 'analiz', label: 'Karne', icon: <BarChart3 className="w-4 h-4" /> },
+    { id: 'home', label: 'Dersler', icon: <BookOpen className="w-5 h-5" /> },
+    { id: 'beklenen', label: 'Spotlar', icon: <Flame className="w-5 h-5" /> },
+    { id: 'deneme', label: 'Deneme', icon: <Award className="w-5 h-5" /> },
+    { id: 'analiz', label: 'Karne', icon: <BarChart3 className="w-5 h-5" /> },
   ];
 
-  const odakDesktopTabs: Array<{
+  const odakPrimaryTabs: Array<{
     id: OdakSubTab;
     label: string;
     icon: React.ReactNode;
   }> = [
-    { id: 'kronometre', label: 'Kronometre', icon: <Timer className="w-4 h-4" /> },
-    { id: 'konular', label: '55 Konu Turu', icon: <Layers className="w-4 h-4" /> },
-    { id: 'analiz', label: 'Etüt Analizi', icon: <BarChart3 className="w-4 h-4" /> },
-    { id: 'hedef', label: 'Hedef & Plan', icon: <Target className="w-4 h-4" /> },
+    { id: 'kronometre', label: 'Süre', icon: <Timer className="w-5 h-5" /> },
+    { id: 'konular', label: 'Konular', icon: <Layers className="w-5 h-5" /> },
+    { id: 'analiz', label: 'Analiz', icon: <BarChart3 className="w-5 h-5" /> },
+    { id: 'hedef', label: 'Hedef', icon: <Target className="w-5 h-5" /> },
   ];
 
   const showOnboarding = !studyState.onboardingCompleted || replayOnboardingOpen;
 
-  const glassCapsuleClass = isLightMode
-    ? 'ios-liquid-glass-light'
-    : 'ios-liquid-glass-dark';
-
-  const glassOrbClass = isLightMode
-    ? 'ios-liquid-orb-light text-slate-700'
-    : 'ios-liquid-orb-dark text-slate-200';
-
-  const activeGlassPillClass = isLightMode
-    ? 'ios-liquid-pill-active-light text-white'
-    : 'ios-liquid-pill-active-dark text-blue-200';
+  const isDerslerActive =
+    activeTab === 'home' ||
+    activeTab === 'vaka' ||
+    activeTab === 'cikmis' ||
+    activeTab === 'spot';
 
   return (
     <div
       className={`min-h-screen w-full overflow-x-hidden flex flex-col transition-colors duration-200 ${
         isLightMode
-          ? isOdakMode
-            ? 'bg-[#F3F6FB] text-slate-900'
-            : 'bg-[#F6F8FC] text-slate-900'
-          : isOdakMode
-          ? 'bg-[#090D16] text-slate-100'
+          ? 'bg-[#F6F8FC] text-slate-900'
           : 'bg-[#0A0E17] text-slate-100'
       }`}
     >
-      {/* iOS 26/27 Yüzen "Liquid Glass" Şeffaf Kırınımlı Üst Kapsül Bar */}
+      {/* Sade, Tam Genişlikte Sabit Üst Bar (Sıfır Tekrar Buton, Rahat Dokunma Alanı) */}
       <header
-        className={`sticky top-0 z-30 pt-safe px-2.5 sm:px-4 pb-1.5 pointer-events-none ${
-          isLightMode ? 'ios-scroll-veil-top-light' : 'ios-scroll-veil-top-dark'
+        className={`sticky top-0 inset-x-0 z-30 pt-safe border-b backdrop-blur-xl transition-colors ${
+          isLightMode
+            ? 'bg-white/90 border-slate-200/80'
+            : 'bg-[#0C1220]/90 border-white/8'
         }`}
       >
-        <div
-          className={`pointer-events-auto max-w-4xl mx-auto h-12 rounded-full px-2 sm:px-3 flex items-center justify-between gap-1.5 ${glassCapsuleClass}`}
-        >
-          {/* Sol: İkon + Liquid Glass Mod Geçiş Kapsülü */}
-          <div className="flex items-center gap-1.5 shrink-0">
+        <div className="max-w-4xl mx-auto h-14 px-3.5 sm:px-5 flex items-center justify-between gap-2">
+          {/* Sol: İkon + Akademi / Odak Geçişi */}
+          <div className="flex items-center gap-2 shrink-0">
             <button
               type="button"
               onClick={() => {
@@ -616,15 +612,13 @@ export const App: React.FC = () => {
               <img
                 src="/icon-192.png"
                 alt="TUS Akademi"
-                className="w-7 h-7 sm:w-8 sm:h-8 rounded-full shadow-xs object-cover"
+                className="w-8 h-8 rounded-xl shadow-2xs object-cover"
               />
             </button>
 
             <div
-              className={`inline-flex rounded-full p-0.5 ${
-                isLightMode
-                  ? 'bg-slate-900/6 border border-slate-900/8'
-                  : 'bg-black/28 border border-white/12'
+              className={`inline-flex rounded-xl p-0.5 ${
+                isLightMode ? 'bg-slate-100' : 'bg-white/[0.07]'
               }`}
               role="group"
               aria-label="Çalışma Modu"
@@ -632,9 +626,9 @@ export const App: React.FC = () => {
               <button
                 type="button"
                 onClick={() => handleSwitchMode('akademi')}
-                className={`px-2 sm:px-2.5 py-1 rounded-full text-[10.5px] sm:text-[11px] font-extrabold transition whitespace-nowrap ${
+                className={`h-8 px-3 rounded-lg text-xs font-extrabold transition whitespace-nowrap ${
                   !isOdakMode
-                    ? activeGlassPillClass
+                    ? 'bg-blue-600 text-white shadow-2xs'
                     : isLightMode
                     ? 'text-slate-600 hover:text-slate-900'
                     : 'text-slate-400 hover:text-slate-200'
@@ -645,15 +639,15 @@ export const App: React.FC = () => {
               <button
                 type="button"
                 onClick={() => handleSwitchMode('odak')}
-                className={`px-2 sm:px-2.5 py-1 rounded-full text-[10.5px] sm:text-[11px] font-extrabold inline-flex items-center gap-1 transition whitespace-nowrap ${
+                className={`h-8 px-3 rounded-lg text-xs font-extrabold inline-flex items-center gap-1 transition whitespace-nowrap ${
                   isOdakMode
-                    ? activeGlassPillClass
+                    ? 'bg-blue-600 text-white shadow-2xs'
                     : isLightMode
                     ? 'text-slate-600 hover:text-slate-900'
                     : 'text-slate-400 hover:text-slate-200'
                 }`}
               >
-                <Timer className="w-3 h-3" />
+                <Timer className="w-3.5 h-3.5" />
                 <span>Odak</span>
                 {studyState.activeTimer.running && (
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-300" />
@@ -662,10 +656,10 @@ export const App: React.FC = () => {
             </div>
           </div>
 
-          {/* Geniş Ekran Yatay Sekmeler (Moda Göre Tamamen Yalıtılmış) */}
-          <div className="hidden lg:flex items-center gap-1 min-w-0 overflow-x-auto no-scrollbar">
+          {/* Geniş Ekran (iPad / Masaüstü) 4 Temiz Sekme */}
+          <div className="hidden lg:flex items-center gap-1">
             {isOdakMode
-              ? odakDesktopTabs.map((tab) => {
+              ? odakPrimaryTabs.map((tab) => {
                   const active = odakSubTab === tab.id;
                   return (
                     <button
@@ -675,11 +669,11 @@ export const App: React.FC = () => {
                         triggerHaptic('light');
                         setOdakSubTab(tab.id);
                       }}
-                      className={`px-2.5 py-1.5 rounded-full text-xs font-bold flex items-center gap-1 transition whitespace-nowrap ${
+                      className={`h-9 px-3.5 rounded-xl text-xs font-extrabold inline-flex items-center gap-1.5 transition whitespace-nowrap ${
                         active
-                          ? activeGlassPillClass
+                          ? 'bg-blue-600 text-white'
                           : isLightMode
-                          ? 'text-slate-600 hover:bg-white/60'
+                          ? 'text-slate-600 hover:bg-slate-100'
                           : 'text-slate-300 hover:bg-white/8'
                       }`}
                     >
@@ -688,31 +682,26 @@ export const App: React.FC = () => {
                     </button>
                   );
                 })
-              : akademiDesktopTabs.map((tab) => {
-                  const active = activeTab === tab.id;
+              : akademiPrimaryTabs.map((tab) => {
+                  const active =
+                    tab.id === 'home' ? isDerslerActive : activeTab === tab.id;
                   return (
                     <button
                       key={tab.id}
                       type="button"
                       onClick={() => {
                         triggerHaptic('light');
-                        if (
-                          tab.id === 'vaka' ||
-                          tab.id === 'cikmis' ||
-                          tab.id === 'spot'
-                        ) {
-                          handleNavigateTab(tab.id, { basket: 'unsolved' });
-                        } else if (tab.id === 'beklenen') {
+                        if (tab.id === 'beklenen') {
                           handleNavigateTab('beklenen');
                         } else {
                           setActiveTab(tab.id);
                         }
                       }}
-                      className={`px-2.5 py-1.5 rounded-full text-xs font-bold flex items-center gap-1 transition whitespace-nowrap ${
+                      className={`h-9 px-3.5 rounded-xl text-xs font-extrabold inline-flex items-center gap-1.5 transition whitespace-nowrap ${
                         active
-                          ? activeGlassPillClass
+                          ? 'bg-blue-600 text-white'
                           : isLightMode
-                          ? 'text-slate-600 hover:bg-white/60'
+                          ? 'text-slate-600 hover:bg-slate-100'
                           : 'text-slate-300 hover:bg-white/8'
                       }`}
                     >
@@ -723,43 +712,8 @@ export const App: React.FC = () => {
                 })}
           </div>
 
-          {/* Sağ Liquid Glass Damlacıkları (Sıfır Taşma — 320px'den 1024px'e Tam Responsive) */}
-          <div className="flex items-center gap-1 shrink-0">
-            {isOdakMode ? (
-              <button
-                type="button"
-                onClick={() => {
-                  triggerHaptic('light');
-                  setReplayOnboardingOpen(true);
-                }}
-                aria-label="Uygulama Tanıtımı"
-                title="Uygulama Tanıtımı"
-                className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition ${glassOrbClass}`}
-              >
-                <Compass className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-teal-500" />
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={() => {
-                  triggerHaptic('light');
-                  setActiveTab('analiz');
-                }}
-                aria-label="Karne ve Ayarlar"
-                title="Karne ve Ayarlar"
-                className={`lg:hidden w-7 h-7 sm:w-auto sm:h-8 sm:px-2.5 rounded-full text-[11px] font-extrabold inline-flex items-center justify-center gap-1 transition ${
-                  activeTab === 'analiz' ? activeGlassPillClass : glassOrbClass
-                }`}
-              >
-                <BarChart3
-                  className={`w-3.5 h-3.5 ${
-                    activeTab === 'analiz' ? 'text-white' : 'text-emerald-500'
-                  }`}
-                />
-                <span className="hidden sm:inline">Karne</span>
-              </button>
-            )}
-
+          {/* Sağ: Sadece Tema ve PRO (Sıfır Kalabalık, Rahat Boyut) */}
+          <div className="flex items-center gap-1.5 shrink-0">
             <button
               type="button"
               onClick={() => {
@@ -770,12 +724,16 @@ export const App: React.FC = () => {
                 }));
               }}
               aria-label="Tema Değiştir"
-              className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition ${glassOrbClass}`}
+              className={`w-9 h-9 rounded-xl flex items-center justify-center transition ${
+                isLightMode
+                  ? 'bg-slate-100 hover:bg-slate-200/80 text-slate-700'
+                  : 'bg-white/8 hover:bg-white/12 text-amber-300'
+              }`}
             >
               {isLightMode ? (
-                <Moon className="w-3.5 h-3.5 text-slate-700" />
+                <Moon className="w-4 h-4" />
               ) : (
-                <Sun className="w-3.5 h-3.5 text-amber-300" />
+                <Sun className="w-4 h-4" />
               )}
             </button>
 
@@ -787,9 +745,9 @@ export const App: React.FC = () => {
                     triggerHaptic('light');
                     setProBannerVisible((v) => !v);
                   }}
-                  className={`inline-flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-full text-[10px] sm:text-[10.5px] font-extrabold whitespace-nowrap shrink-0 transition ${activeGlassPillClass}`}
+                  className="h-9 px-3 rounded-xl bg-blue-600/12 text-blue-600 dark:text-blue-300 text-xs font-extrabold whitespace-nowrap shrink-0 transition"
                 >
-                  <span>PRO</span>
+                  PRO
                 </button>
               ) : (
                 <button
@@ -798,9 +756,9 @@ export const App: React.FC = () => {
                     triggerHaptic('medium');
                     handleOpenPaywall();
                   }}
-                  className="inline-flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-[10px] sm:text-[10.5px] font-extrabold whitespace-nowrap shrink-0 shadow-xs"
+                  className="h-9 px-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-extrabold inline-flex items-center gap-1 whitespace-nowrap shrink-0 shadow-2xs transition"
                 >
-                  <Crown className="w-3 h-3 shrink-0" />
+                  <Crown className="w-3.5 h-3.5 shrink-0" />
                   <span>PRO</span>
                 </button>
               ))}
@@ -808,8 +766,8 @@ export const App: React.FC = () => {
         </div>
       </header>
 
-      {/* Ana İçerik Alanı */}
-      <main className="flex-1 max-w-4xl w-full mx-auto px-3 sm:px-4 pt-1.5 pb-28 lg:pb-8 space-y-2.5">
+      {/* Ana İçerik Alanı (Alttaki Sabit Nav Bar İçin Geniş Güvenli Boşluk) */}
+      <main className="flex-1 max-w-4xl w-full mx-auto px-3.5 sm:px-5 pt-3 pb-24 lg:pb-10">
         {!isOdakMode && isPro && proBannerVisible && (
           <div
             className={`rounded-2xl border px-3.5 py-2.5 flex items-center justify-between gap-2 text-xs ${
@@ -836,296 +794,212 @@ export const App: React.FC = () => {
           </div>
         )}
 
-        {isOdakMode ? (
-          <OdakModuScreen
-            studyState={studyState}
-            isLight={isLightMode}
-            activeSubTab={odakSubTab}
-            onChangeSubTab={setOdakSubTab}
-            onUpdateStudyState={setStudyState}
-          />
-        ) : (
-          <>
-            {activeTab === 'home' && (
-              <AnaSayfaScreen
-                studyState={studyState}
-                isPro={isPro}
-                isLight={isLightMode}
-                totalSolvedCount={summaryStats.totalSolved}
-                priceLabel={proPriceLabel}
-                onNavigateTab={handleNavigateTab}
-                onOpenPaywall={handleOpenPaywall}
-              />
-            )}
+        <div key={`${isOdakMode ? 'odak-' + odakSubTab : activeTab}`} className="animate-page-enter space-y-3">
+          {isOdakMode ? (
+            <OdakModuScreen
+              studyState={studyState}
+              isLight={isLightMode}
+              activeSubTab={odakSubTab}
+              onChangeSubTab={setOdakSubTab}
+              onUpdateStudyState={setStudyState}
+            />
+          ) : (
+            <>
+              {activeTab === 'home' && (
+                <AnaSayfaScreen
+                  studyState={studyState}
+                  isPro={isPro}
+                  isLight={isLightMode}
+                  totalSolvedCount={summaryStats.totalSolved}
+                  priceLabel={proPriceLabel}
+                  onNavigateTab={handleNavigateTab}
+                  onOpenPaywall={handleOpenPaywall}
+                />
+              )}
 
-            {activeTab === 'beklenen' && (
-              <BeklenenSpotlarScreen
-                isLight={isLightMode}
-                focusedPearlId={focusedPearlId}
-                openedFromWidget={openedFromWidget}
-                pinnedWidgetPearlId={studyState.pinnedWidgetPearlId}
-                savedPearlIds={studyState.savedExpectedPearlIds}
-                onTogglePinPearl={handleTogglePinPearl}
-                onToggleSavePearl={handleToggleSavePearl}
-                onJumpToBranchVaka={(branchId) =>
-                  handleNavigateTab('vaka', { basket: 'unsolved', branchId })
-                }
-              />
-            )}
+              {activeTab === 'beklenen' && (
+                <BeklenenSpotlarScreen
+                  isLight={isLightMode}
+                  focusedPearlId={focusedPearlId}
+                  openedFromWidget={openedFromWidget}
+                  pinnedWidgetPearlId={studyState.pinnedWidgetPearlId}
+                  savedPearlIds={studyState.savedExpectedPearlIds}
+                  onTogglePinPearl={handleTogglePinPearl}
+                  onToggleSavePearl={handleToggleSavePearl}
+                  onJumpToBranchVaka={(branchId) =>
+                    handleNavigateTab('vaka', { basket: 'unsolved', branchId })
+                  }
+                />
+              )}
 
-            {activeTab === 'vaka' && (
-              <VakaTestScreen
-                key="vaka-standard"
-                mode="standard"
-                isPro={isPro}
-                isLight={isLightMode}
-                totalSolvedCount={summaryStats.totalSolved}
-                vakaAnswers={studyState.vakaAnswers}
-                bookmarkedVakaIds={studyState.bookmarkedVakaIds}
-                onRecordVakaAnswer={handleRecordVakaAnswer}
-                onToggleBookmarkVaka={handleToggleBookmarkVaka}
-                onOpenPaywall={handleOpenPaywall}
-                initialBasket={vakaBasketJump}
-                initialBranch={vakaBranchJump}
-                onPrefChange={(p) => {
-                  if (p.branchId) {
-                    setVakaBranchJump(p.branchId);
+              {activeTab === 'vaka' && (
+                <VakaTestScreen
+                  key="vaka-standard"
+                  mode="standard"
+                  isPro={isPro}
+                  isLight={isLightMode}
+                  totalSolvedCount={summaryStats.totalSolved}
+                  vakaAnswers={studyState.vakaAnswers}
+                  bookmarkedVakaIds={studyState.bookmarkedVakaIds}
+                  onRecordVakaAnswer={handleRecordVakaAnswer}
+                  onToggleBookmarkVaka={handleToggleBookmarkVaka}
+                  onOpenPaywall={handleOpenPaywall}
+                  onBackToSubjects={() => setActiveTab('home')}
+                  initialBasket={vakaBasketJump}
+                  initialBranch={vakaBranchJump}
+                  onPrefChange={(p) => {
+                    if (p.branchId) {
+                      setVakaBranchJump(p.branchId);
+                      setStudyState((prev) => ({
+                        ...prev,
+                        vakaBranchPref: p.branchId!,
+                      }));
+                    }
+                  }}
+                />
+              )}
+
+              {activeTab === 'cikmis' && (
+                <VakaTestScreen
+                  key="vaka-osym-twin"
+                  mode="osym_twin"
+                  isPro={isPro}
+                  isLight={isLightMode}
+                  totalSolvedCount={summaryStats.totalSolved}
+                  vakaAnswers={studyState.vakaAnswers}
+                  bookmarkedVakaIds={studyState.bookmarkedVakaIds}
+                  onRecordVakaAnswer={handleRecordVakaAnswer}
+                  onToggleBookmarkVaka={handleToggleBookmarkVaka}
+                  onOpenPaywall={handleOpenPaywall}
+                  onBackToSubjects={() => setActiveTab('home')}
+                  initialBasket={twinBasketJump}
+                  initialBranch={twinBranchJump}
+                  initialYear={studyState.twinYearPref}
+                  onPrefChange={(p) => {
+                    if (p.branchId) setTwinBranchJump(p.branchId);
                     setStudyState((prev) => ({
                       ...prev,
-                      vakaBranchPref: p.branchId!,
+                      ...(p.branchId ? { twinBranchPref: p.branchId } : {}),
+                      ...(p.year ? { twinYearPref: p.year as TwinYearFilter } : {}),
                     }));
-                  }
-                }}
-              />
-            )}
+                  }}
+                />
+              )}
 
-            {activeTab === 'cikmis' && (
-              <VakaTestScreen
-                key="vaka-osym-twin"
-                mode="osym_twin"
-                isPro={isPro}
-                isLight={isLightMode}
-                totalSolvedCount={summaryStats.totalSolved}
-                vakaAnswers={studyState.vakaAnswers}
-                bookmarkedVakaIds={studyState.bookmarkedVakaIds}
-                onRecordVakaAnswer={handleRecordVakaAnswer}
-                onToggleBookmarkVaka={handleToggleBookmarkVaka}
-                onOpenPaywall={handleOpenPaywall}
-                initialBasket={twinBasketJump}
-                initialBranch={twinBranchJump}
-                initialYear={studyState.twinYearPref}
-                onPrefChange={(p) => {
-                  if (p.branchId) setTwinBranchJump(p.branchId);
-                  setStudyState((prev) => ({
-                    ...prev,
-                    ...(p.branchId ? { twinBranchPref: p.branchId } : {}),
-                    ...(p.year ? { twinYearPref: p.year as TwinYearFilter } : {}),
-                  }));
-                }}
-              />
-            )}
+              {activeTab === 'spot' && (
+                <DogruYanlisScreen
+                  isPro={isPro}
+                  isLight={isLightMode}
+                  totalSolvedCount={summaryStats.totalSolved}
+                  spotAnswers={studyState.spotAnswers}
+                  bookmarkedSpotIds={studyState.bookmarkedSpotIds}
+                  onRecordSpotAnswer={handleRecordSpotAnswer}
+                  onToggleBookmarkSpot={handleToggleBookmarkSpot}
+                  onOpenPaywall={handleOpenPaywall}
+                  onBackToSubjects={() => setActiveTab('home')}
+                  initialBasket={spotBasketJump}
+                  initialBranch={spotBranchJump}
+                  onBranchChange={(b) => {
+                    setSpotBranchJump(b);
+                    setStudyState((prev) => ({ ...prev, spotBranchPref: b }));
+                  }}
+                />
+              )}
 
-            {activeTab === 'spot' && (
-              <DogruYanlisScreen
-                isPro={isPro}
-                isLight={isLightMode}
-                totalSolvedCount={summaryStats.totalSolved}
-                spotAnswers={studyState.spotAnswers}
-                bookmarkedSpotIds={studyState.bookmarkedSpotIds}
-                onRecordSpotAnswer={handleRecordSpotAnswer}
-                onToggleBookmarkSpot={handleToggleBookmarkSpot}
-                onOpenPaywall={handleOpenPaywall}
-                initialBasket={spotBasketJump}
-                initialBranch={spotBranchJump}
-                onBranchChange={(b) => {
-                  setSpotBranchJump(b);
-                  setStudyState((prev) => ({ ...prev, spotBranchPref: b }));
-                }}
-              />
-            )}
+              {activeTab === 'deneme' && (
+                <DenemeRehberScreen
+                  isPro={isPro}
+                  isLight={isLightMode}
+                  totalSolvedCount={summaryStats.totalSolved}
+                  vakaAnswers={studyState.vakaAnswers}
+                  onRecordExamAttempt={handleRecordExamAttempt}
+                  onRecordVakaAnswer={handleRecordVakaAnswer}
+                  onOpenPaywall={handleOpenPaywall}
+                />
+              )}
 
-            {activeTab === 'deneme' && (
-              <DenemeRehberScreen
-                isPro={isPro}
-                isLight={isLightMode}
-                totalSolvedCount={summaryStats.totalSolved}
-                vakaAnswers={studyState.vakaAnswers}
-                onRecordExamAttempt={handleRecordExamAttempt}
-                onRecordVakaAnswer={handleRecordVakaAnswer}
-                onOpenPaywall={handleOpenPaywall}
-              />
-            )}
-
-            {activeTab === 'analiz' && (
-              <AnalizScreen
-                studyState={studyState}
-                isPro={isPro}
-                isLight={isLightMode}
-                onUpdateStudyState={setStudyState}
-                onJumpToMistakes={handleJumpToMistakes}
-                onOpenPaywall={handleOpenPaywall}
-                onResetProgress={handleResetProgress}
-                onReplayOnboarding={() => setReplayOnboardingOpen(true)}
-              />
-            )}
-          </>
-        )}
+              {activeTab === 'analiz' && (
+                <AnalizScreen
+                  studyState={studyState}
+                  isPro={isPro}
+                  isLight={isLightMode}
+                  onUpdateStudyState={setStudyState}
+                  onJumpToMistakes={handleJumpToMistakes}
+                  onOpenPaywall={handleOpenPaywall}
+                  onResetProgress={handleResetProgress}
+                  onReplayOnboarding={() => setReplayOnboardingOpen(true)}
+                />
+              )}
+            </>
+          )}
+        </div>
       </main>
 
-      {/* Odak Modu Liquid Glass Saf Etüt Menüsü */}
-      {isOdakMode && odakHubOpen && (
-        <div
-          className="lg:hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-xs flex items-end justify-center p-3 pb-8"
-          onClick={() => setOdakHubOpen(false)}
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className={`w-full max-w-md rounded-3xl p-4 space-y-3 ${glassCapsuleClass}`}
-          >
-            <div className="flex items-center justify-between">
-              <div className="text-xs font-extrabold uppercase tracking-wider text-teal-500">
-                Saf Odak Çalışma Alanı
-              </div>
-              <button
-                type="button"
-                onClick={() => setOdakHubOpen(false)}
-                className={`p-1.5 rounded-full ${glassOrbClass}`}
-                aria-label="Kapat"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2">
-              {[
-                {
-                  id: 'kronometre' as const,
-                  label: 'Kronometre',
-                  sub: 'Serbest & Pomodoro',
-                  icon: <Timer className="w-4 h-4 text-teal-500" />,
-                },
-                {
-                  id: 'konular' as const,
-                  label: '55 Konu Turu',
-                  sub: '1., 2. ve 3. Tur takibi',
-                  icon: <Layers className="w-4 h-4 text-emerald-500" />,
-                },
-                {
-                  id: 'analiz' as const,
-                  label: 'Etüt Analizi',
-                  sub: '7 gün & ders süreleri',
-                  icon: <BarChart3 className="w-4 h-4 text-cyan-500" />,
-                },
-                {
-                  id: 'hedef' as const,
-                  label: 'Hedef & Plan',
-                  sub: 'TUS tarihi & dal puanı',
-                  icon: <Target className="w-4 h-4 text-amber-500" />,
-                },
-              ].map((item) => {
-                const active = odakSubTab === item.id;
-                return (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => {
-                      triggerHaptic('light');
-                      setOdakSubTab(item.id);
-                      setOdakHubOpen(false);
-                    }}
-                    className={`text-left rounded-2xl p-3 flex items-start gap-2.5 transition ${
-                      active ? activeGlassPillClass : glassOrbClass
-                    }`}
-                  >
-                    <div className="mt-0.5 shrink-0">{item.icon}</div>
-                    <div className="min-w-0">
-                      <div className="text-xs font-extrabold truncate">{item.label}</div>
-                      <div className="text-[10px] opacity-80 truncate">{item.sub}</div>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-
-            <button
-              type="button"
-              onClick={() => handleSwitchMode('akademi')}
-              className="w-full py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold flex items-center justify-center gap-1.5 shadow-sm"
-            >
-              <Zap className="w-4 h-4" />
-              <span>Akademi Moduna Geç</span>
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* iOS 26/27 Yüzen "Liquid Glass" Şeffaf Alt Kapsül Navigasyon Çubuğu */}
-      <div className="lg:hidden fixed bottom-3 inset-x-3 z-30 pointer-events-none flex justify-center pb-safe">
-        {isOdakMode ? (
-          <button
-            type="button"
-            onClick={() => {
-              triggerHaptic('medium');
-              setOdakHubOpen((o) => !o);
-            }}
-            aria-label="Odak Menüsü"
-            className={`pointer-events-auto inline-flex items-center gap-2 px-5 py-3 rounded-full font-extrabold text-xs active:scale-95 transition ${glassCapsuleClass}`}
-          >
-            <span className="w-6 h-6 rounded-full bg-teal-500/20 border border-teal-400/40 flex items-center justify-center text-teal-400">
-              <Timer className="w-3.5 h-3.5" />
-            </span>
-            <span>Odak Menüsü</span>
-            {studyState.activeTimer.running && (
-              <span className="w-2 h-2 rounded-full bg-amber-400" />
-            )}
-          </button>
-        ) : (
-          <nav
-            aria-label="Ana Navigasyon"
-            className={`pointer-events-auto w-full max-w-md rounded-full p-1.5 transition-all duration-150 ${glassCapsuleClass}`}
-          >
-            <div className="grid grid-cols-5 gap-1 items-center">
-              {[
-                { id: 'home' as const, label: 'Dersler', icon: <Home className="w-4 h-4" /> },
-                { id: 'vaka' as const, label: 'Vaka', icon: <CheckSquare className="w-4 h-4" /> },
-                { id: 'cikmis' as const, label: 'İkiz', icon: <Sparkles className="w-4 h-4" /> },
-                { id: 'spot' as const, label: 'Spot', icon: <Zap className="w-4 h-4" /> },
-                { id: 'deneme' as const, label: 'Deneme', icon: <Award className="w-4 h-4" /> },
-              ].map((tab) => {
-                const active = activeTab === tab.id;
+      {/* Aşağıya Sabitli, Tam Genişlikli, Responsive Native iOS Alt Navigasyon Çubuğu (4 Temiz Sekme — Sıfır Tekrar!) */}
+      <nav
+        aria-label="Ana Navigasyon"
+        className={`lg:hidden fixed bottom-0 inset-x-0 z-30 border-t backdrop-blur-xl pb-safe transition-colors ${
+          isLightMode
+            ? 'bg-white/94 border-slate-200/90'
+            : 'bg-[#0C1220]/94 border-white/10'
+        }`}
+      >
+        <div className="max-w-md mx-auto grid grid-cols-4 h-[60px] px-2">
+          {isOdakMode
+            ? odakPrimaryTabs.map((tab) => {
+                const active = odakSubTab === tab.id;
                 return (
                   <button
                     key={tab.id}
                     type="button"
                     onClick={() => {
-                      triggerHaptic('light');
-                      if (tab.id === 'home') {
-                        setActiveTab('home');
-                      } else if (tab.id === 'deneme') {
-                        handleNavigateTab('deneme');
-                      } else {
-                        handleNavigateTab(tab.id, { basket: 'unsolved' });
-                      }
+                      triggerHaptic('selection');
+                      setOdakSubTab(tab.id);
                     }}
-                    className={`py-1.5 px-1 rounded-full flex flex-col items-center justify-center gap-0.5 transition ${
+                    className={`flex flex-col items-center justify-center gap-1 transition active:scale-95 ${
                       active
-                        ? `${activeGlassPillClass} font-extrabold`
+                        ? 'text-blue-600 dark:text-blue-400 font-extrabold'
                         : isLightMode
-                        ? 'text-slate-700 hover:text-slate-950 font-semibold'
-                        : 'text-slate-300 hover:text-white font-medium'
+                        ? 'text-slate-400 hover:text-slate-700 font-semibold'
+                        : 'text-slate-500 hover:text-slate-300 font-semibold'
                     }`}
                   >
                     {tab.icon}
-                    <span className="text-[10px] leading-tight whitespace-nowrap">
-                      {tab.label}
-                    </span>
+                    <span className="text-[11px] leading-none">{tab.label}</span>
+                  </button>
+                );
+              })
+            : akademiPrimaryTabs.map((tab) => {
+                const active =
+                  tab.id === 'home' ? isDerslerActive : activeTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => {
+                      triggerHaptic('selection');
+                      if (tab.id === 'beklenen') {
+                        handleNavigateTab('beklenen');
+                      } else {
+                        setActiveTab(tab.id);
+                      }
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    className={`flex flex-col items-center justify-center gap-1 transition active:scale-95 ${
+                      active
+                        ? 'text-blue-600 dark:text-blue-400 font-extrabold'
+                        : isLightMode
+                        ? 'text-slate-400 hover:text-slate-700 font-semibold'
+                        : 'text-slate-500 hover:text-slate-300 font-semibold'
+                    }`}
+                  >
+                    {tab.icon}
+                    <span className="text-[11px] leading-none">{tab.label}</span>
                   </button>
                 );
               })}
-            </div>
-          </nav>
-        )}
-      </div>
+        </div>
+      </nav>
 
       {/* İlk Giriş Tanıtım & Kişiselleştirme Ekranı */}
       <OnboardingModal

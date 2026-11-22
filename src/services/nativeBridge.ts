@@ -75,7 +75,7 @@ export function requestNativeEntitlementCheck(): void {
 
 export function syncNativeTheme(theme: 'light' | 'dark'): void {
   try {
-    const bgColor = theme === 'light' ? '#F3F7F9' : '#071117';
+    const bgColor = theme === 'light' ? '#F6F8FC' : '#0A0E17';
     if (typeof document !== 'undefined') {
       document.documentElement.style.backgroundColor = bgColor;
       document.body.style.backgroundColor = bgColor;

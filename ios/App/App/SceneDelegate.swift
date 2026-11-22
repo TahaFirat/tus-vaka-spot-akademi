@@ -722,7 +722,7 @@ final class TUSLiveActivityAndWidgetManager {
 
 // MARK: - Custom TUS Bridge View Controller (StoreKit 2 + Theme Sync + Spotlight + Share + WKScriptMessageHandler)
 class TUSBridgeViewController: CAPBridgeViewController, WKScriptMessageHandler {
-    private var isLightTheme: Bool = false
+    private var isLightTheme: Bool = true
     private var isWebAppReady: Bool = false
     private var pendingDeepLinkPayload: [String: Any]? = nil
 
@@ -749,15 +749,15 @@ class TUSBridgeViewController: CAPBridgeViewController, WKScriptMessageHandler {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        let darkBg = UIColor(red: 7.0/255.0, green: 17.0/255.0, blue: 23.0/255.0, alpha: 1.0)
-        view.backgroundColor = darkBg
+        let initialBg = UIColor(red: 246.0/255.0, green: 248.0/255.0, blue: 252.0/255.0, alpha: 1.0)
+        view.backgroundColor = initialBg
         TUSNativeHapticsEngine.shared.prepareGenerators()
         TUSMedicalSpotlightIndexer.shared.indexHighYieldMedicalTopics()
 
         if let webView = self.webView {
-            webView.backgroundColor = darkBg
+            webView.backgroundColor = initialBg
             webView.isOpaque = true
-            webView.scrollView.backgroundColor = darkBg
+            webView.scrollView.backgroundColor = initialBg
             webView.scrollView.bounces = false
             webView.scrollView.alwaysBounceVertical = false
             webView.scrollView.alwaysBounceHorizontal = false
@@ -779,8 +779,8 @@ class TUSBridgeViewController: CAPBridgeViewController, WKScriptMessageHandler {
         DispatchQueue.main.async {
             self.isLightTheme = isLight
             let bgColor = isLight
-                ? UIColor(red: 243.0/255.0, green: 247.0/255.0, blue: 249.0/255.0, alpha: 1.0)
-                : UIColor(red: 7.0/255.0, green: 17.0/255.0, blue: 23.0/255.0, alpha: 1.0)
+                ? UIColor(red: 246.0/255.0, green: 248.0/255.0, blue: 252.0/255.0, alpha: 1.0)
+                : UIColor(red: 10.0/255.0, green: 14.0/255.0, blue: 23.0/255.0, alpha: 1.0)
             self.view.backgroundColor = bgColor
             self.webView?.backgroundColor = bgColor
             self.webView?.scrollView.backgroundColor = bgColor

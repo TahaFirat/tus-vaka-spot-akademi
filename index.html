@@ -7,8 +7,8 @@
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
     />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="theme-color" content="#071117" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="theme-color" content="#F6F8FC" />
     <title>TUS Vaka & Spot Akademi</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -18,8 +18,77 @@
     />
     <link rel="icon" type="image/png" href="/icon-192.png" />
     <link rel="apple-touch-icon" href="/icon-192.png" />
+    <style>
+      #tus-launch-curtain {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        background: #f6f8fc;
+        color: #0f172a;
+        font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+        transition: opacity 0.36s cubic-bezier(0.22, 1, 0.36, 1), transform 0.36s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+      #tus-launch-curtain.dark-curtain {
+        background: #0a0e17;
+        color: #f8fafc;
+      }
+      #tus-launch-curtain.curtain-hidden {
+        opacity: 0;
+        transform: scale(1.03);
+        pointer-events: none;
+      }
+      #tus-launch-curtain img {
+        width: 80px;
+        height: 80px;
+        border-radius: 22px;
+        box-shadow: 0 12px 30px rgba(37, 99, 235, 0.16);
+      }
+      #tus-launch-curtain .curtain-title {
+        font-size: 18px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+      }
+      #tus-launch-curtain .curtain-bar {
+        width: 88px;
+        height: 4px;
+        border-radius: 999px;
+        background: rgba(37, 99, 235, 0.14);
+        overflow: hidden;
+      }
+      #tus-launch-curtain .curtain-bar > div {
+        width: 48%;
+        height: 100%;
+        border-radius: 999px;
+        background: linear-gradient(90deg, #2563eb, #10b981);
+        animation: tusCurtainSlide 0.9s ease-in-out infinite alternate;
+      }
+      @keyframes tusCurtainSlide {
+        from { transform: translateX(-20%); }
+        to { transform: translateX(130%); }
+      }
+    </style>
   </head>
-  <body class="bg-[#071117] text-slate-100 antialiased selection:bg-emerald-500/30 selection:text-emerald-200">
+  <body class="bg-[#F6F8FC] text-slate-900 antialiased selection:bg-blue-500/20">
+    <div id="tus-launch-curtain">
+      <img src="/icon-192.png" alt="TUS Akademi" />
+      <div class="curtain-title">TUS Akademi</div>
+      <div class="curtain-bar"><div></div></div>
+    </div>
+    <script>
+      try {
+        var raw = localStorage.getItem('tus_vaka_spot_akademi_state_v1');
+        if (raw && raw.indexOf('"theme":"dark"') !== -1) {
+          var el = document.getElementById('tus-launch-curtain');
+          if (el) el.classList.add('dark-curtain');
+          document.body.style.backgroundColor = '#0A0E17';
+        }
+      } catch (e) {}
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

@@ -225,8 +225,8 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
   };
 
   const cardClass = isLight
-    ? 'bg-white border-slate-200/90 shadow-xs'
-    : 'bg-[#0C1B24] border-white/10 shadow-md';
+    ? 'bg-white border-slate-200/85 shadow-[0_1px_3px_rgba(15,23,42,0.04)]'
+    : 'bg-[#121826] border-white/8 shadow-md';
 
   return (
     <div className="space-y-2.5">
@@ -324,8 +324,8 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
           </div>
 
           <div className="flex items-center justify-between gap-2 pt-1">
-            <span className="text-xs text-slate-400">Hedef Seç:</span>
-            <div className="flex items-center gap-1">
+            <span className="text-xs font-semibold text-slate-400">Hedef</span>
+            <div className="flex items-center gap-1.5">
               {[20, 40, 60, 100].map((val) => (
                 <button
                   key={val}
@@ -337,10 +337,12 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
                       dailyTarget: val,
                     }));
                   }}
-                  className={`px-2.5 py-0.5 rounded-lg text-xs font-bold border transition ${
+                  className={`h-9 min-w-[44px] px-2.5 rounded-xl text-xs font-extrabold border transition active:scale-[0.97] ${
                     studyState.dailyTarget === val
-                      ? 'bg-emerald-600 border-emerald-500 text-white'
-                      : 'border-slate-500/20 text-slate-400'
+                      ? 'bg-[#2563EB] border-[#2563EB] text-white shadow-xs'
+                      : isLight
+                      ? 'bg-slate-50 border-slate-200 text-slate-600'
+                      : 'bg-[#0A0E17] border-white/10 text-slate-300'
                   }`}
                 >
                   {val}
@@ -354,13 +356,13 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
         <div
           className={`rounded-2xl border p-3.5 flex flex-col justify-between gap-2.5 ${cardClass}`}
         >
-          <div className="space-y-2">
+          <div className="space-y-2.5">
             <div className="flex items-center justify-between text-xs font-extrabold">
               <span className="flex items-center gap-1.5">
                 <RotateCcw className="w-4 h-4 text-rose-500" />
-                <span>Hata Defteri & Hafıza Kutuları</span>
+                <span>Hata Defteri</span>
               </span>
-              <span className="text-[10.5px] font-bold text-emerald-500 tabular-nums">
+              <span className="text-[11px] font-bold text-emerald-500 tabular-nums">
                 Kalıcı: {stats.srs.box4}
               </span>
             </div>
@@ -369,17 +371,17 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
               {[
                 { label: 'Kutu 1', val: stats.srs.box1, cls: 'text-rose-500' },
                 { label: 'Kutu 2', val: stats.srs.box2, cls: 'text-amber-500' },
-                { label: 'Kutu 3', val: stats.srs.box3, cls: 'text-teal-500' },
+                { label: 'Kutu 3', val: stats.srs.box3, cls: 'text-[#2563EB]' },
                 { label: 'Kutu 4', val: stats.srs.box4, cls: 'text-emerald-500' },
               ].map((b) => (
                 <div
                   key={b.label}
-                  className={`rounded-xl border py-1.5 px-1 ${
-                    isLight ? 'bg-slate-50 border-slate-200' : 'bg-[#071117] border-white/8'
+                  className={`rounded-xl border py-2 px-1 ${
+                    isLight ? 'bg-slate-50 border-slate-200' : 'bg-[#0A0E17] border-white/8'
                   }`}
                 >
-                  <div className="text-[9.5px] font-bold text-slate-400">{b.label}</div>
-                  <div className={`text-xs font-extrabold tabular-nums ${b.cls}`}>
+                  <div className="text-[10px] font-bold text-slate-400">{b.label}</div>
+                  <div className={`text-sm font-extrabold tabular-nums ${b.cls}`}>
                     {b.val}
                   </div>
                 </div>
@@ -394,7 +396,7 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
                   triggerHaptic('medium');
                   onJumpToMistakes('vaka');
                 }}
-                className={`py-2 px-2.5 rounded-xl border text-xs font-extrabold transition disabled:opacity-45 ${
+                className={`h-11 px-3 rounded-xl border text-xs font-extrabold transition active:scale-[0.98] disabled:opacity-45 ${
                   isLight
                     ? 'bg-rose-50 hover:bg-rose-100 border-rose-300 text-rose-700'
                     : 'bg-rose-500/15 hover:bg-rose-500/25 border-rose-500/30 text-rose-300'
@@ -410,7 +412,7 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
                   triggerHaptic('medium');
                   onJumpToMistakes('spot');
                 }}
-                className={`py-2 px-2.5 rounded-xl border text-xs font-extrabold transition disabled:opacity-45 ${
+                className={`h-11 px-3 rounded-xl border text-xs font-extrabold transition active:scale-[0.98] disabled:opacity-45 ${
                   isLight
                     ? 'bg-amber-50 hover:bg-amber-100 border-amber-300 text-amber-800'
                     : 'bg-amber-500/15 hover:bg-amber-500/25 border-amber-500/30 text-amber-300'
@@ -427,16 +429,16 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
       <div className={`rounded-2xl border p-3.5 space-y-2.5 ${cardClass}`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5 text-xs font-extrabold">
-            <BarChart3 className="w-4 h-4 text-emerald-500" />
-            <span>11 TUS Branşında Ustalık</span>
+            <BarChart3 className="w-4 h-4 text-[#2563EB]" />
+            <span>Branş Bazlı Ustalık</span>
           </div>
           {!isPro && (
             <button
               type="button"
               onClick={() => onOpenPaywall()}
-              className="text-xs font-bold text-amber-500 hover:underline"
+              className="h-8 px-2.5 rounded-lg bg-amber-500/15 text-amber-600 text-xs font-extrabold"
             >
-              PRO’ya Geç →
+              PRO’ya Geç
             </button>
           )}
         </div>
@@ -458,17 +460,14 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
             return (
               <div
                 key={branch.id}
-                className={`rounded-xl border p-2.5 space-y-1 ${
+                className={`rounded-xl border p-2.5 space-y-1.5 ${
                   isLight
                     ? 'bg-slate-50 border-slate-200/80'
-                    : 'bg-[#071117] border-white/6'
+                    : 'bg-[#0A0E17] border-white/6'
                 }`}
               >
                 <div className="flex items-center justify-between gap-2 text-xs">
                   <span className="font-bold truncate min-w-0">
-                    <span className="text-[10px] font-extrabold text-emerald-500 mr-1">
-                      [{branch.session}]
-                    </span>
                     {branch.shortName}
                   </span>
                   <span className="text-[11px] text-slate-400 tabular-nums shrink-0">
@@ -479,7 +478,7 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
 
                 <div className="w-full h-1.5 rounded-full bg-slate-500/15 overflow-hidden">
                   <div
-                    className="h-full bg-gradient-to-r from-emerald-500 to-teal-400"
+                    className="h-full bg-[#2563EB]"
                     style={{ width: `${accuracy}%` }}
                   />
                 </div>
@@ -489,12 +488,12 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
         </div>
       </div>
 
-      {/* Uygulama Ayarları, Tanıtımı Tekrar İncele, Yedekleme & Bildirim */}
+      {/* Ayarlar & Yedekleme */}
       <div className={`rounded-2xl border p-3.5 space-y-3 ${cardClass}`}>
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-1.5 text-xs font-extrabold">
-            <Layers className="w-4 h-4 text-emerald-500" />
-            <span>Ayarlar, Uygulama Tanıtımı & Yedekleme</span>
+            <Layers className="w-4 h-4 text-[#2563EB]" />
+            <span>Ayarlar & Yedekleme</span>
           </div>
 
           <button
@@ -503,25 +502,25 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
               triggerHaptic('light');
               onReplayOnboarding();
             }}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold transition shadow-xs"
+            className="h-10 inline-flex items-center gap-1.5 px-3.5 rounded-xl bg-[#2563EB] hover:bg-blue-700 text-white text-xs font-extrabold transition active:scale-[0.98]"
           >
-            <Compass className="w-3.5 h-3.5" />
-            <span>Tanıtımı Tekrar İncele</span>
+            <Compass className="w-4 h-4" />
+            <span>Ders Seçimi</span>
           </button>
         </div>
 
         {/* Günlük Hatırlatıcı & Karne Paylaşımı */}
-        <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-500/15 text-xs">
-          <div className="flex flex-wrap items-center gap-1.5">
-            <Bell className="w-3.5 h-3.5 text-teal-500 shrink-0" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t border-slate-500/15 text-xs">
+          <div className="flex items-center gap-1.5">
+            <Bell className="w-4 h-4 text-[#2563EB] shrink-0" />
             <select
               value={reminderHour}
               onChange={(e) => setReminderHour(Number(e.target.value))}
               aria-label="Hatırlatıcı Saati"
-              className={`rounded-xl px-2.5 py-1.5 text-xs font-bold border outline-none ${
+              className={`h-10 flex-1 rounded-xl px-2.5 text-xs font-bold border outline-none ${
                 isLight
                   ? 'bg-slate-50 border-slate-200 text-slate-800'
-                  : 'bg-[#071117] border-white/10 text-slate-100'
+                  : 'bg-[#0A0E17] border-white/10 text-slate-100'
               }`}
             >
               {[9, 12, 18, 19, 20, 21, 22].map((h) => (
@@ -542,9 +541,9 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
                   studyState.dailyTarget
                 );
               }}
-              className="px-2.5 py-1.5 rounded-xl bg-teal-600 text-white text-xs font-extrabold"
+              className="h-10 px-3.5 rounded-xl bg-[#2563EB] text-white text-xs font-extrabold shrink-0"
             >
-              Hatırlatıcı Kur
+              Kur
             </button>
 
             <button
@@ -553,7 +552,7 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
                 triggerHaptic('light');
                 cancelDailyTusReminder();
               }}
-              className={`px-2 py-1.5 rounded-xl border text-xs font-bold ${
+              className={`h-10 px-3 rounded-xl border text-xs font-bold shrink-0 ${
                 isLight
                   ? 'bg-slate-100 border-slate-200 text-slate-600'
                   : 'bg-white/5 border-white/10 text-slate-300'
@@ -571,9 +570,13 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
                 `TUS Vaka & Spot Akademi Karnem • Çözülen: ${stats.totalSolved} Soru • ÖSYM Netim: ${stats.overallNet} • Tahmini TUS: ${stats.estimatedScore} • TUS'a Kalan: ${countdownDays} Gün`
               );
             }}
-            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-slate-500/15 hover:bg-slate-500/25 text-xs font-bold"
+            className={`h-10 inline-flex items-center justify-center gap-1.5 px-3.5 rounded-xl border text-xs font-extrabold transition ${
+              isLight
+                ? 'bg-slate-50 border-slate-200 text-slate-800 hover:bg-slate-100'
+                : 'bg-[#0A0E17] border-white/10 text-slate-200 hover:bg-white/10'
+            }`}
           >
-            <Share2 className="w-3.5 h-3.5" />
+            <Share2 className="w-4 h-4" />
             <span>Karnemi Paylaş</span>
           </button>
         </div>
@@ -586,21 +589,29 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
 
         {/* Yedekle / Yükle / Sıfırla */}
         <div className="pt-2 border-t border-slate-500/15 flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={handleExportJson}
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-slate-500/15 hover:bg-slate-500/25 text-xs font-bold transition"
+              className={`h-10 inline-flex items-center gap-1.5 px-3.5 rounded-xl border text-xs font-bold transition ${
+                isLight
+                  ? 'bg-slate-50 border-slate-200 text-slate-700'
+                  : 'bg-[#0A0E17] border-white/10 text-slate-200'
+              }`}
             >
-              <Download className="w-3.5 h-3.5" />
+              <Download className="w-4 h-4" />
               <span>Yedekle</span>
             </button>
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-slate-500/15 hover:bg-slate-500/25 text-xs font-bold transition"
+              className={`h-10 inline-flex items-center gap-1.5 px-3.5 rounded-xl border text-xs font-bold transition ${
+                isLight
+                  ? 'bg-slate-50 border-slate-200 text-slate-700'
+                  : 'bg-[#0A0E17] border-white/10 text-slate-200'
+              }`}
             >
-              <Upload className="w-3.5 h-3.5" />
+              <Upload className="w-4 h-4" />
               <span>Yükle</span>
             </button>
             <input
@@ -616,10 +627,10 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
             <button
               type="button"
               onClick={() => setConfirmReset(true)}
-              className="inline-flex items-center gap-1 text-xs text-rose-500 font-semibold"
+              className="h-10 inline-flex items-center gap-1.5 px-3 rounded-xl text-xs text-rose-500 font-bold hover:bg-rose-500/10 transition"
             >
-              <Trash2 className="w-3.5 h-3.5" />
-              <span>İlerlemeyi Sıfırla</span>
+              <Trash2 className="w-4 h-4" />
+              <span>Sıfırla</span>
             </button>
           ) : (
             <div className="flex items-center gap-1.5">
@@ -629,14 +640,14 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
                   onResetProgress();
                   setConfirmReset(false);
                 }}
-                className="px-2 py-0.5 rounded bg-rose-600 text-white text-xs font-bold"
+                className="h-10 px-3.5 rounded-xl bg-rose-600 text-white text-xs font-extrabold"
               >
                 Onayla
               </button>
               <button
                 type="button"
                 onClick={() => setConfirmReset(false)}
-                className="px-2 py-0.5 rounded bg-slate-500/20 text-xs"
+                className="h-10 px-3.5 rounded-xl bg-slate-500/20 text-xs font-bold"
               >
                 İptal
               </button>
@@ -655,17 +666,17 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
       {studyState.examHistory.length > 0 && (
         <div className={`rounded-2xl border p-3.5 space-y-2 ${cardClass}`}>
           <span className="text-xs font-extrabold flex items-center gap-1.5">
-            <Award className="w-4 h-4 text-teal-500" />
+            <Award className="w-4 h-4 text-[#2563EB]" />
             <span>Tamamlanan Denemeler ({studyState.examHistory.length})</span>
           </span>
           <div className="space-y-1.5">
             {studyState.examHistory.slice(0, 5).map((ex) => (
               <div
                 key={ex.id}
-                className={`rounded-xl border px-3 py-2 flex items-center justify-between gap-2 text-xs ${
+                className={`rounded-xl border px-3 py-2.5 flex items-center justify-between gap-2 text-xs ${
                   isLight
                     ? 'bg-slate-50 border-slate-200/80 text-slate-700'
-                    : 'bg-[#071117] border-white/6 text-slate-200'
+                    : 'bg-[#0A0E17] border-white/6 text-slate-200'
                 }`}
               >
                 <div className="min-w-0">

@@ -411,12 +411,12 @@ const DenemeRehberScreenInner: React.FC<DenemeRehberScreenProps> = ({
 
   return (
     <div className="space-y-2.5">
-      {/* Compact 3-Way Sub-Tab Switcher */}
+      {/* Compact 3-Way Sub-Tab Switcher (Generous 44px touch targets) */}
       <div
         className={`rounded-2xl border p-1 grid grid-cols-3 gap-1 ${
           isLight
-            ? 'bg-white border-slate-200 shadow-sm'
-            : 'bg-[#0C1B24] border-white/10 shadow-md'
+            ? 'bg-white border-slate-200/85 shadow-[0_1px_3px_rgba(15,23,42,0.04)]'
+            : 'bg-[#121826] border-white/10 shadow-md'
         }`}
       >
         <button
@@ -425,16 +425,16 @@ const DenemeRehberScreenInner: React.FC<DenemeRehberScreenProps> = ({
             triggerHaptic('light');
             setSubTab('deneme');
           }}
-          className={`py-2 px-2 rounded-xl text-[11px] sm:text-xs font-extrabold flex items-center justify-center gap-1 transition ${
+          className={`h-10 px-2 rounded-xl text-[12px] font-extrabold flex items-center justify-center gap-1.5 transition ${
             subTab === 'deneme'
-              ? 'bg-emerald-600 text-white shadow-sm'
+              ? 'bg-[#2563EB] text-white shadow-xs'
               : isLight
               ? 'text-slate-600 hover:text-slate-900'
               : 'text-slate-400 hover:text-slate-200'
           }`}
         >
-          <Award className="w-3.5 h-3.5 shrink-0" />
-          <span className="truncate">TUS Deneme</span>
+          <Award className="w-4 h-4 shrink-0" />
+          <span className="truncate">Deneme</span>
         </button>
 
         <button
@@ -443,16 +443,16 @@ const DenemeRehberScreenInner: React.FC<DenemeRehberScreenProps> = ({
             triggerHaptic('light');
             setSubTab('hesap');
           }}
-          className={`py-2 px-2 rounded-xl text-[11px] sm:text-xs font-extrabold flex items-center justify-center gap-1 transition ${
+          className={`h-10 px-2 rounded-xl text-[12px] font-extrabold flex items-center justify-center gap-1.5 transition ${
             subTab === 'hesap'
-              ? 'bg-amber-500 text-slate-950 shadow-sm'
+              ? 'bg-[#2563EB] text-white shadow-xs'
               : isLight
               ? 'text-slate-600 hover:text-slate-900'
               : 'text-slate-400 hover:text-slate-200'
           }`}
         >
-          <Calculator className="w-3.5 h-3.5 shrink-0" />
-          <span className="truncate">Klinik Hesaplayıcı</span>
+          <Calculator className="w-4 h-4 shrink-0" />
+          <span className="truncate">Hesaplayıcı</span>
         </button>
 
         <button
@@ -461,16 +461,16 @@ const DenemeRehberScreenInner: React.FC<DenemeRehberScreenProps> = ({
             triggerHaptic('light');
             setSubTab('rehber');
           }}
-          className={`py-2 px-2 rounded-xl text-[11px] sm:text-xs font-extrabold flex items-center justify-center gap-1 transition ${
+          className={`h-10 px-2 rounded-xl text-[12px] font-extrabold flex items-center justify-center gap-1.5 transition ${
             subTab === 'rehber'
-              ? 'bg-teal-600 text-white shadow-sm'
+              ? 'bg-[#2563EB] text-white shadow-xs'
               : isLight
               ? 'text-slate-600 hover:text-slate-900'
               : 'text-slate-400 hover:text-slate-200'
           }`}
         >
-          <BookOpen className="w-3.5 h-3.5 shrink-0" />
-          <span className="truncate">Klinik Rehber</span>
+          <BookOpen className="w-4 h-4 shrink-0" />
+          <span className="truncate">Rehber</span>
         </button>
       </div>
 
@@ -484,35 +484,35 @@ const DenemeRehberScreenInner: React.FC<DenemeRehberScreenProps> = ({
                 return (
                   <div
                     key={mode.id}
-                    className={`rounded-2xl border p-3.5 flex flex-col justify-between gap-2.5 transition ${
+                    className={`rounded-2xl border p-4 flex flex-col justify-between gap-3 transition ${
                       isLight
-                        ? 'bg-white border-slate-200/90 shadow-sm'
-                        : 'bg-[#0C1B24] border-white/10 shadow-md'
+                        ? 'bg-white border-slate-200/85 shadow-[0_1px_3px_rgba(15,23,42,0.04)]'
+                        : 'bg-[#121826] border-white/10 shadow-md'
                     }`}
                   >
                     <div className="space-y-1.5">
                       <div className="flex items-center justify-between gap-2">
                         <span
-                          className={`px-2 py-0.5 rounded-md text-[10px] font-extrabold ${
+                          className={`px-2 py-0.5 rounded-md text-[10.5px] font-extrabold ${
                             mode.requiresPro
                               ? 'bg-amber-500/15 text-amber-500 border border-amber-400/30'
-                              : 'bg-emerald-500/15 text-emerald-500 border border-emerald-400/30'
+                              : 'bg-blue-500/12 text-[#2563EB] border border-blue-400/30'
                           }`}
                         >
                           {mode.badge}
                         </span>
                         <span
-                          className={`text-[11px] font-semibold flex items-center gap-1 ${
+                          className={`text-xs font-semibold flex items-center gap-1 ${
                             isLight ? 'text-slate-500' : 'text-slate-400'
                           }`}
                         >
-                          <Clock className="w-3.5 h-3.5 text-teal-500" />
+                          <Clock className="w-3.5 h-3.5 text-[#2563EB]" />
                           {mode.durationMinutes} dk
                         </span>
                       </div>
 
                       <h3
-                        className={`text-sm font-extrabold leading-snug ${
+                        className={`text-[15px] font-extrabold leading-snug ${
                           isLight ? 'text-slate-900' : 'text-white'
                         }`}
                       >
@@ -520,14 +520,14 @@ const DenemeRehberScreenInner: React.FC<DenemeRehberScreenProps> = ({
                       </h3>
                       <p
                         className={`text-xs leading-snug ${
-                          isLight ? 'text-slate-600' : 'text-slate-400'
+                          isLight ? 'text-slate-500' : 'text-slate-400'
                         }`}
                       >
                         {mode.subtitle}
                       </p>
 
                       {mode.id === 'maraton-40' && (
-                        <div className="pt-1.5 flex flex-wrap gap-1">
+                        <div className="pt-1.5 flex flex-wrap gap-1.5">
                           {TUS_BRANCHES.map((b) => {
                             const active = selectedBranches.includes(b.id);
                             return (
@@ -535,14 +535,14 @@ const DenemeRehberScreenInner: React.FC<DenemeRehberScreenProps> = ({
                                 key={b.id}
                                 type="button"
                                 onClick={() => handleToggleBranch(b.id)}
-                                className={`px-2 py-0.5 rounded-md text-[10px] font-bold border transition ${
+                                className={`h-8 px-2.5 rounded-lg text-[11px] font-bold border transition ${
                                   active
                                     ? isLight
-                                      ? 'bg-emerald-50 border-emerald-400 text-emerald-700'
-                                      : 'bg-emerald-500/15 border-emerald-400/40 text-emerald-300'
+                                      ? 'bg-blue-50 border-blue-400 text-[#2563EB]'
+                                      : 'bg-blue-500/20 border-blue-400/40 text-blue-300'
                                     : isLight
-                                    ? 'bg-slate-100 border-slate-200 text-slate-400'
-                                    : 'bg-white/5 border-white/5 text-slate-500'
+                                    ? 'bg-slate-100 border-slate-200 text-slate-500'
+                                    : 'bg-white/5 border-white/10 text-slate-400'
                                 }`}
                               >
                                 {b.shortName}
@@ -556,22 +556,22 @@ const DenemeRehberScreenInner: React.FC<DenemeRehberScreenProps> = ({
                     <button
                       type="button"
                       onClick={() => handleStartExam(mode)}
-                      className={`w-full py-2.5 px-3.5 rounded-xl font-extrabold text-xs flex items-center justify-center gap-1.5 transition ${
+                      className={`w-full h-12 px-4 rounded-xl font-extrabold text-[13px] flex items-center justify-center gap-2 transition active:scale-[0.98] ${
                         locked
                           ? isLight
                             ? 'bg-amber-50 hover:bg-amber-100 border border-amber-400 text-amber-800'
                             : 'bg-amber-500/15 hover:bg-amber-500/25 border border-amber-400/40 text-amber-300'
-                          : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm'
+                          : 'bg-[#2563EB] hover:bg-blue-700 text-white shadow-sm'
                       }`}
                     >
                       {locked ? (
                         <>
-                          <Lock className="w-3.5 h-3.5" />
-                          <span>PRO ile Denemeyi Aç</span>
+                          <Lock className="w-4 h-4" />
+                          <span>PRO ile Aç</span>
                         </>
                       ) : (
                         <>
-                          <Play className="w-3.5 h-3.5 fill-current" />
+                          <Play className="w-4 h-4 fill-current" />
                           <span>Denemeyi Başlat</span>
                         </>
                       )}
@@ -586,13 +586,13 @@ const DenemeRehberScreenInner: React.FC<DenemeRehberScreenProps> = ({
               className={`rounded-2xl border p-4 space-y-3.5 ${
                 isLight
                   ? 'bg-white border-slate-200 shadow-md'
-                  : 'bg-[#0C1B24] border-white/10 shadow-xl'
+                  : 'bg-[#121826] border-white/10 shadow-xl'
               }`}
             >
-              <div className="flex items-center justify-between gap-2 border-b border-slate-500/15 pb-2.5">
+              <div className="flex items-center justify-between gap-2 border-b border-slate-500/15 pb-3">
                 <div>
-                  <div className="text-[11px] font-extrabold uppercase text-emerald-500">
-                    ÖSYM TUS Deneme Karnesi
+                  <div className="text-[11px] font-extrabold uppercase text-[#2563EB]">
+                    Deneme Karnesi
                   </div>
                   <h3 className="text-sm sm:text-base font-extrabold">
                     {finishedResult.title}
@@ -605,9 +605,9 @@ const DenemeRehberScreenInner: React.FC<DenemeRehberScreenProps> = ({
                     setActiveMode(null);
                     setFinishedResult(null);
                   }}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 text-white text-xs font-bold"
+                  className="h-10 inline-flex items-center gap-1.5 px-3.5 rounded-xl bg-[#2563EB] text-white text-xs font-extrabold"
                 >
-                  <RotateCcw className="w-3.5 h-3.5" />
+                  <RotateCcw className="w-4 h-4" />
                   <span>Yeni Deneme</span>
                 </button>
               </div>
@@ -615,7 +615,7 @@ const DenemeRehberScreenInner: React.FC<DenemeRehberScreenProps> = ({
               <div className="grid grid-cols-4 gap-2 text-center">
                 <div
                   className={`rounded-xl border p-2.5 ${
-                    isLight ? 'bg-slate-50 border-slate-200' : 'bg-[#071117] border-white/8'
+                    isLight ? 'bg-slate-50 border-slate-200' : 'bg-[#0A0E17] border-white/8'
                   }`}
                 >
                   <div className="text-[10px] text-slate-400 font-bold">Doğru</div>
@@ -625,7 +625,7 @@ const DenemeRehberScreenInner: React.FC<DenemeRehberScreenProps> = ({
                 </div>
                 <div
                   className={`rounded-xl border p-2.5 ${
-                    isLight ? 'bg-slate-50 border-slate-200' : 'bg-[#071117] border-white/8'
+                    isLight ? 'bg-slate-50 border-slate-200' : 'bg-[#0A0E17] border-white/8'
                   }`}
                 >
                   <div className="text-[10px] text-slate-400 font-bold">Yanlış</div>
@@ -635,14 +635,14 @@ const DenemeRehberScreenInner: React.FC<DenemeRehberScreenProps> = ({
                 </div>
                 <div
                   className={`rounded-xl border p-2.5 ${
-                    isLight ? 'bg-slate-50 border-slate-200' : 'bg-[#071117] border-white/8'
+                    isLight ? 'bg-slate-50 border-slate-200' : 'bg-[#0A0E17] border-white/8'
                   }`}
                 >
-                  <div className="text-[10px] text-teal-500 font-bold">ÖSYM Net</div>
+                  <div className="text-[10px] text-[#2563EB] font-bold">ÖSYM Net</div>
                   <div className="text-lg font-extrabold">{finishedResult.netScore}</div>
                 </div>
-                <div className="rounded-xl bg-emerald-500/15 border border-emerald-500/35 p-2.5">
-                  <div className="text-[10px] text-emerald-500 font-bold">TUS Puanı</div>
+                <div className="rounded-xl bg-blue-500/15 border border-blue-500/35 p-2.5">
+                  <div className="text-[10px] text-[#2563EB] font-bold">TUS Puanı</div>
                   <div className="text-lg font-extrabold text-amber-500">
                     {finishedResult.estimatedTusScore}
                   </div>
@@ -779,32 +779,32 @@ const DenemeRehberScreenInner: React.FC<DenemeRehberScreenProps> = ({
               className={`rounded-2xl border overflow-hidden ${
                 isLight
                   ? 'bg-white border-slate-200 shadow-md'
-                  : 'bg-[#0C1B24] border-white/10 shadow-xl'
+                  : 'bg-[#121826] border-white/10 shadow-xl'
               }`}
             >
               <div
-                className={`px-3.5 py-2 border-b flex items-center justify-between gap-2 ${
-                  isLight ? 'bg-slate-50 border-slate-200' : 'bg-[#08131A] border-white/8'
+                className={`px-3.5 py-2.5 border-b flex items-center justify-between gap-2 ${
+                  isLight ? 'bg-slate-50 border-slate-200' : 'bg-[#0A0E17] border-white/8'
                 }`}
               >
-                <span className="text-xs font-extrabold text-emerald-500 truncate">
+                <span className="text-xs font-extrabold text-[#2563EB] truncate">
                   Soru {examIdx + 1}/{examQuestions.length} •{' '}
                   {examQuestions[examIdx]?.branchName}
                 </span>
 
-                <div className="flex items-center gap-1.5 shrink-0">
+                <div className="flex items-center gap-2 shrink-0">
                   <ExamTimerPill endAtMs={examEndMs} onExpire={handleFinishExam} />
                   <button
                     type="button"
                     onClick={handleFinishExam}
-                    className="px-2.5 py-1 rounded-lg bg-amber-500 text-slate-950 font-extrabold text-xs"
+                    className="h-9 px-3.5 rounded-xl bg-amber-500 text-slate-950 font-extrabold text-xs"
                   >
                     Bitir
                   </button>
                 </div>
               </div>
 
-              <div className="px-3.5 py-1.5 border-b border-slate-500/10 flex items-center gap-1 overflow-x-auto no-scrollbar">
+              <div className="px-3.5 py-2 border-b border-slate-500/10 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
                 {examQuestions.map((q, idx) => {
                   const answered = Boolean(examSelections[q.id]);
                   const active = idx === examIdx;
@@ -813,11 +813,11 @@ const DenemeRehberScreenInner: React.FC<DenemeRehberScreenProps> = ({
                       key={q.id}
                       type="button"
                       onClick={() => setExamIdx(idx)}
-                      className={`w-6 h-6 rounded-md text-[11px] font-bold shrink-0 transition ${
+                      className={`w-8 h-8 rounded-lg text-xs font-extrabold shrink-0 transition ${
                         active
-                          ? 'bg-emerald-600 text-white'
+                          ? 'bg-[#2563EB] text-white'
                           : answered
-                          ? 'bg-teal-500/20 text-teal-400'
+                          ? 'bg-blue-500/20 text-[#2563EB]'
                           : isLight
                           ? 'bg-slate-100 text-slate-500'
                           : 'bg-white/5 text-slate-400'
@@ -830,12 +830,12 @@ const DenemeRehberScreenInner: React.FC<DenemeRehberScreenProps> = ({
               </div>
 
               {examQuestions[examIdx] && (
-                <div className="p-3.5 space-y-2.5">
-                  <p className="text-sm font-semibold leading-snug">
+                <div className="p-4 space-y-3">
+                  <p className="text-[15px] font-semibold leading-relaxed">
                     {examQuestions[examIdx].stem}
                   </p>
 
-                  <div className="space-y-1.5">
+                  <div className="space-y-2">
                     {examQuestions[examIdx].options.map((opt) => {
                       const chosen =
                         examSelections[examQuestions[examIdx].id] === opt.letter;
@@ -849,24 +849,24 @@ const DenemeRehberScreenInner: React.FC<DenemeRehberScreenProps> = ({
                               opt.letter
                             )
                           }
-                          className={`w-full text-left rounded-xl border px-3 py-2.5 flex items-center gap-2.5 transition ${
+                          className={`w-full min-h-[52px] text-left rounded-2xl border px-3.5 py-3 flex items-center gap-3 transition active:scale-[0.99] ${
                             chosen
-                              ? 'bg-emerald-500/20 border-emerald-500 font-bold'
+                              ? 'bg-blue-500/15 border-[#2563EB] font-bold'
                               : isLight
                               ? 'bg-slate-50 border-slate-200 hover:bg-slate-100'
-                              : 'bg-[#08131A] border-white/8 hover:bg-white/5'
+                              : 'bg-[#0A0E17] border-white/10 hover:bg-white/5'
                           }`}
                         >
                           <span
-                            className={`w-6 h-6 rounded-lg text-xs font-extrabold flex items-center justify-center shrink-0 ${
+                            className={`w-8 h-8 rounded-xl text-xs font-extrabold flex items-center justify-center shrink-0 ${
                               chosen
-                                ? 'bg-emerald-500 text-white'
-                                : 'bg-emerald-500/15 text-emerald-500'
+                                ? 'bg-[#2563EB] text-white'
+                                : 'bg-blue-500/12 text-[#2563EB]'
                             }`}
                           >
                             {opt.letter}
                           </span>
-                          <span className="text-xs sm:text-sm leading-tight">
+                          <span className="text-[13.5px] leading-snug">
                             {opt.text}
                           </span>
                         </button>
@@ -877,15 +877,19 @@ const DenemeRehberScreenInner: React.FC<DenemeRehberScreenProps> = ({
               )}
 
               <div
-                className={`px-3.5 py-2.5 border-t flex items-center justify-between ${
-                  isLight ? 'bg-slate-50 border-slate-200' : 'bg-[#08131A] border-white/8'
+                className={`px-3.5 py-3 border-t grid grid-cols-2 gap-2.5 ${
+                  isLight ? 'bg-slate-50 border-slate-200' : 'bg-[#0A0E17] border-white/8'
                 }`}
               >
                 <button
                   type="button"
                   disabled={examIdx === 0}
                   onClick={() => setExamIdx((i) => Math.max(0, i - 1))}
-                  className="px-3 py-1.5 rounded-xl bg-slate-500/15 text-xs font-bold disabled:opacity-35"
+                  className={`h-11 rounded-xl border text-xs font-extrabold disabled:opacity-35 ${
+                    isLight
+                      ? 'bg-white border-slate-200 text-slate-700'
+                      : 'bg-[#121826] border-white/10 text-slate-200'
+                  }`}
                 >
                   Önceki
                 </button>
@@ -896,7 +900,7 @@ const DenemeRehberScreenInner: React.FC<DenemeRehberScreenProps> = ({
                     onClick={() =>
                       setExamIdx((i) => Math.min(examQuestions.length - 1, i + 1))
                     }
-                    className="px-4 py-1.5 rounded-xl bg-emerald-600 text-white text-xs font-bold"
+                    className="h-11 rounded-xl bg-[#2563EB] text-white text-xs font-extrabold"
                   >
                     Sonraki
                   </button>
@@ -904,7 +908,7 @@ const DenemeRehberScreenInner: React.FC<DenemeRehberScreenProps> = ({
                   <button
                     type="button"
                     onClick={handleFinishExam}
-                    className="px-4 py-1.5 rounded-xl bg-amber-500 text-slate-950 text-xs font-extrabold"
+                    className="h-11 rounded-xl bg-amber-500 text-slate-950 text-xs font-extrabold"
                   >
                     Sınavı Bitir
                   </button>
@@ -936,7 +940,7 @@ const DenemeRehberScreenInner: React.FC<DenemeRehberScreenProps> = ({
             return (
               <div
                 className={`rounded-2xl border p-3.5 space-y-2.5 ${
-                  isLight ? 'bg-white border-slate-200 shadow-sm' : 'bg-[#0C1B24] border-white/10 shadow-md'
+                  isLight ? 'bg-white border-slate-200 shadow-sm' : 'bg-[#121826] border-white/10 shadow-md'
                 }`}
               >
                 <div className="flex items-center justify-between gap-2">
@@ -1030,7 +1034,7 @@ const DenemeRehberScreenInner: React.FC<DenemeRehberScreenProps> = ({
             return (
               <div
                 className={`rounded-2xl border p-3.5 space-y-2.5 ${
-                  isLight ? 'bg-white border-slate-200 shadow-sm' : 'bg-[#0C1B24] border-white/10 shadow-md'
+                  isLight ? 'bg-white border-slate-200 shadow-sm' : 'bg-[#121826] border-white/10 shadow-md'
                 }`}
               >
                 <div className="flex items-center justify-between gap-2">
@@ -1097,7 +1101,7 @@ const DenemeRehberScreenInner: React.FC<DenemeRehberScreenProps> = ({
               return (
                 <div
                   className={`rounded-2xl border p-3.5 space-y-2.5 ${
-                    isLight ? 'bg-white border-slate-200 shadow-sm' : 'bg-[#0C1B24] border-white/10 shadow-md'
+                    isLight ? 'bg-white border-slate-200 shadow-sm' : 'bg-[#121826] border-white/10 shadow-md'
                   }`}
                 >
                   <div className="flex items-center justify-between">
@@ -1158,7 +1162,7 @@ const DenemeRehberScreenInner: React.FC<DenemeRehberScreenProps> = ({
               return (
                 <div
                   className={`rounded-2xl border p-3.5 space-y-2.5 ${
-                    isLight ? 'bg-white border-slate-200 shadow-sm' : 'bg-[#0C1B24] border-white/10 shadow-md'
+                    isLight ? 'bg-white border-slate-200 shadow-sm' : 'bg-[#121826] border-white/10 shadow-md'
                   }`}
                 >
                   <h3 className="text-xs sm:text-sm font-extrabold">
@@ -1246,29 +1250,29 @@ const DenemeRehberScreenInner: React.FC<DenemeRehberScreenProps> = ({
       {subTab === 'rehber' && (
         <div className="space-y-2.5">
           <div
-            className={`rounded-2xl border p-2.5 space-y-2 ${
-              isLight ? 'bg-white border-slate-200' : 'bg-[#0C1B24] border-white/10'
+            className={`rounded-2xl border p-3 space-y-2.5 ${
+              isLight ? 'bg-white border-slate-200/85' : 'bg-[#121826] border-white/10'
             }`}
           >
             <div className="relative">
-              <Search className="w-4 h-4 text-cyan-500 absolute left-3 top-1/2 -translate-y-1/2" />
+              <Search className="w-4 h-4 text-[#2563EB] absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 value={guideSearch}
                 onChange={(e) => setGuideSearch(e.target.value)}
-                placeholder="İlk tercih, altın standart, antidot, enzim veya triyad ara (vurgulanır)..."
-                className={`w-full pl-9 pr-20 py-1.5 rounded-xl border text-xs focus:outline-none focus:border-teal-500 ${
+                placeholder="İlk tercih, antidot, enzim veya triyad ara..."
+                className={`w-full h-11 pl-9 pr-20 rounded-xl border text-xs focus:outline-none focus:border-[#2563EB] ${
                   isLight
                     ? 'bg-slate-50 border-slate-200 text-slate-900'
-                    : 'bg-[#071117] border-white/10 text-slate-100'
+                    : 'bg-[#0A0E17] border-white/10 text-slate-100'
                 }`}
               />
               {guideSearch && (
                 <span
-                  className={`absolute right-2.5 top-1/2 -translate-y-1/2 px-1.5 py-0.5 rounded text-[10px] font-extrabold ${
+                  className={`absolute right-2.5 top-1/2 -translate-y-1/2 px-2 py-0.5 rounded text-[10px] font-extrabold ${
                     isLight
-                      ? 'bg-cyan-100 text-cyan-800'
-                      : 'bg-cyan-500/20 text-cyan-300'
+                      ? 'bg-blue-100 text-blue-800'
+                      : 'bg-blue-500/20 text-blue-300'
                   }`}
                 >
                   {filteredGuideItems.length} sonuç
@@ -1294,12 +1298,12 @@ const DenemeRehberScreenInner: React.FC<DenemeRehberScreenProps> = ({
                     triggerHaptic('light');
                     setGuideCategory(cat);
                   }}
-                  className={`shrink-0 px-2.5 py-1 rounded-lg text-[11px] font-bold border transition ${
+                  className={`shrink-0 h-9 px-3 rounded-xl text-xs font-bold border transition ${
                     guideCategory === cat
-                      ? 'bg-teal-600 border-teal-500 text-white'
+                      ? 'bg-[#2563EB] border-[#2563EB] text-white'
                       : isLight
                       ? 'bg-slate-100 border-slate-200 text-slate-600'
-                      : 'bg-[#071117] border-white/8 text-slate-400'
+                      : 'bg-[#0A0E17] border-white/10 text-slate-400'
                   }`}
                 >
                   {cat === 'ALL' ? 'Tümü' : cat}
@@ -1321,8 +1325,8 @@ const DenemeRehberScreenInner: React.FC<DenemeRehberScreenProps> = ({
                     <mark
                       className={`rounded px-1 py-0.5 font-extrabold border ${
                         isLight
-                          ? 'bg-cyan-200/90 text-cyan-950 border-cyan-400'
-                          : 'bg-cyan-400/30 text-cyan-100 border-cyan-400/60'
+                          ? 'bg-blue-200/90 text-blue-950 border-blue-400'
+                          : 'bg-blue-400/30 text-blue-100 border-blue-400/60'
                       }`}
                     >
                       {str.slice(idx, idx + q.length)}
@@ -1337,12 +1341,12 @@ const DenemeRehberScreenInner: React.FC<DenemeRehberScreenProps> = ({
                   key={entry.id}
                   className={`rounded-2xl border p-3.5 space-y-2 ${
                     isLight
-                      ? 'bg-white border-slate-200 shadow-sm'
-                      : 'bg-[#0C1B24] border-white/10 shadow-md'
+                      ? 'bg-white border-slate-200/85 shadow-sm'
+                      : 'bg-[#121826] border-white/10 shadow-md'
                   }`}
                 >
                   <div className="flex items-center justify-between gap-2">
-                    <span className="px-2 py-0.5 rounded-md bg-teal-500/15 text-teal-600 text-[10px] font-extrabold">
+                    <span className="px-2 py-0.5 rounded-md bg-blue-500/12 text-[#2563EB] text-[10px] font-extrabold">
                       {entry.category}
                     </span>
                     <span className="text-[11px] font-semibold text-slate-400">
@@ -1350,7 +1354,7 @@ const DenemeRehberScreenInner: React.FC<DenemeRehberScreenProps> = ({
                     </span>
                   </div>
 
-                  <h4 className="text-xs sm:text-sm font-extrabold leading-snug">
+                  <h4 className="text-[13.5px] font-extrabold leading-snug">
                     {highlightGuide(entry.title)}
                   </h4>
 
@@ -1358,7 +1362,7 @@ const DenemeRehberScreenInner: React.FC<DenemeRehberScreenProps> = ({
                     className={`rounded-xl border p-2.5 text-xs font-medium space-y-1 ${
                       isLight
                         ? 'bg-slate-50 border-slate-200 text-slate-700'
-                        : 'bg-[#071117] border-white/6 text-slate-200'
+                        : 'bg-[#0A0E17] border-white/6 text-slate-200'
                     }`}
                   >
                     <div>• {highlightGuide(entry.firstChoiceOrFeature)}</div>
@@ -1378,9 +1382,9 @@ const DenemeRehberScreenInner: React.FC<DenemeRehberScreenProps> = ({
             <button
               type="button"
               onClick={() => setGuideLimit((l) => l + 60)}
-              className="w-full py-2.5 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-500 text-xs font-extrabold"
+              className="w-full h-12 rounded-2xl border border-blue-500/30 bg-blue-500/10 text-[#2563EB] text-xs font-extrabold"
             >
-              Daha Fazla Rehber Kartı Göster ({filteredGuideItems.length - guideLimit} kalan)
+              Daha Fazla Göster ({filteredGuideItems.length - guideLimit} kalan)
             </button>
           )}
         </div>

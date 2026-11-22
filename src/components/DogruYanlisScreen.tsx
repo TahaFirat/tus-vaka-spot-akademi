@@ -48,6 +48,7 @@ interface DogruYanlisScreenProps {
   initialBasket?: 'all' | 'osym_twin' | 'unsolved' | 'wrong' | 'correct' | 'bookmarked';
   initialBranch?: 'ALL' | TusBranchId;
   onBranchChange?: (branchId: 'ALL' | TusBranchId) => void;
+  onBackToSubjects?: () => void;
 }
 
 const DogruYanlisScreenInner: React.FC<DogruYanlisScreenProps> = ({
@@ -62,6 +63,7 @@ const DogruYanlisScreenInner: React.FC<DogruYanlisScreenProps> = ({
   initialBasket = 'unsolved',
   initialBranch = 'ALL',
   onBranchChange,
+  onBackToSubjects,
 }) => {
   const [sessionFilter, setSessionFilter] = useState<'ALL' | TusSessionType>('ALL');
   const [branchFilter, setBranchFilter] = useState<'ALL' | TusBranchId>(initialBranch);
@@ -402,9 +404,27 @@ const DogruYanlisScreenInner: React.FC<DogruYanlisScreenProps> = ({
       : 0;
 
   return (
-    <div className="space-y-2.5">
-      {/* Ultra-Clean AMBOSS + Tusleap Single-Row Top Bar */}
+    <div className="space-y-3">
+      {/* Ultra-Clean Single-Row Top Bar */}
       <div className={`rounded-2xl border px-2.5 py-2 flex items-center gap-2 ${cardBg}`}>
+        {onBackToSubjects && (
+          <button
+            type="button"
+            onClick={() => {
+              triggerHaptic('light');
+              onBackToSubjects();
+            }}
+            aria-label="Derslere Dön"
+            className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition ${
+              isLight
+                ? 'bg-slate-100 hover:bg-slate-200/70 text-slate-700'
+                : 'bg-white/8 hover:bg-white/12 text-slate-200'
+            }`}
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+        )}
+
         <button
           type="button"
           onClick={() => {
@@ -412,7 +432,7 @@ const DogruYanlisScreenInner: React.FC<DogruYanlisScreenProps> = ({
             setShowSubjectPicker((v) => !v);
             setShowFilters(false);
           }}
-          className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-extrabold transition shrink-0 max-w-[148px] ${
+          className={`h-10 inline-flex items-center gap-1.5 px-3 rounded-xl text-[13px] font-extrabold transition shrink-0 max-w-[144px] ${
             showSubjectPicker
               ? 'bg-blue-600 text-white'
               : isLight
@@ -424,15 +444,24 @@ const DogruYanlisScreenInner: React.FC<DogruYanlisScreenProps> = ({
             {activeBranchMeta ? activeBranchMeta.shortName : 'Tüm Dersler'}
           </span>
           <ChevronDown
-            className={`w-3.5 h-3.5 shrink-0 transition-transform ${
+            className={`w-4 h-4 shrink-0 transition-transform ${
               showSubjectPicker ? 'rotate-180' : ''
             }`}
           />
         </button>
 
-        <div className="flex-1 min-w-0 flex items-center gap-2">
+        <div className="flex-1 min-w-0 flex flex-col justify-center gap-1 px-1">
+          <span
+            className={`text-[11px] font-extrabold tabular-nums text-right truncate ${
+              isLight ? 'text-slate-500' : 'text-slate-400'
+            }`}
+          >
+            {filteredSpots.length > 0
+              ? `${(safeIndex + 1).toLocaleString('tr-TR')} / ${filteredSpots.length.toLocaleString('tr-TR')}`
+              : '0 / 0'}
+          </span>
           <div
-            className={`h-1.5 flex-1 rounded-full overflow-hidden ${
+            className={`h-1.5 w-full rounded-full overflow-hidden ${
               isLight ? 'bg-slate-100' : 'bg-white/10'
             }`}
           >
@@ -441,31 +470,31 @@ const DogruYanlisScreenInner: React.FC<DogruYanlisScreenProps> = ({
               style={{ width: `${Math.max(4, progressPct)}%` }}
             />
           </div>
-          <span
-            className={`text-[11px] font-extrabold tabular-nums whitespace-nowrap shrink-0 ${
-              isLight ? 'text-slate-500' : 'text-slate-400'
-            }`}
-          >
-            {filteredSpots.length > 0
-              ? `${(safeIndex + 1).toLocaleString('tr-TR')}/${filteredSpots.length.toLocaleString('tr-TR')}`
-              : '0/0'}
-          </span>
         </div>
 
-        <div className="flex items-center gap-1 shrink-0">
-          <button
-            type="button"
-            onClick={handleShuffleJump}
-            title="Rastgele Spot"
-            aria-label="Rastgele Spot"
-            className={`w-8 h-8 rounded-xl flex items-center justify-center transition ${
-              isLight
-                ? 'bg-slate-100 hover:bg-slate-200/70 text-slate-600'
-                : 'bg-white/6 hover:bg-white/12 text-slate-300'
-            }`}
-          >
-            <Shuffle className="w-3.5 h-3.5" />
-          </button>
+        <div className="flex items-center gap-1.5 shrink-0">
+          {currentSpot && (
+            <button
+              type="button"
+              onClick={() => {
+                triggerHaptic('light');
+                setPinnedSpotId(currentSpot.id);
+                onToggleBookmarkSpot(currentSpot.id);
+              }}
+              aria-label="Kaydet"
+              className={`w-10 h-10 rounded-xl flex items-center justify-center transition ${
+                isBookmarked
+                  ? isLight
+                    ? 'bg-amber-100 text-amber-700'
+                    : 'bg-amber-500/20 text-amber-300'
+                  : isLight
+                  ? 'bg-slate-100 hover:bg-slate-200/70 text-slate-600'
+                  : 'bg-white/8 hover:bg-white/12 text-slate-300'
+              }`}
+            >
+              <Bookmark className={`w-4.5 h-4.5 ${isBookmarked ? 'fill-current' : ''}`} />
+            </button>
+          )}
 
           <button
             type="button"
@@ -475,17 +504,17 @@ const DogruYanlisScreenInner: React.FC<DogruYanlisScreenProps> = ({
               setShowSubjectPicker(false);
             }}
             aria-label="Filtre ve Arama"
-            className={`relative w-8 h-8 rounded-xl flex items-center justify-center transition ${
+            className={`relative w-10 h-10 rounded-xl flex items-center justify-center transition ${
               showFilters || activeFilterBadgeCount > 0
                 ? 'bg-blue-600 text-white'
                 : isLight
                 ? 'bg-slate-100 hover:bg-slate-200/70 text-slate-600'
-                : 'bg-white/6 hover:bg-white/12 text-slate-300'
+                : 'bg-white/8 hover:bg-white/12 text-slate-300'
             }`}
           >
-            <SlidersHorizontal className="w-3.5 h-3.5" />
+            <SlidersHorizontal className="w-4.5 h-4.5" />
             {activeFilterBadgeCount > 0 && !showFilters && (
-              <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-amber-400" />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-amber-400" />
             )}
           </button>
         </div>
@@ -632,10 +661,26 @@ const DogruYanlisScreenInner: React.FC<DogruYanlisScreenProps> = ({
             <button
               type="button"
               onClick={() => {
+                handleShuffleJump();
+                setShowFilters(false);
+              }}
+              className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-extrabold border transition ${
+                isLight
+                  ? 'bg-slate-50 border-slate-200 text-slate-700'
+                  : 'bg-white/[0.04] border-white/10 text-slate-300'
+              }`}
+            >
+              <Shuffle className="w-3.5 h-3.5" />
+              <span>Rastgele</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
                 triggerHaptic('light');
                 setSmartFocusMode((m) => !m);
               }}
-              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-[11px] font-extrabold border transition ${
+              className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-extrabold border transition ${
                 smartFocusMode
                   ? 'bg-emerald-600 border-emerald-600 text-white'
                   : isLight
@@ -711,114 +756,22 @@ const DogruYanlisScreenInner: React.FC<DogruYanlisScreenProps> = ({
           </div>
         </div>
       ) : (
-        <div className={`rounded-2xl border p-3.5 sm:p-4 space-y-2.5 ${cardBg}`}>
-          {/* Zero-Collision Row A Header */}
-          <div className="flex items-center justify-between gap-2 pb-2 border-b border-slate-500/15">
-            <div className="flex items-center gap-1.5 min-w-0 flex-1">
-              <span
-                className={`px-2 py-0.5 rounded-md text-[10px] font-extrabold shrink-0 border ${
-                  currentSpot.session === 'TTBT'
-                    ? isLight
-                      ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
-                      : 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
-                    : isLight
-                    ? 'bg-cyan-50 text-cyan-700 border-cyan-300'
-                    : 'bg-cyan-500/15 text-cyan-300 border-cyan-500/30'
-                }`}
-              >
-                {currentSpot.session}
-              </span>
-              <span className="text-xs font-extrabold truncate">
-                {TUS_BRANCHES.find((b) => b.id === currentSpot.branchId)?.shortName ||
-                  currentSpot.branchName}
-              </span>
-            </div>
-
-            <div className="flex items-center gap-1 shrink-0">
-              <button
-                type="button"
-                onClick={handleShuffleJump}
-                title="Rastgele Spota Geç"
-                aria-label="Rastgele Spot"
-                className={`p-1.5 rounded-lg border transition ${
-                  isLight
-                    ? 'bg-slate-100 border-slate-200 text-slate-600 hover:bg-slate-200/70'
-                    : 'bg-[#071117] border-white/10 text-slate-300 hover:border-white/20'
-                }`}
-              >
-                <Shuffle className="w-3.5 h-3.5" />
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  triggerHaptic('light');
-                  setPinnedSpotId(currentSpot.id);
-                  onToggleBookmarkSpot(currentSpot.id);
-                }}
-                aria-label="Kaydet"
-                className={`p-1.5 rounded-lg border transition ${
-                  isBookmarked
-                    ? isLight
-                      ? 'bg-amber-100 border-amber-400 text-amber-700'
-                      : 'bg-amber-500/20 border-amber-400/50 text-amber-400'
-                    : isLight
-                    ? 'bg-slate-100 border-slate-200 text-slate-500'
-                    : 'bg-[#071117] border-white/10 text-slate-400'
-                }`}
-              >
-                <Bookmark
-                  className={`w-3.5 h-3.5 ${isBookmarked ? 'fill-current' : ''}`}
-                />
-              </button>
-            </div>
-          </div>
-
-          {/* Row B: Dedicated Non-Colliding Badge & Counter Strip */}
-          <div className="flex items-center justify-between gap-2 flex-wrap">
-            <div className="flex flex-wrap items-center gap-1.5 min-w-0">
-              {currentSpot.subTopic.includes('ÖSYM İkizi') && (
-                <span
-                  className={`px-2 py-0.5 rounded-md text-[10.5px] font-extrabold border ${
-                    isLight
-                      ? 'bg-amber-50 text-amber-800 border-amber-300'
-                      : 'bg-amber-500/15 text-amber-300 border-amber-400/35'
-                  }`}
-                >
-                  ★ ÖSYM İkizi
-                </span>
-              )}
-              <span
-                className={`px-2 py-0.5 rounded-md text-[10.5px] font-bold truncate max-w-[220px] sm:max-w-none ${
-                  isLight ? 'bg-slate-100 text-slate-600' : 'bg-white/5 text-slate-400'
-                }`}
-              >
-                {currentSpot.subTopic}
-              </span>
-            </div>
-
-            <span
-              className={`px-2 py-0.5 rounded-lg text-[10.5px] font-extrabold tabular-nums border whitespace-nowrap shrink-0 ml-auto ${
-                isPro
-                  ? isLight
-                    ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
-                    : 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
-                  : isLight
-                  ? 'bg-slate-100 text-slate-700 border-slate-200'
-                  : 'bg-white/5 text-slate-300 border-white/10'
-              }`}
-            >
-              {(safeIndex + 1).toLocaleString('tr-TR')} /{' '}
-              {filteredSpots.length.toLocaleString('tr-TR')}
-            </span>
-          </div>
-
-          {/* Statement Box */}
+        <div className={`rounded-3xl border p-4 sm:p-5 space-y-4 ${cardBg}`}>
+          {/* Clean 1-Line Subtle Context Header (Zero Duplicate Chrome!) */}
           <div
-            className={`rounded-xl border p-4 text-sm sm:text-base font-medium leading-relaxed ${
+            className={`text-xs font-bold truncate ${
+              isLight ? 'text-slate-500' : 'text-slate-400'
+            }`}
+          >
+            {currentSpot.subTopic}
+          </div>
+
+          {/* Crisp Readable Statement Box */}
+          <div
+            className={`rounded-2xl border p-4 sm:p-5 text-[15.5px] sm:text-[17px] font-semibold leading-[1.6] ${
               isLight
-                ? 'bg-slate-50 border-slate-200/80 text-slate-800'
-                : 'bg-[#071117] border-white/8 text-slate-100'
+                ? 'bg-slate-50/80 border-slate-200/80 text-slate-900'
+                : 'bg-white/[0.03] border-white/8 text-slate-100'
             }`}
           >
             “
@@ -831,15 +784,15 @@ const DogruYanlisScreenInner: React.FC<DogruYanlisScreenProps> = ({
             ”
           </div>
 
-          {/* DOĞRU / YANLIŞ Action Buttons */}
-          <div className="grid grid-cols-2 gap-2.5">
+          {/* Large, Comfortable 56px DOĞRU / YANLIŞ Buttons */}
+          <div className="grid grid-cols-2 gap-3">
             <button
               type="button"
               onClick={() => handleAnswerSpot(true)}
-              className={`rounded-xl py-2.5 px-3 font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 border transition ${
+              className={`h-14 rounded-2xl font-extrabold text-sm sm:text-base flex items-center justify-center gap-2 border transition active:scale-[0.98] ${
                 currentAnswer
                   ? currentSpot.isTrue
-                    ? 'bg-emerald-600 border-emerald-400 text-white'
+                    ? 'bg-emerald-600 border-emerald-500 text-white'
                     : currentAnswer.selected === true
                     ? 'bg-rose-600 border-rose-500 text-white'
                     : 'opacity-45 border-slate-500/20'
@@ -848,17 +801,17 @@ const DogruYanlisScreenInner: React.FC<DogruYanlisScreenProps> = ({
                   : 'bg-emerald-500/15 hover:bg-emerald-500/25 border-emerald-500/40 text-emerald-200'
               }`}
             >
-              <Check className="w-4 h-4" />
+              <Check className="w-5 h-5" />
               <span>DOĞRU</span>
             </button>
 
             <button
               type="button"
               onClick={() => handleAnswerSpot(false)}
-              className={`rounded-xl py-2.5 px-3 font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 border transition ${
+              className={`h-14 rounded-2xl font-extrabold text-sm sm:text-base flex items-center justify-center gap-2 border transition active:scale-[0.98] ${
                 currentAnswer
                   ? !currentSpot.isTrue
-                    ? 'bg-emerald-600 border-emerald-400 text-white'
+                    ? 'bg-emerald-600 border-emerald-500 text-white'
                     : currentAnswer.selected === false
                     ? 'bg-rose-600 border-rose-500 text-white'
                     : 'opacity-45 border-slate-500/20'
@@ -867,13 +820,13 @@ const DogruYanlisScreenInner: React.FC<DogruYanlisScreenProps> = ({
                   : 'bg-rose-500/15 hover:bg-rose-500/25 border-rose-500/40 text-rose-200'
               }`}
             >
-              <X className="w-4 h-4" />
+              <X className="w-5 h-5" />
               <span>YANLIŞ</span>
             </button>
           </div>
 
-          {/* Prev / Next Navigation Row */}
-          <div className="flex items-center justify-between gap-2 pt-1">
+          {/* Large 48px Prev / Next Controls */}
+          <div className="grid grid-cols-2 gap-2.5 pt-1">
             <button
               type="button"
               disabled={safeIndex === 0}
@@ -882,35 +835,15 @@ const DogruYanlisScreenInner: React.FC<DogruYanlisScreenProps> = ({
                 setPinnedSpotId(null);
                 setCurrentIndex(Math.max(0, safeIndex - 1));
               }}
-              className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl border text-xs font-bold shrink-0 transition disabled:opacity-40 ${
+              className={`h-12 rounded-2xl border text-sm font-extrabold inline-flex items-center justify-center gap-1.5 transition active:scale-[0.98] disabled:opacity-35 ${
                 isLight
-                  ? 'bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-700'
-                  : 'bg-[#071117] hover:bg-white/5 border-white/10 text-slate-200'
+                  ? 'bg-slate-100 hover:bg-slate-200/80 border-slate-200 text-slate-700'
+                  : 'bg-white/[0.06] hover:bg-white/10 border-white/10 text-slate-200'
               }`}
             >
-              <ChevronLeft className="w-3.5 h-3.5 shrink-0" />
+              <ChevronLeft className="w-4.5 h-4.5 shrink-0" />
               <span>Önceki</span>
             </button>
-
-            {isPro ? (
-              <div className="min-w-0 inline-flex items-center gap-1 text-[10.5px] font-bold text-emerald-500 truncate">
-                <Crown className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                <span className="truncate">PRO • {filteredSpots.length}</span>
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={() =>
-                  onOpenPaywall(
-                    `PRO pakete geçerek ${TUS_SPOT_CARDS.length}+ D/Y spot kartının tamamını sınırsız açabilirsiniz.`
-                  )
-                }
-                className="min-w-0 inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-500 text-[10.5px] font-extrabold hover:bg-amber-500/25 transition truncate"
-              >
-                <Lock className="w-3 h-3 shrink-0" />
-                <span className="truncate">+{TUS_SPOT_CARDS.length - FREE_QUESTION_LIMIT} PRO</span>
-              </button>
-            )}
 
             <button
               type="button"
@@ -949,10 +882,10 @@ const DogruYanlisScreenInner: React.FC<DogruYanlisScreenProps> = ({
                     (basketFilter === 'wrong' && currentAnswer?.isCorrect))
                 )
               }
-              className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold transition disabled:opacity-40"
+              className="h-12 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-extrabold inline-flex items-center justify-center gap-1.5 shadow-sm shadow-blue-600/20 transition active:scale-[0.98] disabled:opacity-40"
             >
               <span>Sonraki</span>
-              <ChevronRight className="w-3.5 h-3.5" />
+              <ChevronRight className="w-4.5 h-4.5" />
             </button>
           </div>
 
