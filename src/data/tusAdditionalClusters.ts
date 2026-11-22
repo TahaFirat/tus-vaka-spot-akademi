@@ -13,7 +13,7 @@ export const ADDITIONAL_TUS_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           '4 aylık bebekte açlıkta ağır hipoglisemik nöbet, masif hepatomegali, taş bebek yüzü, laktik asidoz, hiperürisemi ve hiperlipidemi saptanıyor; glukagon ve adrenalin testine kan şekeri yanıtı alınamıyor.',
         clues: ['ağır hipoglisemik nöbet', 'laktik asidoz, hiperürisemi ve hiperlipidemi', 'glukagon ve adrenalin testine kan şekeri yanıtı alınamıyor'],
-        questionPrompt: 'Bu hastada en olası glikojen depo hastalığı ve eksik enzim aşağıdakilerden hangisidir?',
+        questionPrompt: 'Glukoz-6-fosfataz eksikliğine bağlı açlık hipoglisemisi, laktik asidoz ve hiperürisemi yapan Tip I glikojen depo hastalığı hangisidir?',
         mechanism:
           'Glukoz-6-fosfataz (Tip Ia) veya translokaz (Tip Ib - nötropeni eşlik eder) eksikliğinde karaciğerden serbest glukoz kana verilemez. Ağır açlık hipoglisemisi, laktik asidoz, hiperürisemi ve hiperlipidemi dörtlüsü karakteristiktir.',
         whenCorrectNote: 'Ağır hipoglisemi + laktik asidoz + hiperürisemi + hiperlipidemi (Glukoz-6-fosfataz eksikliği).',
@@ -112,7 +112,7 @@ export const ADDITIONAL_TUS_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           'Diş çekimi sonrası dudaklarda, dilde ve larinkste kaşıntısız, ürtikersiz, gode bırakmayan akut ödem gelişen hastada antihistaminik ve steroid tedavisine yanıt alınamıyor; serum C4 düzeyi çok düşük saptanıyor.',
         clues: ['kaşıntısız, ürtikersiz', 'antihistaminik ve steroid tedavisine yanıt alınamıyor', 'C4 düzeyi çok düşük'],
-        questionPrompt: 'Bradikinin artışıyla gelişen bu tabloda eksik olan protein ve tarama testi aşağıdakilerden hangisidir?',
+        questionPrompt: 'Tarama testinde C4 düzeyinin belirgin düşük saptandığı ve bradikinin artışıyla ürtikersiz anjiyoödem yapan kompleman bozukluğu hangisidir?',
         mechanism:
           'C1 esteraz inhibitör eksikliğinde (Herediter Anjiyoödem) kallikrein kontrolsüz aktifleşerek aşırı BRADİKİNİN üretir ve C1, C4 ile C2’yi tüketir. Ürtiker ve kaşıntı YOKTUR; taramada serum C4 düzeyi düşüktür. Akut atakta C1-INH konsantresi veya bradikinin B2 reseptör antagonisti İkatibant verilir.',
         whenCorrectNote: 'Kaşıntısız/ürtikersiz mukoza ödemi, bradikinin artışı, taramada C4 düşüklüğü, tedavide C1-INH veya İkatibant.',
@@ -394,7 +394,7 @@ export const ADDITIONAL_TUS_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           '71 yaşında erkek hastada ateş, yeni başlayan kalp üfürümü ve ekokardiyografide mitral kapakta vejetasyon saptanıyor. Kan kültürlerinde Streptococcus gallolyticus (S. bovis biyotipi I) üremesi üzerine hastaya tarama amaçlı ek bir tetkik planlanıyor.',
         clues: ['vejetasyon', 'Streptococcus gallolyticus (S. bovis biyotipi I)'],
-        questionPrompt: 'S. gallolyticus (bovis) endokarditi saptanan her hastada mutlaka yapılması gereken işlem aşağıdakilerden hangisidir?',
+        questionPrompt: 'S. gallolyticus (bovis) etkeniyle saptandığında altta yatan kolon kanserini dışlamak için mutlaka kolonoskopi yapılmasını gerektiren enfeksiyon hangisidir?',
         mechanism:
           'Enfektif endokarditin genel olarak, akut dönemde ve İV ilaç bağımlılarında (triküspit kapak) EN SIK etkeni Staphylococcus aureus’tur. Hasarlı doğal kapakta subakut en sık etken S. viridans, erken protez kapakta (<1 yıl) S. epidermidis’tir. Kan kültüründe Streptococcus gallolyticus (S. bovis) üreyen hastalarda %50-60 oranında gizli KOLON KANSERİ veya villöz adenom eşlik ettiği için mutlaka KOLONOSKOPİ yapılmalıdır!',
         whenCorrectNote: 'Genel/Akut/İV bağımlıda en sık: S. aureus; Subakut doğal kapakta: S. viridans; S. gallolyticus (bovis) üremesinde mutlaka Kolonoskopi (Kolon Ca)!',
@@ -433,7 +433,7 @@ export const ADDITIONAL_TUS_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           '56 yaşında kadın hastada alt çene, şakak ve dilin ön 2/3 genel duyusunda ağrı yanı sıra çiğneme kaslarında (m. masseter, m. pterygoideus) güçsüzlük saptanıyor. Kafa tabanı MR incelemesinde sfenoid kemiğin büyük kanadındaki açıklıkta kitle görülüyor.',
         clues: ['dilin ön 2/3 genel duyusu', 'çiğneme kaslarında güçsüzlük', 'sfenoid kemiğin büyük kanadı'],
-        questionPrompt: 'Bu hastada etkilenen kafa tabanı açıklığı ve içinden geçen oluşum hangisidir?',
+        questionPrompt: 'N. mandibularis (V3) ve A. meningea accessoria’nın geçtiği kafa tabanı açıklığı hangisidir?',
         mechanism:
           'Sfenoid kemiğin ala major’unda yer alan Foramen ovale’den N. mandibularis (CN V3), A. meningea accessoria ve N. petrosus minor geçer.',
         whenCorrectNote: 'N. mandibularis (CN V3), A. meningea accessoria ve N. petrosus minor geçişi (Çiğneme kasları ve alt çene duyusu).',
@@ -577,7 +577,7 @@ export const ADDITIONAL_TUS_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           'İntravenöz ilaç kullanımı öyküsü ve sağ kalp endokarditi bulunan hastada boyun venlerinde ventrikül sistolü sırasında belirginleşen sistolik pulsatil "dev c-v dalgası" ve pulsatil hepatomegali saptanıyor.',
         clues: ['sağ kalp endokarditi', 'boyun venlerinde sistolik dev c-v dalgası', 'pulsatil hepatomegali'],
-        questionPrompt: 'Boyun venöz nabzında "x" inişinin silinip dev "c-v" dalgasının görülmesine yol açan kapak patolojisi hangisidir?',
+        questionPrompt: 'Ağır triküspit yetmezliğinde boyun venöz nabzında "x" inişinin silinmesiyle ortaya çıkan karakteristik bulgu hangisidir?',
         mechanism:
           'Triküspit yetmezliğinde ventrikül sistolü sırasında kan sağ ventrikülden sağ atriyuma geri kaçar; normaldeki "x" inişi silinir ve sistolik dev "c-v" dalgası oluşur.',
         whenCorrectNote: 'Triküspit yetmezliğinde sağ atriyuma sistolik regürjitasyon sonucu JVP’de oluşan dev "c-v" dalgası.',

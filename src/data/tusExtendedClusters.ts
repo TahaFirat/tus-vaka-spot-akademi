@@ -32,7 +32,7 @@ export const EXTENDED_TUS_CLUSTERS: DifferentialClusterSeed[] = [
         mechanism:
           'Niasin (B3), NAD+ ve NADP+ koenzimlerinin yapısına katılır. 60 mg triptofandan 1 mg niasin sentezlenir (kinüreninaz enzimi B6 bağımlıdır). Eksikliği Pellegra (Dermatit, Diyare, Demans) yapar; Hartnup hastalığı (triptofan emilim kusuru), Karsinoid sendrom ve İzoniazid kullanımı da pellegra nedenidir.',
         whenCorrectNote: 'Triptofandan sentezlenir, NAD/NADP yapısına katılır, eksikliğinde Pellegra (Dermatit, Diyare, Demans).',
-        firstVsGold: 'Sekonder Pellegra Nedenleri: Hartnup hastalığı (nötral aminoasit transport kusuru), Мalign Karsinoid Sendrom, İzoniazid (B6 eksikliği üzerinden).',
+        firstVsGold: 'Sekonder Pellegra Nedenleri: Hartnup hastalığı (nötral aminoasit transport kusuru), Malign Karsinoid Sendrom, İzoniazid (B6 eksikliği üzerinden).',
         pearl: 'Hartnup hastalığında ve Karsinoid sendromda triptofan niasine dönüşemediği için Pellegra benzeri tablo gelişir.',
         trueStatement: 'Niasin (B3) triptofan aminoasidinden sentezlenir ve eksikliğinde dermatit, diyare, demans ile seyreden pellegra görülür.',
         falseStatement: 'Niasin metiyonin aminoasidinden sentezlenir ve karboksilasyon reaksiyonlarında kofaktör olarak görev yapar.',
@@ -181,7 +181,7 @@ export const EXTENDED_TUS_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           'Hemoptizi ve akut böbrek yetmezliği (Goodpasture sendromu) ile başvuran hastanın böbrek biyopsisinde Bowman boşluğunu dolduran "yarımay (kresent)" yapıları ve immünfloresanda bazal membran boyunca lineer IgG birikimi saptanıyor.',
         clues: ['Goodpasture sendromu', 'yarımay (kresent)', 'lineer IgG birikimi'],
-        questionPrompt: 'RPGN’de Bowman boşluğundaki yarımay (kresent) yapısını oluşturan temel hücre ve plazma proteini hangisidir?',
+        questionPrompt: 'Bowman boşluğunda pariyetal epitel, makrofaj ve fibrin birikimiyle yarımay (kresent) yapıları oluşturan böbrek hastalığı hangisidir?',
         mechanism:
           'RPGN histopatolojik olarak glomerüllerde KRESENT (Yarımay) oluşumu ile karakterizedir. Kresenti oluşturan yapılar: Bowman kapsülünün PARİYETAL EPİTEL hücrelerinin proliferasyonu, göç eden monosit/makrofajlar ve Bowman boşluğuna sızan FİBRİN’dir. Tip 1 (Goodpasture): Anti-GBM (Tip IV kollajen alfa-3 zinciri) ve Lineer IgG birikimi.',
         whenCorrectNote: 'Kresent = Pariyetal epitel proliferasyonu + Makrofaj + Fibrin; Goodpasture = Tip IV kollajen alfa-3 antikorları ve lineer IgG.',

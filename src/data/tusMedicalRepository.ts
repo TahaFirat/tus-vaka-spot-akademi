@@ -1,4 +1,5 @@
 import {
+  DifficultyLevel,
   DifferentialClusterSeed,
   OptionLetter,
   StructuredClusterSeed,
@@ -83,7 +84,7 @@ export const TUS_BRANCHES: TusBranchMeta[] = [
     name: 'Anatomi',
     shortName: 'Anatomi',
     session: 'TTBT',
-    osymWeight: 14,
+    osymWeight: 13,
     subTopics: ['Nöroanatomi', 'Kas-İskelet Sistemi', 'Damar-Sinir Komşulukları', 'Foramenler', 'Klinik Anatomi'],
     description: 'Periferik sinir yaralanmaları, nörovasküler komşuluklar, kraniyal sinirler ve klinik anatomi',
     badgeColor: 'teal',
@@ -93,7 +94,7 @@ export const TUS_BRANCHES: TusBranchMeta[] = [
     name: 'Fizyoloji',
     shortName: 'Fizyoloji',
     session: 'TTBT',
-    osymWeight: 10,
+    osymWeight: 8,
     subTopics: ['Hücre & Kas', 'Kardiyovasküler', 'Solunum', 'Renal Fizyoloji', 'Endokrin & SSS'],
     description: 'Kardiyak siklus, nefron transport mekanizmaları, solunum eğrileri ve endokrin regülasyon',
     badgeColor: 'cyan',
@@ -103,18 +104,18 @@ export const TUS_BRANCHES: TusBranchMeta[] = [
     name: 'Histoloji ve Embriyoloji',
     shortName: 'Histoloji',
     session: 'TTBT',
-    osymWeight: 8,
+    osymWeight: 7,
     subTopics: ['Epitelyum & Bağlantılar', 'Organ Histolojisi', 'Farengeal Arkuslar', 'Nöral Krest', 'Konjenital Anomaliler'],
     description: 'Hücre bağlantıları, özel organ hücreleri, farengeal kese/arkus türevleri ve konjenital anomaliler',
     badgeColor: 'emerald',
   },
-  // B. Klinik Tıp Bilimleri Testi (KTBT — 4 Ana Grup)
+  // B. Klinik Tıp Bilimleri Testi (100 Soru — 4 Ana Grup)
   {
     id: 'dahiliye',
     name: 'Dahiliye Grubu',
     shortName: 'Dahiliye',
     session: 'KTBT',
-    osymWeight: 42,
+    osymWeight: 35,
     subTopics: ['Kardiyoloji & Göğüs', 'Nefroloji', 'Hematoloji & Onkoloji', 'Endokrinoloji', 'Gastroenteroloji & Enfeksiyon'],
     description: 'İç Hastalıkları, Kardiyoloji, Göğüs, Enfeksiyon, Nöroloji, Dermatoloji, Psikiyatri ve FTR vakaları',
     badgeColor: 'teal',
@@ -124,7 +125,7 @@ export const TUS_BRANCHES: TusBranchMeta[] = [
     name: 'Pediatri',
     shortName: 'Pediatri',
     session: 'KTBT',
-    osymWeight: 30,
+    osymWeight: 25,
     subTopics: ['Yenidoğan', 'Çocuk Kardiyolojisi', 'Metabolik Hastalıklar', 'Çocuk Nefrolojisi', 'Çocuk Enfeksiyon'],
     description: 'Yenidoğan acilleri, konjenital kalp hastalıkları, metabolik hastalıklar ve pediatrik sendromlar',
     badgeColor: 'cyan',
@@ -134,7 +135,7 @@ export const TUS_BRANCHES: TusBranchMeta[] = [
     name: 'Cerrahi Grubu',
     shortName: 'Cerrahi',
     session: 'KTBT',
-    osymWeight: 36,
+    osymWeight: 30,
     subTopics: ['Hepatobiliyer & Pankreas', 'Akut Karın & GİS', 'Meme & Tiroid', 'Travma & Toraks', 'Herniler'],
     description: 'Genel Cerrahi, Çocuk Cerrahisi, KBB, Göz, Üroloji, Ortopedi, Kalp-Damar ve Beyin Cerrahisi',
     badgeColor: 'emerald',
@@ -144,7 +145,7 @@ export const TUS_BRANCHES: TusBranchMeta[] = [
     name: 'Kadın Hastalıkları ve Doğum',
     shortName: 'Kadın Doğum',
     session: 'KTBT',
-    osymWeight: 12,
+    osymWeight: 10,
     subTopics: ['Obstetrik Kanamalar', 'Preeklampsi & Eklampsi', 'Jinekolojik Onkoloji', 'PKOS & İnfertilite', 'Ektopik & Mol'],
     description: 'Obstetrik aciller, preeklampsi/eklampsi, jinekolojik kanserler, PKOS ve infertilite yönetimi',
     badgeColor: 'teal',
@@ -419,7 +420,14 @@ function hydrateStructuredVaka(
     case 10: {
       difficulty = 'İleri Ayırıcı Tanı';
       freq = 'Her TUS Sorulur';
-      stemCore = `${branchMeta.name} (${cluster.subTopic} — Grup ${eIdx + 1}) kapsamında aşağıdaki klinik ve mekanizma ifadelerinden hangisi YANLIŞTIR?`;
+      const falseStems = [
+        `${cluster.subTopic} konusunda aşağıdaki ifadelerden hangisi YANLIŞTIR?`,
+        `${branchMeta.name} açısından ${cluster.subTopic} ile ilgili aşağıdaki bilgilerden hangisi YANLIŞTIR?`,
+        `${cluster.subTopic} ayırıcı tanısında aşağıdaki klinik ve mekanizma bilgilerinden hangisi YANLIŞTIR?`,
+        `${cluster.subTopic} başlığında yer alan aşağıdaki önermelerden hangisi hatalıdır?`,
+        `${branchMeta.shortName} klinik pratiğinde ${cluster.subTopic} hakkında aşağıdakilerden hangisi YANLIŞTIR?`,
+      ];
+      stemCore = falseStems[eIdx % falseStems.length];
       buildOpt = (cand, sourceIdx) =>
         sourceIdx === eIdx
           ? `${e.name}: ${cleanDot(e.trapFalse)}.`
@@ -427,9 +435,16 @@ function hydrateStructuredVaka(
       break;
     }
     default: {
-      difficulty = 'Klinik Vaka';
+      difficulty = 'İleri Ayırıcı Tanı';
       freq = 'Yüksek Verimli Vaka';
-      stemCore = `${cluster.subTopic} (Seri ${eIdx + 1}) kapsamında aşağıdaki "antite — tanısal/tedavi yaklaşımı" eşleştirmelerinden hangisi DOĞRUDUR?`;
+      const matchStems = [
+        `${cluster.subTopic} konusunda aşağıdaki tanı ve yaklaşım eşleştirmelerinden hangisi DOĞRUDUR?`,
+        `${branchMeta.name} pratiğinde ${cluster.subTopic} için aşağıdaki eşleştirmelerden hangisi DOĞRUDUR?`,
+        `${cluster.subTopic} yönetiminde aşağıdaki tablo — yaklaşım eşleştirmelerinden hangisi DOĞRUDUR?`,
+        `${cluster.subTopic} başlığında aşağıdaki standart yaklaşım eşleştirmelerinden hangisi DOĞRUDUR?`,
+        `${branchMeta.shortName} açısından ${cluster.subTopic} için aşağıdakilerden hangisi doğru eşleştirilmiştir?`,
+      ];
+      stemCore = matchStems[eIdx % matchStems.length];
       buildOpt = (cand, sourceIdx) => {
         if (sourceIdx === eIdx) {
           return `${e.name} — ${cleanDot(e.management)}`;
@@ -597,10 +612,31 @@ function hydrateStructuredSpot(
   return payload;
 }
 
+function structuredVakaDifficultyLevel(aIdx: number): DifficultyLevel {
+  if (aIdx === 3 || aIdx === 4 || aIdx === 7) return 'Kolay';
+  if (aIdx === 0 || aIdx === 2 || aIdx === 5 || aIdx === 8) return 'Orta';
+  return 'Zor';
+}
+
+function structuredSpotDifficultyLevel(sIdx: number): DifficultyLevel {
+  if (sIdx === 0 || sIdx === 2 || sIdx === 4 || sIdx === 6) return 'Kolay';
+  if (sIdx === 1 || sIdx === 3 || sIdx === 8 || sIdx === 10) return 'Orta';
+  return 'Zor';
+}
+
+function mapLegacyDifficultyLevel(
+  d: TusVakaQuestion['difficulty']
+): DifficultyLevel {
+  if (d === 'Temel Spot') return 'Kolay';
+  if (d === 'İleri Ayırıcı Tanı') return 'Zor';
+  return 'Orta';
+}
+
 class VirtualStructuredVakaQuestion implements TusVakaQuestion {
   readonly id: string;
   readonly session: TusSessionType;
   readonly branchId: TusBranchId;
+  readonly difficultyLevel: DifficultyLevel;
   readonly isOsymTwin?: boolean;
   readonly osymYearTag?: string;
   readonly _cIdx: number;
@@ -619,6 +655,7 @@ class VirtualStructuredVakaQuestion implements TusVakaQuestion {
     this.id = id;
     this.session = session;
     this.branchId = branchId;
+    this.difficultyLevel = structuredVakaDifficultyLevel(aIdx);
     this._cIdx = cIdx;
     this._eIdx = eIdx;
     this._aIdx = aIdx;
@@ -674,6 +711,7 @@ class VirtualStructuredSpotCard implements TusSpotCard {
   readonly id: string;
   readonly session: TusSessionType;
   readonly branchId: TusBranchId;
+  readonly difficultyLevel: DifficultyLevel;
   readonly isTrue: boolean;
   readonly isOsymTwin?: boolean;
   readonly osymYearTag?: string;
@@ -694,6 +732,7 @@ class VirtualStructuredSpotCard implements TusSpotCard {
     this.id = id;
     this.session = session;
     this.branchId = branchId;
+    this.difficultyLevel = structuredSpotDifficultyLevel(sIdx);
     this.isTrue = isTrue;
     this._cIdx = cIdx;
     this._eIdx = eIdx;
@@ -900,6 +939,10 @@ function buildTusRepository(): {
           branchName: branchMeta.name,
           subTopic: cluster.subTopic,
           difficulty: angle.difficulty,
+          difficultyLevel:
+            angleIdx === 0
+              ? mapLegacyDifficultyLevel(cluster.difficulty)
+              : mapLegacyDifficultyLevel(angle.difficulty),
           examFrequency: angle.freq,
           stem: stemText,
           clinicalClues: entity.clues,
@@ -957,7 +1000,7 @@ function buildTusRepository(): {
       ];
 
       const entitySpotBucket: TusSpotCard[] = [];
-      legacySpots.forEach((spot) => {
+      legacySpots.forEach((spot, spotIdx) => {
         const cleanSt = spot.statement.replace(/\(\s*\)/g, '').replace(/\s{2,}/g, ' ').trim();
         if (seenLegacySpots.has(cleanSt)) return;
         seenLegacySpots.add(cleanSt);
@@ -967,6 +1010,12 @@ function buildTusRepository(): {
           branchId: cluster.branchId,
           branchName: branchMeta.name,
           subTopic: cluster.subTopic,
+          difficultyLevel:
+            spotIdx === 0 || spotIdx === 2
+              ? 'Kolay'
+              : spotIdx === 1 || spotIdx === 5
+              ? 'Orta'
+              : 'Zor',
           statement: cleanSt,
           isTrue: spot.isTrue,
           criticalHighlight: spot.criticalHighlight,
@@ -1015,9 +1064,26 @@ function buildTusRepository(): {
     const perEntitySpots: TusSpotCard[][] = [[], [], [], [], []];
 
     for (let eIdx = 0; eIdx < 5; eIdx++) {
-      // Natural organic variation (11 or 12 angles) so branch totals look non-artificial
+      const ent = cluster.entities[eIdx];
+      const vLow = ent.vignette.toLowerCase();
+      const cluesLow = ent.clues.join(' ').toLowerCase();
+      const targetHead = ent.target.split('(')[0].split('—')[0].trim().toLowerCase();
+      const mgmtHead = ent.management.split('(')[0].split('—')[0].trim().toLowerCase();
+      const hallmarkHead = ent.hallmark.split('(')[0].split('—')[0].trim().toLowerCase();
+      const targetLow = ent.target.toLowerCase();
+      const nameLow = ent.name.toLowerCase();
+
+      // Natural organic variation (11 or 12 angles) with strict zero-answer-leak guard
       const angleCount = (sClusterIdx + eIdx) % 5 === 0 ? 11 : 12;
       for (let aIdx = 0; aIdx < angleCount; aIdx++) {
+        // Guard against any rare answer-text overlap in stem (zero stem leaks guaranteed)
+        if (aIdx === 1 && targetHead.length >= 6 && vLow.includes(targetHead)) continue;
+        if (aIdx === 2 && mgmtHead.length >= 6 && vLow.includes(mgmtHead)) continue;
+        if (aIdx === 5 && hallmarkHead.length >= 6 && nameLow.includes(hallmarkHead)) continue;
+        if (aIdx === 6 && hallmarkHead.length >= 6 && targetLow.includes(hallmarkHead)) continue;
+        if (aIdx === 9 && targetHead.length >= 6 && cluesLow.includes(targetHead)) continue;
+        if (aIdx === 5 && hallmarkHead.length >= 6 && cluster.subTopic.toLowerCase().includes(hallmarkHead)) continue;
+
         const id = osymTag ? `twin-${qCounter++}` : `vaka-${qCounter++}`;
         perEntityVaka[eIdx].push(
           new VirtualStructuredVakaQuestion(

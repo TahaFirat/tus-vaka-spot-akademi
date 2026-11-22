@@ -184,7 +184,7 @@ export const TTBT_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           'Aşısız 7 yaşında çocukta boğaz ağrısı, boyunda "boğa boynu" görünümü ve tonsiller üzerinde kaldırıldığında kanayan gri-beyaz psödomembran saptanıyor. Etkenin faj aracılı ürettiği ekzotoksin ökaryotik protein sentezini durdurarak miyokardit yapıyor.',
         clues: ['boğa boynu', 'kaldırıldığında kanayan gri-beyaz psödomembran', 'EF-2', 'miyokardit'],
-        questionPrompt: 'Bu klinik tabloya yol açan bakteri ve toksininin etki mekanizması aşağıdakilerden hangisidir?',
+        questionPrompt: 'EF-2’yi ADP-ribozilasyonla inaktive ederek psödomembranlı farenjit ve miyokardite yol açan etken bakteri aşağıdakilerden hangisidir?',
         mechanism:
           'Corynebacterium diphtheriae beta-fajı ile kodlanan difteri toksini üretir; ADP-ribozilasyon yoluyla Elongasyon Faktörü-2’yi (EF-2) inaktive ederek protein sentezini durdurur (Pseudomonas aeruginosa Ekzotoksin A ile aynı mekanizma).',
         whenCorrectNote: 'Löffler ve potasyum tellüritli besiyeri, metakromatik Babes-Ernst granülleri, EF-2 ADP-ribozilasyonu, psödomembran ve miyokardit.',
@@ -199,7 +199,7 @@ export const TTBT_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           'Otel konaklaması sonrası 58 yaşında sigara içen erkek hastada yüksek ateş, bradikardi (Faget belirtisi), sulu diyare, konfüzyon ve atipik pnömoni gelişiyor. Laboratuvarda serum sodyumu 124 mEq/L (hiponatremi) ve balgam Gram boyamada bol lökosit olmasına rağmen bakteri görülmüyor.',
         clues: ['otel konaklaması', 'sulu diyare', 'hiponatremi', 'bol lökosit olmasına rağmen bakteri görülmüyor'],
-        questionPrompt: 'Bu hastada en olası etken ve üretilmesi için gerekli özel besiyeri aşağıdakilerden hangisidir?',
+        questionPrompt: 'L-sistein ve demir içeren BCYE besiyerinde üreyen, hiponatremi ve ishal ile atipik pnömoni yapan etken bakteri aşağıdakilerden hangisidir?',
         mechanism:
           'Legionella pneumophila klima/su sistemlerinden aerosol yoluyla bulaşır (insandan insana bulaşmaz). Üremesi için L-sistein ve demir içeren BCYE (Buffered Charcoal Yeast Extract) agar gerekir.',
         whenCorrectNote: 'Atipik pnömoni + diyare + hiponatremi + BCYE (sistein + demir) agar + idrarda antijen testi.',
@@ -214,7 +214,7 @@ export const TTBT_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           'Aşısız 4 aylık bebekte 2 haftadır süren paroksismal öksürük nöbetleri, nöbet sonunda inspiratuvar "boğmaca (whoop)" sesi ve öksürük sonrası kusma mevcut. Tam kan sayımında lökosit 34.000/mm³ olup %80’inin olgun lenfosit olduğu görülüyor.',
         clues: ['paroksismal öksürük', 'boğmaca (whoop)', 'öksürük sonrası kusma', 'olgun lenfositoz'],
-        questionPrompt: 'Bu hastada etkenin ürettiği pertussis toksininin temel mekanizması aşağıdakilerden hangisidir?',
+        questionPrompt: 'Gi proteinini ADP-ribozilasyonla inaktive ederek cAMP artışı, belirgin lenfositoz ve boğmaca öksürüğüne yol açan bakteri aşağıdakilerden hangisidir?',
         mechanism:
           'Pertussis toksini Gi (inhibitör G proteini) alt birimini ADP-ribozilasyonla inaktive eder; hücre içi cAMP düzeyi aşırı yükselir, insülin salınımı (hipoglisemi) ve belirgin lenfositoz gelişir. Bordet-Gengou ve Regan-Lowe besiyerinde ürer.',
         whenCorrectNote: 'Gi protein inhibisyonu -> cAMP artışı, belirgin lenfositoz, Regan-Lowe besiyeri, tedavide makrolid.',
@@ -229,7 +229,7 @@ export const TTBT_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           'Paslı çivi batması sonrası aşısız hastada çene kilitlenmesi (trismus), risus sardonicus, opistotonus ve dış uyaranlarla tetiklenen ağrılı tonik kas spazmları gelişiyor.',
         clues: ['trismus', 'risus sardonicus', 'opistotonus', 'tonik kas spazmları'],
-        questionPrompt: 'Bu tabloya neden olan tetanospazmin toksininin etki mekanizması aşağıdakilerden hangisidir?',
+        questionPrompt: 'Tetanospazmin toksiniyle Renshaw hücrelerinden glisin ve GABA salınımını bloke ederek spastik paralizi yapan etken bakteri aşağıdakilerden hangisidir?',
         mechanism:
           'Tetanospazmin aksonal retrograd taşınma ile omurilikteki Renshaw ara nöronlarına ulaşır; SNARE proteinlerini (sinaptobrevin) parçalayarak inhibitör nörotransmitterler olan Glisin ve GABA salınımını engeller -> Spastik felç.',
         whenCorrectNote: 'Renshaw hücrelerinden Glisin ve GABA salınımının engellenmesi -> Spastik paralizi, trismus, risus sardonicus.',
@@ -244,7 +244,7 @@ export const TTBT_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           'Kirli su tüketimi sonrası hastada karın ağrısı ve ateş olmaksızın günde 15-20 kez "pirinç yıkantı suyu" görünümünde masif sulu diyare ve hipovolemik şok gelişiyor. TCBS besiyerinde sarı koloniler ve karanlık alanda "kayan yıldız" hareketi izleniyor.',
         clues: ['pirinç yıkantı suyu', 'TCBS besiyerinde sarı koloniler', 'kayan yıldız hareketi'],
-        questionPrompt: 'Bu bakterinin enterotoksininin temel etki mekanizması aşağıdakilerden hangisidir?',
+        questionPrompt: 'Gs proteinini kalıcı aktive ederek cAMP artışı ve pirinç yıkantı suyu şeklinde ishale yol açan bakteri aşağıdakilerden hangisidir?',
         mechanism:
           'Kolera toksini, GM1 gangliozid reseptörüne bağlanır ve Gs proteininin alfa alt birimini ADP-ribozilasyonla kalıcı olarak aktive eder; adenilat siklaz ve cAMP artar, lümene yoğun klor ve su sekresyonu olur.',
         whenCorrectNote: 'Gs proteininin kalıcı aktivasyonu -> cAMP artışı, TCBS’de sarı koloni, oksidaz pozitif virgül şekilli basil.',
@@ -446,7 +446,7 @@ export const TTBT_CLUSTERS: DifferentialClusterSeed[] = [
         mechanism:
           'Sulcus nervi radialis (spiral oluk) içinde N. radialis ve A. profunda brachii birlikte seyreder. Humerus gövde kırığında yaralanmasıyla ön kol ekstansörleri felç olur ve "Düşük El (Wrist Drop)" gelişir.',
         whenCorrectNote: 'Humerus corpus kırığı, a. profunda brachii komşuluğu, düşük el (wrist drop) ve 1. dorsal web aralığı duyu kaybı.',
-        firstVsGold: 'Humerus Collum Chirurgicum: N. axillaris • Corpus Humeri: N. radialis • Suprakondiler: N. medianus • Медиal Epikondil: N. ulnaris.',
+        firstVsGold: 'Humerus Collum Chirurgicum: N. axillaris • Corpus Humeri: N. radialis • Suprakondiler: N. medianus • Medial Epikondil: N. ulnaris.',
         pearl: 'Corpus humeri kırığında N. radialis (ve A. profunda brachii) yaralanır -> Düşük El (Wrist Drop) gelişir.',
         trueStatement: 'Humerus gövde (corpus) kırıklarında sulcus nervi radialis içinde seyreden n. radialis yaralanır ve düşük el (wrist drop) gelişir.',
         falseStatement: 'Humerus gövde kırıklarında en sık n. ulnaris yaralanır ve hastada ebe eli deformitesi oluşur.',
@@ -633,7 +633,7 @@ export const TTBT_CLUSTERS: DifferentialClusterSeed[] = [
         mechanism:
           'Nöral krest hücreleri göç yeteneği yüksek multipotent hücrelerdir. Hirschsprung hastalığı (enterik pleksus göç kusuru), feokromositoma, melanom, nöroblastom ve konotrunkal kalp anomalileri (Fallot, Trunkus) nöral krest patolojileridir.',
         whenCorrectNote: 'Melanosit, Schwann hücresi, adrenal medulla, enterik gangliyonlar (Meissner/Auerbach), pia-araknoid mater ve aortikopulmoner septum.',
-        firstVsGold: 'Schwann hücresi & Pia-Araknoid: Nöral krest • Oligodendrosit & Astrosit: Nöral tüp (Nöroektoderm) • Mikroglia ve Dura mater: Mezodorm.',
+        firstVsGold: 'Schwann hücresi & Pia-Araknoid: Nöral krest • Oligodendrosit & Astrosit: Nöral tüp (Nöroektoderm) • Mikroglia ve Dura mater: Mezoderm.',
         pearl: 'Schwann hücresi, melanosit, adrenal medulla, odontoblast ve aortikopulmoner septum Nöral Krest kökenlidir.',
         trueStatement: 'Adrenal medulla kromaffin hücreleri, melanositler, Schwann hücreleri ve aortikopulmoner septum nöral krest kökenlidir.',
         falseStatement: 'Merkezi sinir sistemini miyelinleyen oligodendrositler ve fagositik mikroglia hücreleri nöral krestten gelişir.',
@@ -655,7 +655,7 @@ export const TTBT_CLUSTERS: DifferentialClusterSeed[] = [
         falseHighlight: 'iki komşu epitel hücresini birbirine bağlar ve konneksin',
       },
       {
-        entityName: 'Mezenterik/Ürogenital Mezodorm (Ara Mezodorm) — Böbrek ve Gonad Korteksi',
+        entityName: 'İntermediate (Ara) Mezoderm — Böbrek ve Gonad Korteksi',
         patientVignette:
           'Embriyolojik gelişimde pronefroz, mezonefroz ve kalıcı böbreği oluşturan metanefrozun (üreter tomurcuğu + metanefrik blastem) yanı sıra gonadların ve adrenal korteksin geliştiği mezoderm bölümü inceleniyor.',
         clues: ['metanefrozun', 'üreter tomurcuğu', 'gonadların ve adrenal korteksin'],

@@ -15,9 +15,9 @@ export const KTBT_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           '61 yaşında erkek hasta ani başlayan göğüs ağrısı ile acil servise getiriliyor. EKG’de DII, DIII ve aVF derivasyonlarında ST yükselmesi, V4R derivasyonunda 2 mm ST elevasyonu saptanıyor. Kan basıncı 82/50 mmHg, nabız 54/dk, akciğer oskültasyonu tamamen temiz ancak boyun venöz dolgunluğu (JVD) belirgin artmış.',
         clues: ['DII, DIII ve aVF derivasyonlarında ST yükselmesi', 'V4R', 'akciğer oskültasyonu tamamen temiz', 'boyun venöz dolgunluğu (JVD)'],
-        questionPrompt: 'Sağ koroner arter (RCA) tıkanıklığına bağlı bu klinik tabloda akut yönetim yaklaşımı aşağıdakilerden hangisidir?',
+        questionPrompt: 'Nitrat ve morfinin kesinlikle kontrendike olduğu, öncelikle agresif IV izotonik sıvı yüklemesi gerektiren bu akut koroner sendrom tablosu hangisidir?',
         mechanism:
-          'İnferior MI’a eşlik eden Sağ Ventrikül MI’da hipoteansiyon, juguler venöz dolgunluk ve temiz akciğer (Kussmaul bulgusu) triyadı görülür. Sağ ventrikül önyüke (preload) bağımlı olduğundan ilk tercih %0.9 NaCl (IV izotonik sıvı) yüklemesidir; önyükü düşüren Nitratlar ve Diüretikler kesinlikle kontrendikedir!',
+          'İnferior MI’a eşlik eden Sağ Ventrikül MI’da hipotansiyon, juguler venöz dolgunluk ve temiz akciğer (Kussmaul bulgusu) triyadı görülür. Sağ ventrikül önyüke (preload) bağımlı olduğundan ilk tercih %0.9 NaCl (IV izotonik sıvı) yüklemesidir; önyükü düşüren Nitratlar ve Diüretikler kesinlikle kontrendikedir!',
         whenCorrectNote: 'DII-DIII-aVF + V4R ST elevasyonu, temiz akciğer + JVD + hipotansiyon -> İlk tercih IV izotonik sıvı, nitrat kontrendike.',
         firstVsGold: 'En Duyarlı EKG Derivasyonu: V4R • İlk Medikal Tedavi: IV %0.9 NaCl • Kesinlikle Kontrendike İlaçlar: Nitratlar, Diüretikler ve Morfin.',
         pearl: 'Sağ ventrikül MI (DII, DIII, aVF + V4R) önyüke bağımlıdır: İlk tedavi IV İZOTONİK SIVIDIR; NİTRAT ve DİÜRETİK kesinlikle verilmez!',
@@ -116,7 +116,7 @@ export const KTBT_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           '9 aylık siyanotik konjenital kalp hastalığı olan bebek ağlama sonrası derinleşen siyanoz, takipne ve pulmoner stenoz üfürümünün kaybolması (Hipoksik Spell atağı) ile acil servise getiriliyor. Telekardiyografide "Tahta Pabuç (Coeur en sabot)" görünümü mevcuttur.',
         clues: ['Hipoksik Spell atağı', 'pulmoner stenoz üfürümünün kaybolması', 'Tahta Pabuç (Coeur en sabot)'],
-        questionPrompt: 'Erken çocukluk çağının en sık siyanotik konjenital kalp hastalığı olan bu tabloda ilk acil manevra hangisidir?',
+        questionPrompt: 'Hipoksik spell atağında ilk acil manevra olarak diz-göğüs pozisyonu uygulanan ve prognozunu pulmoner stenoz derecesinin belirlediği siyanotik kalp hastalığı hangisidir?',
         mechanism:
           'Fallot Tetralojisi 4 bileşenden oluşur: 1. Geniş VSD, 2. Pulmoner Stenoz (prognozu ve siyanozun derecesini belirleyen en önemli bileşen!), 3. Ata binen aort (Dekstropozisyon), 4. Sağ ventrikül hipertrofisi. Hipoksik spell atağında ilk yapılacak manevra sistemik vasküler direnci (SVR) artırarak sağdan sola şantı azaltan Diz-Göğüs (Knee-chest / Squatting) pozisyonudur; ayrıca O2, Morfin ve Propranolol verilir (Digoksin kontrendikedir!).',
         whenCorrectNote: 'Pulmoner stenoz + VSD + Ata binen aort + RVH, tahta pabuç kalp, spell atağında diz-göğüs pozisyonu + morfin + propranolol.',
@@ -131,7 +131,7 @@ export const KTBT_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           '3 haftalık erkek bebek her beslenme sonrasında safrasız, fışkırır tarzda (projektil) kusma ve kusma sonrası tekrar açlık hissi ile getiriliyor. Sağ üst kadranda "zeytin (olive)" kitlesi palpe ediliyor ve kan gazında pH: 7.54, Cl: 84 mEq/L, K: 2.9 mEq/L saptanıyor.',
         clues: ['3 haftalık', 'safrasız, fışkırır tarzda (projektil) kusma', 'zeytin (olive) kitlesi', 'pH: 7.54, Cl: 84'],
-        questionPrompt: 'Bu bebekte cerrahi (Ramstedt piloromiyotomi) öncesinde mutlak düzeltilmesi gereken metabolik tablo ve ilk tanı yöntemi hangisidir?',
+        questionPrompt: 'Safrasız projektil kusma, hipokloremik hipokalemik metabolik alkaloz ile seyreden ve tanısında ilk tercih USG kullanılan bu yenidoğan tablosu hangisidir?',
         mechanism:
           'Mide çıkışı (pilor) darlığında mide asidi (HCl) kusma ile kaybedilir ve böbrekten H+ karşılığında K+ atılır (paradoksal asidüri). Sonuçta Hipokloremik, Hipokalemik Metabolik Alkaloz gelişir. Tanıda ilk tercih Ultrasonografidir. Pilor stenozu cerrahi bir acil DEĞİLDİR, medikal bir acildir: Önce sıvı-elektrolit ve alkaloz düzeltilir, sonra Ramstedt piloromiyotomi yapılır.',
         whenCorrectNote: '3-6. haftada safrasız projektil kusma, olive mass, USG ile tanı, hipokloremik hipokalemik metabolik alkaloz.',
@@ -146,7 +146,7 @@ export const KTBT_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           'Prematüre doğan ve mama ile beslenen 10 günlük bebekte batın distansiyonu, safralı gastrik rezidü ve kanlı dışkılama gelişiyor. Ayakta direkt batın grafisinde bağırsak duvarı içinde hava kabarcıkları ("Pnömatozis intestinalis") ve portal vende gaz izleniyor.',
         clues: ['Prematüre', 'kanlı dışkılama', 'Pnömatozis intestinalis', 'portal vende gaz'],
-        questionPrompt: 'Yenidoğanın en sık kazanılmış gastrointestinal acili olan bu tabloda kesin cerrahi endikasyonu hangisidir?',
+        questionPrompt: 'Direkt karın grafisinde pnömatozis intestinalis izlenen ve pnömoperitoneum (perforasyon) varlığında acil cerrahi gerektiren bu yenidoğan acili hangisidir?',
         mechanism:
           'Nekrotizan Enterokolit (NEK) en sık terminal ileum ve sağ kolonu tutar. Radyolojide bağırsak duvarında hava görülmesi (Pnömatozis intestinalis) tanı koydurucudur. Başlangıç tedavisi: Enteral beslenmenin kesilmesi (NPO), NG dekompresyon ve geniş spektrumlu IV antibiyotiktir. Kesin cerrahi endikasyonu ise bağırsak perforasyonunu gösteren Pnömoperitoneum (serbest hava / futbol topu bulgusu) varlığıdır.',
         whenCorrectNote: 'Prematürite, kanlı gaita, direkt grafide pnömatozis intestinalis; perforasyon (pnömoperitoneum) varsa acil cerrahi.',
@@ -161,7 +161,7 @@ export const KTBT_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           'Topuk kanı taraması yapılmamış 7 aylık bebek açık ten-göz-saç rengi (hipopigmentasyon), egzama benzeri döküntü, mikrosefali, nöromotor gerilik ve idrarında "fare/küf kokusu" ile getiriliyor.',
         clues: ['hipopigmentasyon', 'mikrosefali', 'fare/küf kokusu'],
-        questionPrompt: 'Tirozinin esansiyel aminoasit haline geldiği bu metabolik hastalıkta eksik olan enzim ve kofaktörü hangisidir?',
+        questionPrompt: 'Fenilalanin hidroksilaz veya BH4 eksikliğine bağlı gelişen, idrarda küf kokusu yapan ve tirozini esansiyel hale getiren metabolik hastalık hangisidir?',
         mechanism:
           'Klasik Fenilketonüride Fenilalanin Hidroksilaz (veya malign FKÜ’de kofaktörü Tetrahidrobiopterin - BH4) eksiktir. Fenilalanin tirozine dönüşemez; melanin sentezi azalır (açık renk saç/göz), fenilasetat/fenillaktat idrarda küf kokusu yapar ve tirozin diyette esansiyel hale gelir.',
         whenCorrectNote: 'Fenilalanin hidroksilaz (kofaktör BH4) eksikliği, küf/fare kokulu idrar, hipopigmentasyon, tirozinin esansiyel olması.',
@@ -187,7 +187,7 @@ export const KTBT_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           '46 yaşında kadın hasta yağlı yemek sonrası başlayan ve 8 saattir devam eden sağ üst kadran ağrısı, ateş, bulantı ve lökositoz ile başvuruyor. Derin inspiryumda sağ subkostal palpasyonla soluk alma duruyor (Murphy bulgusu pozitif).',
         clues: ['8 saattir devam eden sağ üst kadran ağrısı', 'ateş', 'Murphy bulgusu pozitif'],
-        questionPrompt: 'Bu hastada tanı için İLK istenecek görüntüleme ile EN DUYARLI (altın standart) görüntüleme eşleştirmesi hangisidir?',
+        questionPrompt: 'İlk tercih görüntülemesi USG, en duyarlı (altın standart) testi HIDA sintigrafisi olan bu akut biliyer tablo hangisidir?',
         mechanism:
           'Akut taşlı kolesistit sistik kanalın taşla tıkanması sonucu gelişir. Tanıda İLK istenecek görüntüleme yöntemi Ultrasonografidir (taş, duvar kalınlığı >4 mm, perikolesistik sıvı, sonografik Murphy). USG’nin tanı koyamadığı şüpheli olgularda EN DUYARLI (altın standart) yöntem HIDA (Biliyer) Sintigrafisidir (safra kesesinin dolmaması/görüntülenememesi tanı koydurur).',
         whenCorrectNote: 'Murphy bulgusu pozitif; İlk tercih görüntüleme USG, En duyarlı/Altın standart görüntüleme HIDA sintigrafisi, tedavi erken laparoskopik kolesistektomi.',
@@ -202,7 +202,7 @@ export const KTBT_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           'Koledokolitiazis öyküsü olan 68 yaşında hastada titremeyle yükselen ateş, sağ üst kadran ağrısı, sarılık (Charcot triyadı) tablosuna hipotansiyon ve bilinç bulanıklığı (Reynolds pentadı) ekleniyor.',
         clues: ['ateş, sağ üst kadran ağrısı, sarılık (Charcot triyadı)', 'hipotansiyon ve bilinç bulanıklığı (Reynolds pentadı)'],
-        questionPrompt: 'Sıvı resüsitasyonu ve IV antibiyotik başlanan bu hastada hayat kurtarıcı biliyer dekompresyon yöntemi hangisidir?',
+        questionPrompt: 'Charcot triyadına hipotansiyon ve konfüzyonun eklenmesiyle Reynolds pentadı oluşturan ve acil ERCP ile biliyer drenaj gerektiren bu cerrahi acil hangisidir?',
         mechanism:
           'Koledok tıkanıklığı zemininde gelişen Akut Kolanjitte Ateş + Sağ üst kadran ağrısı + Sarılık = Charcot Triyadı; buna Hipotansiyon (Şok) + Konfüzyon eklenirse = Reynolds Pentadı adını alır. En sık etken E. coli’dir. Tedavide sıvı + antibiyotik sonrası ilk tercih ve altın standart biliyer drenaj yöntemi ERCP (Endoskopik sfinkterotomi / stent) uygulamasıdır.',
         whenCorrectNote: 'Charcot triyadı + Hipotansiyon + Konfüzyon = Reynolds pentadı; ilk tercih drenaj yöntemi ERCP.',
@@ -217,7 +217,7 @@ export const KTBT_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           'Safra taşı öyküsü olan 55 yaşında hastada kuşak tarzında sırta yayılan şiddetli epigastrik ağrı, kusma ve serum amilaz/lipaz düzeylerinde normalin 5 katı artış saptanıyor.',
         clues: ['kuşak tarzında sırta yayılan şiddetli epigastrik ağrı', 'amilaz/lipaz düzeylerinde normalin 5 katı artış'],
-        questionPrompt: 'Bu hastada Ranson prognoz kriterleri ve pankreatik nekroz değerlendirmesi açısından hangisi doğrudur?',
+        questionPrompt: 'Ranson kriterlerinde başvuru anında serum amilaz/lipazın yer almadığı ve nekroz tayini için 48–72 saat sonra kontrastlı BT çekilen bu akut karın tablosu hangisidir?',
         mechanism:
           'Akut pankreatitin en sık nedeni safra taşları, ikinci sık nedeni alkoldür. Tanıda Lipaz, amilaza göre daha özgül ve daha uzun süre yüksek kalan enzimdir. Ancak serum Amilaz ve Lipaz yüksekliğinin derecesi hastalık şiddetini/prognozunu GÖSTERMEZ ve Ranson kriterlerinde YER ALMAZ! Pankreatik nekrozu değerlendirmede altın standart (72. saatten sonra çekilen) İV Kontrastlı Dinamik BT’dir.',
         whenCorrectNote: 'Tanıda lipaz daha özgül; Amilaz, Lipaz ve Bilirubin Ranson kriterlerinde YOKTUR; nekroz için altın standart Kontrastlı BT.',
@@ -232,7 +232,7 @@ export const KTBT_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           'Toraks travması sonrası acil servise getirilen hastada şiddetli dispne, siyanoz, hipotansiyon (obstrüktif şok), boyun venöz dolgunluğu, etkilenen hemitoraksta solunum seslerinin tamamen kaybolması, hipersonorite ve trakeanın karşı tarafa deviye olması saptanıyor.',
         clues: ['obstrüktif şok', 'boyun venöz dolgunluğu', 'solunum seslerinin tamamen kaybolması', 'trakeanın karşı tarafa deviye olması'],
-        questionPrompt: 'Bu hastada saniyeler içinde yapılması gereken ilk hayat kurtarıcı girişim aşağıdakilerden hangisidir?',
+        questionPrompt: 'Klinik muayene ile tanı konulup akciğer grafisi beklenmeden acil iğne torakosentez (ardından tüp torakostomi) gerektiren obstrüktif şok tablosu hangisidir?',
         mechanism:
           'Tansiyon pnömotoraks klinik bir tanıdır! Akciğer grafisi çekmek için beklemek hastanın ölümüne yol açar. Tanı fizik muayene ile konulduğu anda GÖRÜNTÜLEME BEKLENMEDEN acil İğne Torakosentez (dekompresyon) yapılarak tansiyon pnömotoraks basit pnömotoraksa dönüştürülür, ardından Tüp Torakostomi (göğüs tüpü) takılır.',
         whenCorrectNote: 'Klinik tanıdır (görüntüleme beklenmez!), trakea karşıya kayar, JVD + hipotansiyon vardır -> Acil iğne dekompresyon + tüp torakostomi.',
@@ -288,7 +288,7 @@ export const KTBT_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           '35 haftalık gebe kan basıncı 170/115 mmHg, baş ağrısı, görme bulanıklığı, sağ üst kadran ağrısı ve 2+ proteinüri ile yatırılıyor ve eklampsi profilaksisi için IV Magnezyum Sülfat infüzyonu başlanıyor. Takipte hastanın patella refleksi kayboluyor ve solunum sayısı 9/dk’ya düşüyor.',
         clues: ['170/115 mmHg', 'Magnezyum Sülfat', 'patella refleksi kayboluyor', 'solunum sayısı 9/dk’ya'],
-        questionPrompt: 'Magnezyum sülfat toksisitesinin İLK bulgusu ve derhal uygulanması gereken spesifik antidotu aşağıdakilerden hangisidir?',
+        questionPrompt: 'Konvülziyon profilaksisinde MgSO4 kullanılan ve toksisitesinde ilk olarak patella refleksi kaybolup İV kalsiyum glukonat uygulanan bu obstetrik acil hangisidir?',
         mechanism:
           'Ağır preeklampsi ve eklampside nöbet profilaksisi ve tedavisi için altın standart ilaç Magnezyum Sülfattır (antihipertansif değildir!). MgSO4 toksisitesinin İLK klinik bulgusu derin tendon refleksi (patella refleksi) kaybıdır (4-5 mEq/L / 8-10 mg/dL); ardından solunum depresyonu ve kardiyak arrest gelişir. Spesifik antidotu İntravenöz Kalsiyum Glukonattır.',
         whenCorrectNote: 'Eklampsi profilaksisinde MgSO4; toksisitenin ilk bulgusu patella refleksi kaybı, spesifik antidotu Kalsiyum Glukonat.',
@@ -305,7 +305,7 @@ export const KTBT_CLUSTERS: DifferentialClusterSeed[] = [
         clues: ['Beta-hCG düzeyi 2.800 mIU/mL', 'intrauterin gebelik kesesi izlenmiyor', 'sağ tubada 3 cm’lik'],
         questionPrompt: 'En sık tuba uterinanın ampulla bölgesine yerleşen ve rüptür/instabilite durumunda Metotreksat’ın kesin kontrendike olduğu obstetrik tablo hangisidir?',
         mechanism:
-          'Ektopik gebelik en sık Tuba uterina’nın AMPULLA bölgesine yerleşir; en geç rüptüre olan ise İstmus (veya interstisyel) bölgesidir. Hemodinamik olarak stabil, rüptüre olmamış, kitle çapı <3.5-4 cm ve fetal kalp atımı negatif hastalarda sistemik Metotreksat (folik asit antagonisti) verilir. Hemodinamik instabilite ve tüp rüptürü Metotreksat için mutlak kontrendikasyon olup acil cerrahi (salpingektomi/salpingostomi) gerektirir.',
+          'Ektopik gebelik en sık Tuba uterina’nın AMPULLA bölgesine yerleşir; en erken rüptüre olan İstmus, en geç rüptüre olan (en ağır kanamalı) ise İnterstisyel (Kornual) bölgesidir. Hemodinamik olarak stabil, rüptüre olmamış, kitle çapı <3.5-4 cm ve fetal kalp atımı negatif hastalarda sistemik Metotreksat (folik asit antagonisti) verilir. Hemodinamik instabilite ve tüp rüptürü Metotreksat için mutlak kontrendikasyon olup acil cerrahi (salpingektomi/salpingostomi) gerektirir.',
         whenCorrectNote: 'En sık yerleşim Ampulla; rüptür veya hemodinamik instabilite varsa Metotreksat kontrendikedir, cerrahi yapılır.',
         firstVsGold: 'En Sık Yerleşim: Ampulla • Tanısal Altın Standart: Laparoskopi (Klinikte pratik tanı: TV-USG + Seri Beta-hCG).',
         pearl: 'Ektopik gebelik en sık tubanın Ampulla bölgesine yerleşir; tüp rüptürü veya hemodinamik instabilite varsa Metotreksat kontrendikedir!',
@@ -318,7 +318,7 @@ export const KTBT_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           '31 yaşında nullipar kadın hasta sekonder progresif dismenore, disparoni, kronik pelvik ağrı ve 2 yıldır infertilite şikayeti ile başvuruyor. Transvajinal USG’de sol overde homojen buzlu cam görünümünde 5 cm kist (endometrioma) saptanıyor.',
         clues: ['progresif dismenore, disparoni', 'infertilite', 'buzlu cam görünümünde', 'endometrioma'],
-        questionPrompt: 'Bu hastalıkta en sık pelvik yerleşim yeri ve kesin tanı için altın standart yöntem aşağıdakilerden hangisidir?',
+        questionPrompt: 'En sık overlere yerleşen (endometrioma) ve kesin tanısı laparoskopik gözlem ile histopatolojik biyopsiyle konulan jinekolojik hastalık hangisidir?',
         mechanism:
           'Endometrial gland ve stromanın uterus kavitesi dışında bulunmasına Endometriozis denir (myometrium içinde bulunmasına ise Adenomyozis denir). Endometriozis en sık OVER’e yerleşir (Endometrioma / Çikolata kisti), ikinci sıklıkta Douglas boşluğu ve uterosakral ligamentleri tutar. Kesin tanı için altın standart yöntem Laparoskopi ile direkt gözlem ve histopatolojik biyopsidir.',
         whenCorrectNote: 'Dismenore + disparoni + infertilite; en sık yerleşim Over, kesin tanı altın standart Laparoskopi + Biyopsi.',
@@ -412,7 +412,7 @@ export const TUS_CLINICAL_GUIDE_ENTRIES: TusClinicalGuideEntry[] = [
     firstChoiceOrFeature: 'Glikoliz -> PFK-1 • Glukoneogenez -> Fruktoz-1,6-bisfosfataz • Glikojen Sentezi -> Glikojen Sentaz',
     goldStandardOrTarget: 'Glikojen Yıkımı -> Glikojen Fosforilaz • Kolesterol Sentezi -> HMG-KoA Redüktaz • Keton Sentezi -> HMG-KoA Sentaz',
     clinicalTrapNote: 'Yağ asidi sentezi hız kısıtlayıcı: Asetil-KoA Karboksilaz (Biyotin bağımlı); Beta-oksidasyon hız kısıtlayıcı: Karnitin Palmitoil Transferaz-I (KPT-I).',
-    pearl: 'Hekzokinaz Monofosfat Şantı (PPP) hız kısıtlayıcı enzimi: Glukoz-6-Fosfat Dehidrogenaz (G6PD - NADPH üretir).',
+    pearl: 'Heksoz Monofosfat Şantı (Pentoz Fosfat Yolu / PPP) hız kısıtlayıcı enzimi: Glukoz-6-Fosfat Dehidrogenaz (G6PD - NADPH üretir).',
   },
   {
     id: 'guide-7',

@@ -1,4 +1,8 @@
-export const FREE_QUESTION_LIMIT = 30;
+export const DAILY_FREE_VAKA_LIMIT = 15;
+export const DAILY_FREE_SPOT_LIMIT = 15;
+export const DAILY_FREE_PEARL_LIMIT = 10;
+export const DAILY_FREE_EXAM_LIMIT = 1;
+export const FREE_QUESTION_LIMIT = DAILY_FREE_VAKA_LIMIT;
 export const PRO_PRODUCT_ID = 'com.tus.akademi.lifetime.pro';
 export const PRO_MONTHLY_PRODUCT_ID = 'com.tus.akademi.pro.monthly';
 export const PRO_SIXMONTH_PRODUCT_ID = 'com.tus.akademi.pro.sixmonths';

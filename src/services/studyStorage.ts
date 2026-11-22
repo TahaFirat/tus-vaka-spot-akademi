@@ -175,6 +175,10 @@ export interface TusStudyState {
   examHistory: TusExamAttempt[];
   dailyTarget: number;
   todaySolvedCount: number;
+  todayFreeVakaUsed: number;
+  todayFreeSpotUsed: number;
+  todayFreePearlUsed: number;
+  todayFreeExamUsed: number;
   lastStudyDate: string;
   streakDays: number;
   targetTusDate: string;
@@ -223,6 +227,10 @@ export const DEFAULT_STUDY_STATE: TusStudyState = {
   examHistory: [],
   dailyTarget: 40,
   todaySolvedCount: 0,
+  todayFreeVakaUsed: 0,
+  todayFreeSpotUsed: 0,
+  todayFreePearlUsed: 0,
+  todayFreeExamUsed: 0,
   lastStudyDate: getLocalDateString(),
   streakDays: 1,
   targetTusDate: getNextActiveTusDate(),
@@ -253,6 +261,10 @@ export function loadStudyState(): TusStudyState {
     const today = getLocalDateString();
     let streakDays = parsed.streakDays ?? 1;
     let todaySolvedCount = parsed.todaySolvedCount ?? 0;
+    let todayFreeVakaUsed = parsed.todayFreeVakaUsed ?? 0;
+    let todayFreeSpotUsed = parsed.todayFreeSpotUsed ?? 0;
+    let todayFreePearlUsed = parsed.todayFreePearlUsed ?? 0;
+    let todayFreeExamUsed = parsed.todayFreeExamUsed ?? 0;
 
     if (parsed.lastStudyDate && parsed.lastStudyDate !== today) {
       const prevDate = new Date(`${parsed.lastStudyDate}T12:00:00`);
@@ -269,6 +281,10 @@ export function loadStudyState(): TusStudyState {
         streakDays = 1;
       }
       todaySolvedCount = 0;
+      todayFreeVakaUsed = 0;
+      todayFreeSpotUsed = 0;
+      todayFreePearlUsed = 0;
+      todayFreeExamUsed = 0;
     }
 
     const migratedDate = parsed.targetTusDate
@@ -286,6 +302,10 @@ export function loadStudyState(): TusStudyState {
       targetTusDate: activeTargetDate,
       streakDays,
       todaySolvedCount,
+      todayFreeVakaUsed,
+      todayFreeSpotUsed,
+      todayFreePearlUsed,
+      todayFreeExamUsed,
       lastStudyDate: today,
       uiMode: parsed.uiMode === 'odak' ? 'odak' : 'akademi',
       topicTours:
@@ -350,6 +370,21 @@ export function computeNextSrsEntry(
   };
 }
 
+// 2024/2 – 2026 Güncel ÖSYM TUS Standart Puan Simülasyon Referansı (100 Temel + 100 Klinik)
+export const TUS_SCORE_MODEL_META = {
+  temelQuestions: 100,
+  klinikQuestions: 100,
+  sessionMinutes: 135,
+  temelRefMean: 19.5,
+  klinikRefMean: 21.0,
+  refStdDev: 19.8,
+  primaryWeight: 0.6,
+  secondaryWeight: 0.4,
+  barajScore: 45,
+  penaltyFactor: 0.95, // 16 Mayıs 2024 sonrası %5 puan kesintisi
+};
+
+// 4 yanlış 1 doğruyu götürür: Net = Doğru - (Yanlış / 4)
 export function calculateOsymNet(correct: number, wrong: number): number {
   const rawNet = correct - wrong / 4;
   return Number(rawNet.toFixed(2));
@@ -357,41 +392,64 @@ export function calculateOsymNet(correct: number, wrong: number): number {
 
 export function calculateEstimatedTusScore(net: number, totalQuestions: number): number {
   if (totalQuestions <= 0) return 45;
-  const ratio = Math.max(0, net) / totalQuestions;
-  const score = 40 + ratio * 44;
-  return Number(Math.min(85, Math.max(35, score)).toFixed(1));
+  const projected100 = (net / totalQuestions) * 100;
+  const sp =
+    50 +
+    10 *
+      ((projected100 -
+        (TUS_SCORE_MODEL_META.temelRefMean + TUS_SCORE_MODEL_META.klinikRefMean) / 2) /
+        TUS_SCORE_MODEL_META.refStdDev);
+  return Number(Math.min(89.9, Math.max(30, sp)).toFixed(1));
 }
 
-// 100 soruluk TTBT & 100 soruluk KTBT resmi TUS ağırlıklı simülasyon hesaplayıcısı
+// 100 Temel + 100 Klinik güncel ÖSYM TUS Standart Puan simülasyonu (%60 / %40 ağırlık + isteğe bağlı %5 kesinti)
 export function calculateOfficialStyleTusScores(
-  ttbtCorrect: number,
-  ttbtWrong: number,
-  ktbtCorrect: number,
-  ktbtWrong: number
+  temelCorrect: number,
+  temelWrong: number,
+  klinikCorrect: number,
+  klinikWrong: number,
+  hasPenalty = false
 ): {
   ttbtNet: number;
   ktbtNet: number;
   tTusScore: number;
   kTusScore: number;
 } {
-  const safeTc = Math.max(0, Math.min(100, ttbtCorrect));
-  const safeTw = Math.max(0, Math.min(100 - safeTc, ttbtWrong));
-  const safeKc = Math.max(0, Math.min(100, ktbtCorrect));
-  const safeKw = Math.max(0, Math.min(100 - safeKc, ktbtWrong));
+  const safeTc = Math.max(0, Math.min(100, temelCorrect));
+  const safeTw = Math.max(0, Math.min(100 - safeTc, temelWrong));
+  const safeKc = Math.max(0, Math.min(100, klinikCorrect));
+  const safeKw = Math.max(0, Math.min(100 - safeKc, klinikWrong));
 
   const ttbtNet = calculateOsymNet(safeTc, safeTw);
   const ktbtNet = calculateOsymNet(safeKc, safeKw);
 
-  // Yaklaşık T-TUS (%70 TTBT + %30 KTBT) & K-TUS (%30 TTBT + %70 KTBT) bandı
-  const weightedT = ttbtNet * 0.7 + ktbtNet * 0.3;
-  const weightedK = ktbtNet * 0.7 + ttbtNet * 0.3;
-  const toScore = (weightedNet: number) =>
-    Number(Math.min(84, Math.max(35, 36 + (weightedNet / 100) * 48)).toFixed(1));
+  const temelSp =
+    50 +
+    10 *
+      ((ttbtNet - TUS_SCORE_MODEL_META.temelRefMean) /
+        TUS_SCORE_MODEL_META.refStdDev);
+  const klinikSp =
+    50 +
+    10 *
+      ((ktbtNet - TUS_SCORE_MODEL_META.klinikRefMean) /
+        TUS_SCORE_MODEL_META.refStdDev);
+
+  const mult = hasPenalty ? TUS_SCORE_MODEL_META.penaltyFactor : 1;
+  const rawT =
+    (TUS_SCORE_MODEL_META.primaryWeight * temelSp +
+      TUS_SCORE_MODEL_META.secondaryWeight * klinikSp) *
+    mult;
+  const rawK =
+    (TUS_SCORE_MODEL_META.primaryWeight * klinikSp +
+      TUS_SCORE_MODEL_META.secondaryWeight * temelSp) *
+    mult;
+
+  const clampScore = (v: number) => Number(Math.min(90, Math.max(30, v)).toFixed(1));
 
   return {
     ttbtNet,
     ktbtNet,
-    tTusScore: toScore(weightedT),
-    kTusScore: toScore(weightedK),
+    tTusScore: clampScore(rawT),
+    kTusScore: clampScore(rawK),
   };
 }

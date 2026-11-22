@@ -18,6 +18,7 @@ import {
   Zap,
 } from 'lucide-react';
 import {
+  DifficultyLevel,
   matchesSpotSearch,
   TUS_BRANCHES,
   TUS_SPOT_CARDS,
@@ -26,7 +27,7 @@ import {
 } from '../data/tusMedicalRepository';
 import { BRANCH_VISUALS } from '../data/branchVisuals';
 import {
-  FREE_QUESTION_LIMIT,
+  DAILY_FREE_SPOT_LIMIT,
   triggerHaptic,
 } from '../services/nativeBridge';
 import { SpotAnswerRecord } from '../services/studyStorage';
@@ -34,7 +35,7 @@ import { SpotAnswerRecord } from '../services/studyStorage';
 interface DogruYanlisScreenProps {
   isPro: boolean;
   isLight: boolean;
-  totalSolvedCount: number;
+  todayFreeUsed: number;
   spotAnswers: Record<string, SpotAnswerRecord>;
   bookmarkedSpotIds: string[];
   onRecordSpotAnswer: (
@@ -54,7 +55,7 @@ interface DogruYanlisScreenProps {
 const DogruYanlisScreenInner: React.FC<DogruYanlisScreenProps> = ({
   isPro,
   isLight,
-  totalSolvedCount,
+  todayFreeUsed,
   spotAnswers,
   bookmarkedSpotIds,
   onRecordSpotAnswer,
@@ -67,6 +68,7 @@ const DogruYanlisScreenInner: React.FC<DogruYanlisScreenProps> = ({
 }) => {
   const [sessionFilter, setSessionFilter] = useState<'ALL' | TusSessionType>('ALL');
   const [branchFilter, setBranchFilter] = useState<'ALL' | TusBranchId>(initialBranch);
+  const [difficultyFilter, setDifficultyFilter] = useState<'ALL' | DifficultyLevel>('ALL');
   const resolvedDefaultBasket = useMemo(() => {
     if (initialBasket !== 'all' && initialBasket !== 'unsolved') return initialBasket;
     return TUS_SPOT_CARDS.some((s) => !spotAnswers[s.id]) ? 'unsolved' : 'all';
@@ -139,6 +141,7 @@ const DogruYanlisScreenInner: React.FC<DogruYanlisScreenProps> = ({
     const matched = effectivePool.filter((s) => {
       if (sessionFilter !== 'ALL' && s.session !== sessionFilter) return false;
       if (branchFilter !== 'ALL' && s.branchId !== branchFilter) return false;
+      if (difficultyFilter !== 'ALL' && s.difficultyLevel !== difficultyFilter) return false;
 
       if (s.id === pinnedSpotId) {
         if (qLower) {
@@ -183,6 +186,7 @@ const DogruYanlisScreenInner: React.FC<DogruYanlisScreenProps> = ({
     effectivePool,
     sessionFilter,
     branchFilter,
+    difficultyFilter,
     basketFilter,
     searchQuery,
     spotAnswers,
@@ -195,7 +199,7 @@ const DogruYanlisScreenInner: React.FC<DogruYanlisScreenProps> = ({
   useEffect(() => {
     setCurrentIndex(0);
     setPinnedSpotId(null);
-  }, [sessionFilter, branchFilter, basketFilter, searchQuery, isPro, smartFocusMode]);
+  }, [sessionFilter, branchFilter, difficultyFilter, basketFilter, searchQuery, isPro, smartFocusMode]);
 
   const safeIndex =
     filteredSpots.length > 0
@@ -212,9 +216,7 @@ const DogruYanlisScreenInner: React.FC<DogruYanlisScreenProps> = ({
     let wrong = 0;
     let correct = 0;
     let osymTwin = 0;
-    const basePool = isPro
-      ? TUS_SPOT_CARDS
-      : TUS_SPOT_CARDS.slice(0, FREE_QUESTION_LIMIT);
+    const basePool = TUS_SPOT_CARDS;
 
     basePool.forEach((s) => {
       if (s.isOsymTwin) osymTwin++;
@@ -237,10 +239,10 @@ const DogruYanlisScreenInner: React.FC<DogruYanlisScreenProps> = ({
     async (selectedTrue: boolean) => {
       if (!currentSpot) return;
 
-      if (!isPro && totalSolvedCount >= FREE_QUESTION_LIMIT && !currentAnswer) {
+      if (!isPro && todayFreeUsed >= DAILY_FREE_SPOT_LIMIT && !currentAnswer) {
         await triggerHaptic('warning');
         onOpenPaywall(
-          `Ücretsiz ${FREE_QUESTION_LIMIT} soru/spot çözüm hakkınızı tamamladınız. Tüm ${TUS_SPOT_CARDS.length}+ D/Y spot kartını sınırsız açmak için PRO pakete geçin.`
+          `Bugünkü ${DAILY_FREE_SPOT_LIMIT} ücretsiz D/Y spot hakkın doldu. Sınırsız çözüm için PRO'ya geç veya yarın yenilenmesini bekle.`
         );
         return;
       }
@@ -255,7 +257,7 @@ const DogruYanlisScreenInner: React.FC<DogruYanlisScreenProps> = ({
         currentSpot.branchId
       );
     },
-    [currentSpot, isPro, totalSolvedCount, currentAnswer, onOpenPaywall, onRecordSpotAnswer]
+    [currentSpot, isPro, todayFreeUsed, currentAnswer, onOpenPaywall, onRecordSpotAnswer]
   );
 
   const handleShuffleJump = () => {
@@ -628,6 +630,42 @@ const DogruYanlisScreenInner: React.FC<DogruYanlisScreenProps> = ({
       {/* Collapsible Filter & Search Drawer */}
       {showFilters && (
         <div className={`rounded-2xl border p-3 space-y-2.5 ${cardBg}`}>
+          <div className="grid grid-cols-4 gap-1.5">
+            {(
+              [
+                { id: 'ALL' as const, label: 'Tüm Zorluk' },
+                { id: 'Kolay' as const, label: 'Kolay' },
+                { id: 'Orta' as const, label: 'Orta' },
+                { id: 'Zor' as const, label: 'Zor' },
+              ]
+            ).map((d) => {
+              const active = difficultyFilter === d.id;
+              return (
+                <button
+                  key={d.id}
+                  type="button"
+                  onClick={() => {
+                    triggerHaptic('selection');
+                    setDifficultyFilter(d.id);
+                  }}
+                  className={`h-9 rounded-xl text-xs font-extrabold border transition ${
+                    active
+                      ? d.id === 'Kolay'
+                        ? 'bg-emerald-600 border-emerald-600 text-white'
+                        : d.id === 'Zor'
+                        ? 'bg-rose-600 border-rose-600 text-white'
+                        : 'bg-[#2563EB] border-[#2563EB] text-white'
+                      : isLight
+                      ? 'bg-slate-50 border-slate-200 text-slate-600'
+                      : 'bg-white/[0.04] border-white/10 text-slate-300'
+                  }`}
+                >
+                  {d.label}
+                </button>
+              );
+            })}
+          </div>
+
           <div className="flex flex-wrap items-center gap-1.5">
             {[
               { id: 'unsolved' as const, label: `Yeni (${basketCounts.unsolved})` },
@@ -744,6 +782,7 @@ const DogruYanlisScreenInner: React.FC<DogruYanlisScreenProps> = ({
               onClick={() => {
                 setSessionFilter('ALL');
                 setBranchFilter('ALL');
+                setDifficultyFilter('ALL');
                 setBasketFilter('all');
                 setSearchQuery('');
                 setSmartFocusMode(false);
@@ -757,13 +796,33 @@ const DogruYanlisScreenInner: React.FC<DogruYanlisScreenProps> = ({
         </div>
       ) : (
         <div className={`rounded-3xl border p-4 sm:p-5 space-y-4 ${cardBg}`}>
-          {/* Clean 1-Line Subtle Context Header (Zero Duplicate Chrome!) */}
-          <div
-            className={`text-xs font-bold truncate ${
-              isLight ? 'text-slate-500' : 'text-slate-400'
-            }`}
-          >
-            {currentSpot.subTopic}
+          {/* Clean 1-Line Context Header + Subtle Difficulty Tag */}
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-1.5 min-w-0">
+              <span
+                className={`px-2 py-0.5 rounded-md text-[10px] font-extrabold shrink-0 ${
+                  currentSpot.difficultyLevel === 'Kolay'
+                    ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-300'
+                    : currentSpot.difficultyLevel === 'Zor'
+                    ? 'bg-rose-500/15 text-rose-600 dark:text-rose-300'
+                    : 'bg-blue-500/15 text-[#2563EB] dark:text-blue-300'
+                }`}
+              >
+                {currentSpot.difficultyLevel}
+              </span>
+              <span
+                className={`text-xs font-bold truncate ${
+                  isLight ? 'text-slate-500' : 'text-slate-400'
+                }`}
+              >
+                {currentSpot.subTopic}
+              </span>
+            </div>
+            {!isPro && (
+              <span className="text-[11px] font-extrabold text-amber-500 shrink-0 tabular-nums">
+                {Math.max(0, DAILY_FREE_SPOT_LIMIT - todayFreeUsed)} hak
+              </span>
+            )}
           </div>
 
           {/* Crisp Readable Statement Box */}
@@ -861,13 +920,10 @@ const DogruYanlisScreenInner: React.FC<DogruYanlisScreenProps> = ({
                   return;
                 }
 
-                if (
-                  !isPro &&
-                  safeIndex >= filteredSpots.length - 1 &&
-                  TUS_SPOT_CARDS.length > FREE_QUESTION_LIMIT
-                ) {
+                if (!isPro && todayFreeUsed >= DAILY_FREE_SPOT_LIMIT) {
+                  triggerHaptic('warning');
                   onOpenPaywall(
-                    `Ücretsiz ${FREE_QUESTION_LIMIT} demo spotu tamamladınız. ${TUS_SPOT_CARDS.length}+ spotluk tam havuzu açmak için PRO'ya geçin.`
+                    `Bugünkü ${DAILY_FREE_SPOT_LIMIT} ücretsiz D/Y spot hakkın doldu. Sınırsız devam etmek için PRO'ya geç.`
                   );
                   return;
                 }

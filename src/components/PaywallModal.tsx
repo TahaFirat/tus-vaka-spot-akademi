@@ -203,13 +203,13 @@ export const PaywallModal: React.FC<PaywallModalProps> = ({
                 TUS Akademi PRO
               </h2>
               <p
-                className={`text-[11px] font-medium truncate ${
+                className={`text-[11px] font-medium leading-snug ${
                   isLight ? 'text-slate-500' : 'text-slate-400'
                 }`}
               >
                 {reasonMessage ||
                   (totalSolvedCount >= FREE_QUESTION_LIMIT
-                    ? `Ücretsiz ${FREE_QUESTION_LIMIT} soru hakkın doldu`
+                    ? `Bugünkü ${FREE_QUESTION_LIMIT} ücretsiz soru hakkın doldu`
                     : `${totalFmt}+ soru, ikiz ve altın spot sınırsız`)}
               </p>
             </div>

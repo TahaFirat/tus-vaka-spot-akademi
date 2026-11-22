@@ -15,6 +15,8 @@ export type TusBranchId =
 
 export type OptionLetter = 'A' | 'B' | 'C' | 'D' | 'E';
 
+export type DifficultyLevel = 'Kolay' | 'Orta' | 'Zor';
+
 export interface TusBranchMeta {
   id: TusBranchId;
   name: string;
@@ -39,6 +41,7 @@ export interface TusVakaQuestion {
   branchName: string;
   subTopic: string;
   difficulty: 'Temel Spot' | 'Klinik Vaka' | 'İleri Ayırıcı Tanı';
+  difficultyLevel: DifficultyLevel;
   examFrequency: 'Her TUS Sorulur' | 'Yüksek Verimli Vaka' | 'Altın Standart Spot';
   stem: string;
   clinicalClues: string[];
@@ -58,6 +61,7 @@ export interface TusSpotCard {
   branchId: TusBranchId;
   branchName: string;
   subTopic: string;
+  difficultyLevel: DifficultyLevel;
   statement: string;
   isTrue: boolean;
   criticalHighlight: string;

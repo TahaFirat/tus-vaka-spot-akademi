@@ -137,7 +137,7 @@ export const TUS_EXPECTED_PEARLS: TusExpectedPearl[] = [
     branchShort: 'Anatomi',
     category: '2027 Beklenen',
     shortTitle: 'Humerus Kırığı Sinir Eşleşmesi',
-    widgetSummary: 'Cerrahi boyun: N. axillaris • Gövde (sulkus): N. radialis • Медиal epikondil: N. ulnaris.',
+    widgetSummary: 'Cerrahi boyun: N. axillaris • Gövde (sulkus): N. radialis • Medial epikondil: N. ulnaris.',
     coreFact: 'Humerus kırıklarında kemiğe doğrudan komşu seyreden periferik sinirler spesifik seviyelerde yaralanır.',
     examComparison: 'Suprakondiler kırık: N. medianus (anterior interosseöz) + A. brachialis (Volkmann iskemisi).',
     redFlagTrap: 'Humerus anatomik boyun kırığında sinir hasarından ziyade kaput humeri avasküler nekrozu ön plandadır!',

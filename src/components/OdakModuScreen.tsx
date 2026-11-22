@@ -4,6 +4,7 @@ import {
   BookOpen,
   Clock,
   Flame,
+  HelpCircle,
   Layers,
   Pause,
   Play,
@@ -40,6 +41,7 @@ interface OdakModuScreenProps {
   activeSubTab?: OdakSubTab;
   onChangeSubTab?: (tab: OdakSubTab) => void;
   onUpdateStudyState: (updater: (prev: TusStudyState) => TusStudyState) => void;
+  onOpenGuide?: (tab?: 'puan' | 'dagilim' | 'sistem') => void;
 }
 
 function formatDurationClock(totalSec: number): string {
@@ -153,6 +155,7 @@ export const OdakModuScreen: React.FC<OdakModuScreenProps> = React.memo(
     activeSubTab,
     onChangeSubTab,
     onUpdateStudyState,
+    onOpenGuide,
   }) => {
     const [internalTab, setInternalTab] = useState<OdakSubTab>('kronometre');
     const subTab = activeSubTab ?? internalTab;
@@ -164,11 +167,12 @@ export const OdakModuScreen: React.FC<OdakModuScreenProps> = React.memo(
     const [topicSessionFilter, setTopicSessionFilter] = useState<'ALL' | 'TTBT' | 'KTBT'>('ALL');
     const [topicBranchFilter, setTopicBranchFilter] = useState<'ALL' | TusBranchId>('ALL');
 
-    // Saf TUS Net -> Puan Hedef Planlayıcı (100 TTBT + 100 KTBT)
-    const [ttbtCorrect, setTtbtCorrect] = useState(66);
-    const [ttbtWrong, setTtbtWrong] = useState(16);
-    const [ktbtCorrect, setKtbtCorrect] = useState(70);
-    const [ktbtWrong, setKtbtWrong] = useState(14);
+    // TUS Net -> Puan Hedef Planlayıcı (100 Temel + 100 Klinik)
+    const [ttbtCorrect, setTtbtCorrect] = useState(55);
+    const [ttbtWrong, setTtbtWrong] = useState(20);
+    const [ktbtCorrect, setKtbtCorrect] = useState(60);
+    const [ktbtWrong, setKtbtWrong] = useState(16);
+    const [hasPenalty, setHasPenalty] = useState(false);
 
     const cardBg = isLight
       ? 'bg-white border-slate-200/85 shadow-[0_1px_3px_rgba(15,23,42,0.04)]'
@@ -340,7 +344,8 @@ export const OdakModuScreen: React.FC<OdakModuScreenProps> = React.memo(
       ttbtCorrect,
       ttbtWrong,
       ktbtCorrect,
-      ktbtWrong
+      ktbtWrong,
+      hasPenalty
     );
     const activeTargetSpec =
       TUS_SPECIALTY_TARGETS.find((s) => s.id === studyState.targetSpecialtyId) ||
@@ -529,7 +534,7 @@ export const OdakModuScreen: React.FC<OdakModuScreenProps> = React.memo(
                         : `${subCardBg} ${isLight ? 'text-slate-600' : 'text-slate-300'}`
                     }`}
                   >
-                    {s === 'ALL' ? 'Tüm Dersler' : s}
+                    {s === 'ALL' ? 'Tüm Dersler' : s === 'TTBT' ? 'Temel' : 'Klinik'}
                   </button>
                 ))}
                 {TUS_BRANCHES.filter(
@@ -764,8 +769,8 @@ export const OdakModuScreen: React.FC<OdakModuScreenProps> = React.memo(
 
               <div className="grid grid-cols-2 gap-2">
                 <div className={`rounded-xl border p-2.5 space-y-1.5 ${subCardBg}`}>
-                  <div className="flex items-center justify-between text-[11px] font-extrabold text-teal-500">
-                    <span>TTBT (100)</span>
+                  <div className="flex items-center justify-between text-[11px] font-extrabold text-[#2563EB]">
+                    <span>Temel (100)</span>
                     <span>{simScores.ttbtNet} Net</span>
                   </div>
                   <div className="grid grid-cols-2 gap-1.5 text-xs">
@@ -784,7 +789,7 @@ export const OdakModuScreen: React.FC<OdakModuScreenProps> = React.memo(
                           setTtbtCorrect(nextC);
                           setTtbtWrong((w) => Math.min(w, 100 - nextC));
                         }}
-                        className={`w-full rounded-lg border px-2 py-1 font-bold tabular-nums outline-none ${cardBg}`}
+                        className={`w-full h-10 rounded-xl border px-2.5 font-bold tabular-nums outline-none ${cardBg}`}
                       />
                     </label>
                     <label className="space-y-0.5">
@@ -802,15 +807,15 @@ export const OdakModuScreen: React.FC<OdakModuScreenProps> = React.memo(
                             )
                           )
                         }
-                        className={`w-full rounded-lg border px-2 py-1 font-bold tabular-nums outline-none ${cardBg}`}
+                        className={`w-full h-10 rounded-xl border px-2.5 font-bold tabular-nums outline-none ${cardBg}`}
                       />
                     </label>
                   </div>
                 </div>
 
                 <div className={`rounded-xl border p-2.5 space-y-1.5 ${subCardBg}`}>
-                  <div className="flex items-center justify-between text-[11px] font-extrabold text-cyan-500">
-                    <span>KTBT (100)</span>
+                  <div className="flex items-center justify-between text-[11px] font-extrabold text-emerald-500">
+                    <span>Klinik (100)</span>
                     <span>{simScores.ktbtNet} Net</span>
                   </div>
                   <div className="grid grid-cols-2 gap-1.5 text-xs">
@@ -829,7 +834,7 @@ export const OdakModuScreen: React.FC<OdakModuScreenProps> = React.memo(
                           setKtbtCorrect(nextC);
                           setKtbtWrong((w) => Math.min(w, 100 - nextC));
                         }}
-                        className={`w-full rounded-lg border px-2 py-1 font-bold tabular-nums outline-none ${cardBg}`}
+                        className={`w-full h-10 rounded-xl border px-2.5 font-bold tabular-nums outline-none ${cardBg}`}
                       />
                     </label>
                     <label className="space-y-0.5">
@@ -847,23 +852,54 @@ export const OdakModuScreen: React.FC<OdakModuScreenProps> = React.memo(
                             )
                           )
                         }
-                        className={`w-full rounded-lg border px-2 py-1 font-bold tabular-nums outline-none ${cardBg}`}
+                        className={`w-full h-10 rounded-xl border px-2.5 font-bold tabular-nums outline-none ${cardBg}`}
                       />
                     </label>
                   </div>
                 </div>
               </div>
 
+              <div className="flex items-center justify-between gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    triggerHaptic('selection');
+                    setHasPenalty((p) => !p);
+                  }}
+                  className={`h-9 px-3 rounded-xl border text-[11px] font-extrabold transition ${
+                    hasPenalty
+                      ? 'bg-rose-500/15 border-rose-500/40 text-rose-500'
+                      : `${subCardBg} text-slate-400`
+                  }`}
+                >
+                  {hasPenalty ? '✓ %5 Kesinti Aktif' : '%5 Kesinti Uygula'}
+                </button>
+
+                {onOpenGuide && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      triggerHaptic('light');
+                      onOpenGuide('puan');
+                    }}
+                    className="h-9 px-3 rounded-xl text-[11px] font-extrabold text-[#2563EB] inline-flex items-center gap-1"
+                  >
+                    <HelpCircle className="w-3.5 h-3.5" />
+                    <span>Formül</span>
+                  </button>
+                )}
+              </div>
+
               <div className="grid grid-cols-2 gap-2 text-center">
                 <div className={`rounded-xl border p-2.5 ${subCardBg}`}>
-                  <div className="text-[10px] font-bold text-slate-400">TAHMİNİ K-TUS</div>
-                  <div className="text-xl font-extrabold text-emerald-500 tabular-nums">
+                  <div className="text-[10px] font-bold text-slate-400">K Puanı (%60K / %40T)</div>
+                  <div className={`text-xl font-extrabold tabular-nums ${simScores.kTusScore < 45 ? 'text-rose-500' : 'text-emerald-500'}`}>
                     {simScores.kTusScore}
                   </div>
                 </div>
                 <div className={`rounded-xl border p-2.5 ${subCardBg}`}>
-                  <div className="text-[10px] font-bold text-slate-400">TAHMİNİ T-TUS</div>
-                  <div className="text-xl font-extrabold text-teal-500 tabular-nums">
+                  <div className="text-[10px] font-bold text-slate-400">T Puanı (%60T / %40K)</div>
+                  <div className={`text-xl font-extrabold tabular-nums ${simScores.tTusScore < 45 ? 'text-rose-500' : 'text-[#2563EB]'}`}>
                     {simScores.tTusScore}
                   </div>
                 </div>

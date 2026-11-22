@@ -113,11 +113,11 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
         falseHighlight: 'hücre içinden kalsiyum salınımına bağlı olarak ağır hiperkalsemi gelişir',
       },
       {
-        entityName: 'Hiperkalemi Acil Tedavisi (İlk Yapılacak: İV Kalsiyum Glukonat — Membran Stabilizasyonu)',
+        entityName: 'Ağır Hiperkalemi Acili (İlk Yapılacak: İV Kalsiyum Glukonat — Membran Stabilizasyonu)',
         patientVignette:
           '[2025 TUS Konsept İkizi] Kronik böbrek yetmezliği olan hasta acil servise kas güçsüzlüğü ile getiriliyor. Serum potasyum düzeyi 7.4 mEq/L ölçülüyor; EKG’de sivri T dalgaları, PR uzaması, P dalgası silinmesi ve QRS genişlemesi saptanıyor.',
-        clues: ['potasyum 7.4 mEq/L', 'EKG’de sivri T dalgaları ve QRS genişlemesi', 'ilk uygulanacak ajan'],
-        questionPrompt: 'EKG değişikliği olan bu ağır elektrolit acilinde miyokard membranını stabilize etmek için İLK uygulanması gereken tedavi yaklaşımı hangisidir?',
+        clues: ['potasyum 7.4 mEq/L', 'EKG’de sivri T dalgaları ve QRS genişlemesi', 'miyokard membran stabilizasyonu'],
+        questionPrompt: 'EKG değişikliği eşlik eden ve miyokard membranını stabilize etmek için ilk olarak İV Kalsiyum glukonat uygulanmasını gerektiren bu elektrolit acili hangisidir?',
         mechanism:
           'EKG bulgusu olan hiperkalemide İLK adım potasyumu düşürmek değil, miyokard hücre membranının eşik potansiyelini yükselterek kalbi aritmiden korumaktır; bunun için İV Kalsiyum glukonat verilir. Ardından K+’u hücre içine sokmak için İnsülin + Dekstroz ve Nebülize Salbutamol verilir.',
         whenCorrectNote: 'EKG bulgulu hiperkalemide İLK tercih: İV Kalsiyum glukonat (Potasyumu düşürmez, miyokard membranını stabilize eder).',
@@ -418,7 +418,7 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
         mechanism:
           'Metotreksat dihidrofolat redüktazı (DHFR) inhibe eder. Folinik asit (Lökovorin / N5-formil-THF) DHFR basamağını bypass ederek normal hücreleri kurtarır. Böbrek yetmezliği olan hastada aşırı yüksek plazma metotreksat düzeyini hızla yıkmak için ise rekombinant karboksipeptidaz G2 enzimi olan Glukarpidaz kullanılır.',
         whenCorrectNote: 'Hücresel Kurtarma (Rescue) Ajanı: Folinik asit (Lökovorin) • Böbrek Yetmezliğinde Plazma Metotreksatını Yıkan Enzim: Glukarpidaz.',
-        firstVsGold: 'Kemik İliği/Mukoza Kurtarma: Lökovorin (Folinik asit) • Ağır Böbrek Yetmezliğinde Metotreksatı İnaftive Eden Enzim: Glukarpidaz + İdrar Alkalinizasyonu.',
+        firstVsGold: 'Kemik İliği/Mukoza Kurtarma: Lökovorin (Folinik asit) • Ağır Böbrek Yetmezliğinde Metotreksatı İnaktive Eden Enzim: Glukarpidaz + İdrar Alkalinizasyonu.',
         pearl: 'Metotreksat toksisitesinde Folik asit değil, DHFR enzimine ihtiyaç duymayan FOLİNİK ASİT (Lökovorin) verilir; böbrek yetmezliğinde metotreksatı doğrudan yıkan enzim ise Glukarpidaz’dır.',
         trueStatement: 'Metotreksat toksisitesinde hücresel kurtarma için lökovorin (folinik asit), böbrek yetmezliğinde plazma metotreksatını yıkmak için ise glukarpidaz kullanılır.',
         falseStatement: 'Metotreksat zehirlenmesinde spesifik antidot olarak mesna ve deksrazoksan kullanılır.',
@@ -438,7 +438,7 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           '[2021 TUS Konsept İkizi] Meme kanseri nedeniyle radikal mastektomi ve aksiller lenf nodu diseksiyonu yapılan 48 yaşındaki kadın hastada postoperatif dönemde elini duvara dayayıp ittiğinde sağ skapulanın medial kenarının arkaya doğru belirginleştiği (Kanat skapula) ve kolunu 90 derecenin üzerine kaldıramadığı saptanıyor.',
         clues: ['aksiller lenf nodu diseksiyonu sonrası', 'duvarı iterken kanat skapula (winged scapula)', 'kolun 90° üzerine abduksiyon (hiperabduksiyon) kaybı'],
-        questionPrompt: 'Bu hastada yaralanan sinir ve felç olan kas eşleşmesi aşağıdakilerden hangisidir?',
+        questionPrompt: 'M. serratus anterior felcine ve kanat skapulaya yol açan sinir yaralanması aşağıdakilerden hangisidir?',
         mechanism:
           'C5-C6-C7 köklerinden çıkan N. thoracicus longus (Bell siniri), M. serratus anterior’u innerve eder. Aksiller diseksiyonda yaralandığında skapula göğüs duvarına sabitlenemez (Kanat skapula) ve glenoid kavite yukarı döndürülemediği için kol 90°’nin üzerine kaldırılamaz.',
         whenCorrectNote: 'Aksiller diseksiyon + Kanat skapula (Winged scapula) + Kolun 90° üzerine abduksiyon kaybı -> N. thoracicus longus (M. serratus anterior).',
@@ -458,7 +458,7 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
           'N. axillaris (C5-C6), humerus cerrahi boynu ile komşudur ve Spatium quadrangulare’den geçer; M. deltoideus ile M. teres minor’u motor olarak innerve eder. Yaralanmasında kol 15–90° abduksiyon yapamaz, omuz düzleşir (apolet belirtisi) ve omuz dış yanında duyu kaybı olur.',
         whenCorrectNote: 'Collum chirurgicum humeri kırığı / Omuz çıkığı + Spatium quadrangulare + M. deltoideus & M. teres minor felci + Kolun 15–90° abduksiyon kaybı.',
         firstVsGold: 'Collum Chirurgicum Kırığı: N. axillaris • Corpus Humeri (Sulcus n. radialis) Kırığı: N. radialis • Epicondylus Medialis Kırığı: N. ulnaris • Suprakondiler Kırık: N. medianus.',
-        pearl: 'Humerus kırıkları ve sinirleri TUS klasiğidir: Collum chirurgicum -> N. axillaris; Corpus (dişafiz) -> N. radialis; Suprakondiler -> N. medianus; Medial epikondil -> N. ulnaris.',
+        pearl: 'Humerus kırıkları ve sinirleri TUS klasiğidir: Collum chirurgicum -> N. axillaris; Corpus (diyafiz) -> N. radialis; Suprakondiler -> N. medianus; Medial epikondil -> N. ulnaris.',
         trueStatement: 'Humerus cerrahi boyun kırıklarında N. axillaris yaralanır; M. deltoideus ve M. teres minor felcine bağlı olarak kol 15-90 derece abduksiyon yapamaz.',
         falseStatement: 'Humerus cerrahi boyun kırıklarında en sık N. ulnaris yaralanır ve hastada pençe el (claw hand) deformitesi gelişir.',
         falseHighlight: 'en sık N. ulnaris yaralanır ve hastada pençe el (claw hand) deformitesi gelişir',
@@ -498,7 +498,7 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           '[2019 TUS Konsept İkizi] Kalçanın üst-iç kadranına hatalı intramüsküler enjeksiyon yapılan hastada yürüme sırasında sağ ayağı üzerinde tek ayakla durduğunda pelvisin desteklenmeyen SOL (karşı) tarafa doğru düştüğü (pozitif Trendelenburg belirtisi) ve ördekvari yürüyüş geliştiği görülüyor.',
         clues: ['hatalı gluteal İM enjeksiyon', 'sağ ayak üzerinde dururken pelvisin SOL (karşı) tarafa düşmesi', 'Trendelenburg belirtisi (+)'],
-        questionPrompt: 'Foramen suprapiriforme’den geçen ve yaralanmasında karşı tarafa pelvis düşmesine (Trendelenburg) yol açan bu sinir ve kas ikilisi hangisidir?',
+        questionPrompt: 'Foramen suprapiriforme’den geçen ve yaralanmasında karşı tarafa pelvis düşmesine (Trendelenburg) yol açan sinir hasarı hangisidir?',
         mechanism:
           'N. gluteus superior (L4-S1), Foramen suprapiriforme’den geçen tek yapıdır (A./V. glutea superior ile) ve M. gluteus medius, M. gluteus minimus ile M. tensor fasciae latae’yi innerve eder. Sağ N. gluteus superior felcinde sağ ayak üzerinde durulduğunda sol (karşı) pelvis aşağı düşer.',
         whenCorrectNote: 'Foramen suprapiriforme + M. gluteus medius & minimus felci + Sağlam ayak üzerinde dururken karşı pelvisin düşmesi (Trendelenburg +).',
@@ -567,7 +567,7 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           '[2024 TUS Konsept İkizi] Multipl miyelom (hafif zincir nefropatisi) tanılı bir hastada kan şekeri normal (88 mg/dL) olmasına rağmen idrarda glukozüri, generalize aminoasidüri, fosfatüri, ürikozüri ve bikarbonat kaybına bağlı normal anyon açıklı (hiperkloremik) metabolik asidoz (Tip 2 RTA) saptanıyor.',
         clues: ['normoglisemik glukozüri + aminoasidüri + fosfatüri', 'bikarbonat kaybı (Tip 2 RTA)', 'proksimal tübül yaygın transport bozukluğu'],
-        questionPrompt: 'Glukoz ve aminoasitlerin %100’ünün geri emildiği bu nefron segmenti ve yaygın işlev bozukluğuna verilen ad hangisidir?',
+        questionPrompt: 'Glukoz ve aminoasitlerin %100’ünün geri emildiği, yaygın işlev bozukluğunda Fanconi sendromu gelişen nefron segmenti hangisidir?',
         mechanism:
           'Proksimal tübül filtrelenen glukoz ve aminoasitlerin %100’ünü, HCO3-’ün %85’ini ve su/Na+’un %65’ini İZOOZMOTİK olarak geri emer (tübül sıvısı ozmolalitesi plazmaya eşittir: 300 mOsm/L). Yaygın proksimal tübül disfonksiyonuna Fanconi sendromu (veya Tip 2 RTA) denir.',
         whenCorrectNote: 'Proksimal tübül: %100 Glukoz/Aminoasit + %85 HCO3- + %65 Na+/Su izoozmotik emilim + Asetazolamid ve SGLT2i hedefi + Bozukluğunda Fanconi sendromu.',
@@ -906,7 +906,7 @@ export const OSYM_TWIN_TUS_CLUSTERS: DifferentialClusterSeed[] = [
         questionPrompt: 'En sık tuba uterinanın ampulla bölgesine yerleşen ve seçilmiş stabil olgularda tek doz metotreksat ile medikal tedavi edilebilen bu tablo hangisidir?',
         mechanism:
           'Ektopik gebelik en sık (%70) tuba uterinanın Ampulla bölgesine yerleşir (en erken rüptüre olan ise İstmus’tur). Hemodinamik olarak stabil, rüptüre olmamış, kitle çapı <3.5–4 cm, fetal kalp atımı negatif ve Beta-hCG <5000 mIU/mL olan hastalarda tek doz İM Metotreksat verilir. Rüptür/hemodinamik instabilite, emzirme ve heterotopik gebelikte metotreksat kesin kontrendikedir.',
-        whenCorrectNote: 'En sık yerleşim: Ampulla • Medikal tedavi: Metotreksat (Stabil hasta, rüptür yok, FKA yok, Beta-hCG < 5000) • Rüptür varsa: Acil лаparoskopik salpenjektomi.',
+        whenCorrectNote: 'En sık yerleşim: Ampulla • Medikal tedavi: Metotreksat (Stabil hasta, rüptür yok, FKA yok, Beta-hCG < 5000) • Rüptür varsa: Acil laparoskopik salpenjektomi.',
         firstVsGold: 'En Sık Yerleşim: Ampulla • En Erken Rüptür: İstmus • En Geç Rüptür (Ağır Kanama): İnterstisyel (Kornual) • Medikal Ajan: İM Metotreksat.',
         pearl: 'Metotreksat tedavisinde başarı takibi 4. ve 7. gün Beta-hCG düzeyleri ile yapılır; 4. ve 7. günler arasında Beta-hCG’de en az %15 düşüş olması beklenir!',
         trueStatement: 'Ektopik gebelik en sık ampulla yerleşimlidir; rüptüre olmamış, fetal kalp atımı negatif ve hemodinamik olarak stabil hastalarda metotreksat ile tedavi edilir.',

@@ -23,7 +23,11 @@ import {
   TUS_BRANCHES,
   TusBranchId,
 } from '../data/tusMedicalRepository';
-import { shareClinicalSummary, triggerHaptic } from '../services/nativeBridge';
+import {
+  DAILY_FREE_PEARL_LIMIT,
+  shareClinicalSummary,
+  triggerHaptic,
+} from '../services/nativeBridge';
 
 export function getActiveFullExpectedPearl(
   pinnedPearlId?: string | null,
@@ -38,13 +42,17 @@ export function getActiveFullExpectedPearl(
 }
 
 interface BeklenenSpotlarScreenProps {
+  isPro: boolean;
   isLight: boolean;
+  todayFreePearlUsed: number;
   focusedPearlId?: string | null;
   openedFromWidget?: boolean;
   pinnedWidgetPearlId: string | null;
   savedPearlIds: string[];
   onTogglePinPearl: (pearlId: string) => void;
   onToggleSavePearl: (pearlId: string) => void;
+  onConsumeFreePearl: () => void;
+  onOpenPaywall: (reason?: string) => void;
   onJumpToBranchVaka: (branchId: TusBranchId) => void;
 }
 
@@ -61,13 +69,17 @@ const CATEGORIES: Array<'ALL' | 'SAVED' | ExpectedPearlCategory> = [
 
 export const BeklenenSpotlarScreen: React.FC<BeklenenSpotlarScreenProps> = React.memo(
   ({
+    isPro,
     isLight,
+    todayFreePearlUsed,
     focusedPearlId,
     openedFromWidget = false,
     pinnedWidgetPearlId,
     savedPearlIds,
     onTogglePinPearl,
     onToggleSavePearl,
+    onConsumeFreePearl,
+    onOpenPaywall,
     onJumpToBranchVaka,
   }) => {
     const defaultActive = useMemo(
@@ -141,12 +153,25 @@ export const BeklenenSpotlarScreen: React.FC<BeklenenSpotlarScreenProps> = React
       ? 'bg-slate-50 border-slate-200/80'
       : 'bg-white/[0.04] border-white/8';
 
+    const openPearlWithQuota = (targetId: string) => {
+      if (targetId === currentPearl.id) return;
+      if (!isPro && todayFreePearlUsed >= DAILY_FREE_PEARL_LIMIT) {
+        triggerHaptic('warning');
+        onOpenPaywall(
+          `Bugünkü ${DAILY_FREE_PEARL_LIMIT} ücretsiz Altın Spot hakkın doldu. 2.751 spotun tamamı için PRO'ya geç.`
+        );
+        return;
+      }
+      if (!isPro) onConsumeFreePearl();
+      setActivePearlId(targetId);
+    };
+
     const handleStep = (dir: -1 | 1) => {
       if (filteredPearls.length <= 1) return;
       triggerHaptic('selection');
       const nextIdx =
         (currentIndex + dir + filteredPearls.length) % filteredPearls.length;
-      setActivePearlId(filteredPearls[nextIdx].id);
+      openPearlWithQuota(filteredPearls[nextIdx].id);
     };
 
     const hasActiveFilter =
@@ -312,7 +337,7 @@ export const BeklenenSpotlarScreen: React.FC<BeklenenSpotlarScreenProps> = React
             <div className="flex items-center justify-between gap-2 flex-wrap">
               <div className="flex items-center gap-1.5 flex-wrap">
                 <span className="px-2 py-0.5 rounded-lg bg-emerald-500/15 text-emerald-500 text-[10.5px] font-extrabold">
-                  [{currentPearl.session}] {currentPearl.branchShort}
+                  {currentPearl.session === 'TTBT' ? 'Temel' : 'Klinik'} • {currentPearl.branchShort}
                 </span>
                 <span className="px-2 py-0.5 rounded-lg bg-amber-500/15 text-amber-500 text-[10.5px] font-extrabold">
                   {currentPearl.category}
@@ -320,13 +345,18 @@ export const BeklenenSpotlarScreen: React.FC<BeklenenSpotlarScreenProps> = React
                 {(openedFromWidget && focusedPearlId === currentPearl.id) ||
                 isLiveWidgetSpot ? (
                   <span className="px-2 py-0.5 rounded-lg bg-cyan-500/15 text-cyan-500 text-[10px] font-extrabold">
-                    {isPinned ? 'Widget’ta Sabit' : 'Aktif Widget Spotu'}
+                    {isPinned ? 'Widget’ta' : 'Widget'}
                   </span>
                 ) : null}
               </div>
 
               <span className="text-[11px] font-extrabold text-slate-400 tabular-nums">
                 {currentIndex + 1} / {filteredPearls.length}
+                {!isPro && (
+                  <span className="ml-1.5 text-amber-500">
+                    • {Math.max(0, DAILY_FREE_PEARL_LIMIT - todayFreePearlUsed)} hak
+                  </span>
+                )}
               </span>
             </div>
 
@@ -344,28 +374,28 @@ export const BeklenenSpotlarScreen: React.FC<BeklenenSpotlarScreenProps> = React
               </p>
             </div>
 
-            {/* Katman 1: Klinik Mekanizma & Net Bilgi */}
+            {/* Katman 1: Mekanizma */}
             <div className={`rounded-2xl border p-3 space-y-1 ${subBg}`}>
               <div className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-500">
-                Net Sınav Bilgisi & Mekanizma
+                Mekanizma
               </div>
               <p className="text-xs leading-relaxed font-medium">
                 {currentPearl.coreFact}
               </p>
             </div>
 
-            {/* Katman 2: İlk Tercih vs Altın Standart / Ayırıcı Nokta */}
+            {/* Katman 2: Ayırıcı Tanı */}
             <div className={`rounded-2xl border p-3 space-y-1 ${subBg}`}>
               <div className="flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-wider text-teal-500">
                 <ArrowLeftRight className="w-3.5 h-3.5" />
-                <span>İlk Tercih & Ayırıcı Karşılaştırma</span>
+                <span>Ayırıcı Tanı</span>
               </div>
               <p className="text-xs leading-relaxed font-semibold">
                 {currentPearl.examComparison}
               </p>
             </div>
 
-            {/* Katman 3: AMBOSS Kırmızı Bayrak (ÖSYM Tuzağı) */}
+            {/* Katman 3: Sınav Tuzağı */}
             <div
               className={`rounded-2xl border p-3 space-y-1 ${
                 isLight
@@ -375,7 +405,7 @@ export const BeklenenSpotlarScreen: React.FC<BeklenenSpotlarScreenProps> = React
             >
               <div className="flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-wider text-rose-500">
                 <AlertTriangle className="w-3.5 h-3.5" />
-                <span>ÖSYM Kırmızı Bayrak Tuzağı</span>
+                <span>Sınav Tuzağı</span>
               </div>
               <p className="text-xs leading-relaxed font-semibold">
                 {currentPearl.redFlagTrap}
@@ -488,7 +518,7 @@ export const BeklenenSpotlarScreen: React.FC<BeklenenSpotlarScreenProps> = React
                     type="button"
                     onClick={() => {
                       triggerHaptic('selection');
-                      setActivePearlId(item.id);
+                      openPearlWithQuota(item.id);
                       window.scrollTo({ top: 0, behavior: 'smooth' });
                     }}
                     className={`text-left rounded-xl border p-2.5 space-y-1 transition ${
@@ -531,38 +561,19 @@ export const BeklenenSpotlarScreen: React.FC<BeklenenSpotlarScreenProps> = React
           </div>
         )}
 
-        {/* 4 Farklı iOS Widget Çeşidi Bilgi Kartı */}
-        <div className={`rounded-2xl border p-3.5 space-y-2 ${cardBg}`}>
-          <div className="flex items-center gap-1.5 text-xs font-extrabold">
-            <Smartphone className="w-4 h-4 text-emerald-500" />
-            <span>4 Farklı iOS Widget Çeşidi (Ana & Kilit Ekranı)</span>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
-            {[
-              {
-                name: '1. Günün Çıkacak TUS Spotu',
-                desc: 'Küçük, Orta, Büyük ve Kilit ekranında tam metin spotlar; dokununca doğrudan bu kartı açar.',
-              },
-              {
-                name: '2. İlk Tercih & ÖSYM Tuzak Kartı',
-                desc: 'İlk tercih vs altın standart ve kırmızı bayrak tuzaklarını ana ekranda gösterir.',
-              },
-              {
-                name: '3. TUS Geri Sayım & Spot',
-                desc: 'Resmi ÖSYM sayacı, günlük hedef ve aktif spotu tek bakışta birleştirir.',
-              },
-              {
-                name: '4. Saf Odak & Etüt Halkası',
-                desc: 'Günlük etüt dakikası, seri ve 55 konu tur yüzdesiyle doğrudan Odak modunu açar.',
-              },
-            ].map((w) => (
-              <div key={w.name} className={`rounded-xl border p-2.5 space-y-0.5 ${subBg}`}>
-                <div className="font-extrabold text-emerald-500">{w.name}</div>
-                <div className="text-slate-400 leading-snug">{w.desc}</div>
-              </div>
-            ))}
-          </div>
-        </div>
+        {/* Kompakt Açılır Widget İpucu */}
+        <details className={`rounded-2xl border px-3.5 py-2.5 text-xs ${cardBg}`}>
+          <summary className="cursor-pointer list-none flex items-center justify-between gap-2 font-extrabold">
+            <span className="flex items-center gap-1.5">
+              <Smartphone className="w-4 h-4 text-[#2563EB]" />
+              <span>iPhone Ana Ekran Widgetları</span>
+            </span>
+            <span className="text-[11px] text-slate-400">Nasıl Eklenir ▾</span>
+          </summary>
+          <p className="pt-2 text-[11px] text-slate-400 leading-relaxed">
+            Ana ekrana basılı tut → <strong>+</strong> → <strong>TUS Akademi</strong> widgetını ekle. Beğendiğin spotu <strong>Widget’a Sabitle</strong> ile ana ekranında tutabilirsin.
+          </p>
+        </details>
       </div>
     );
   }

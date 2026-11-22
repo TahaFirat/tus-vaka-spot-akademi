@@ -20,6 +20,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import {
+  DifficultyLevel,
   matchesVakaSearch,
   OptionLetter,
   TUS_BRANCHES,
@@ -29,13 +30,13 @@ import {
   TusSessionType,
 } from '../data/tusMedicalRepository';
 import { BRANCH_VISUALS } from '../data/branchVisuals';
-import { FREE_QUESTION_LIMIT, triggerHaptic } from '../services/nativeBridge';
+import { DAILY_FREE_VAKA_LIMIT, triggerHaptic } from '../services/nativeBridge';
 import { TwinYearFilter, VakaAnswerRecord } from '../services/studyStorage';
 
 interface VakaTestScreenProps {
   isPro: boolean;
   isLight: boolean;
-  totalSolvedCount: number;
+  todayFreeUsed: number;
   vakaAnswers: Record<string, VakaAnswerRecord>;
   bookmarkedVakaIds: string[];
   onRecordVakaAnswer: (
@@ -57,7 +58,7 @@ interface VakaTestScreenProps {
 const VakaTestScreenInner: React.FC<VakaTestScreenProps> = ({
   isPro,
   isLight,
-  totalSolvedCount,
+  todayFreeUsed,
   vakaAnswers,
   bookmarkedVakaIds,
   onRecordVakaAnswer,
@@ -77,6 +78,7 @@ const VakaTestScreenInner: React.FC<VakaTestScreenProps> = ({
 
   const [sessionFilter, setSessionFilter] = useState<'ALL' | TusSessionType>('ALL');
   const [branchFilter, setBranchFilter] = useState<'ALL' | TusBranchId>(initialBranch);
+  const [difficultyFilter, setDifficultyFilter] = useState<'ALL' | DifficultyLevel>('ALL');
   const [yearFilter, setYearFilter] = useState<TwinYearFilter>(initialYear);
   const resolvedDefaultBasket = useMemo(() => {
     if (initialBasket !== 'all' && initialBasket !== 'unsolved') return initialBasket;
@@ -168,6 +170,7 @@ const VakaTestScreenInner: React.FC<VakaTestScreenProps> = ({
     const matched = effectivePool.filter((q) => {
       if (sessionFilter !== 'ALL' && q.session !== sessionFilter) return false;
       if (branchFilter !== 'ALL' && q.branchId !== branchFilter) return false;
+      if (difficultyFilter !== 'ALL' && q.difficultyLevel !== difficultyFilter) return false;
       if (
         isDedicatedTwinTab &&
         yearFilter !== 'ALL' &&
@@ -220,6 +223,7 @@ const VakaTestScreenInner: React.FC<VakaTestScreenProps> = ({
     isDedicatedTwinTab,
     sessionFilter,
     branchFilter,
+    difficultyFilter,
     yearFilter,
     basketFilter,
     searchQuery,
@@ -235,7 +239,7 @@ const VakaTestScreenInner: React.FC<VakaTestScreenProps> = ({
     setPinnedQuestionId(null);
     setShowClues(false);
     setShowDiffDetails(false);
-  }, [sessionFilter, branchFilter, yearFilter, basketFilter, searchQuery, isPro, smartFocusMode, isDedicatedTwinTab]);
+  }, [sessionFilter, branchFilter, difficultyFilter, yearFilter, basketFilter, searchQuery, isPro, smartFocusMode, isDedicatedTwinTab]);
 
   const safeIndex =
     filteredQuestions.length > 0
@@ -278,11 +282,11 @@ const VakaTestScreenInner: React.FC<VakaTestScreenProps> = ({
   const handleSelectOption = async (letter: OptionLetter) => {
     if (!currentQuestion) return;
 
-    // Strict Freemium Gate: first 30 questions are free
-    if (!isPro && totalSolvedCount >= FREE_QUESTION_LIMIT && !currentAnswer) {
+    // Daily Free Quota Gate: 15 free questions/day -> instant redirect to PRO paywall
+    if (!isPro && todayFreeUsed >= DAILY_FREE_VAKA_LIMIT && !currentAnswer) {
       await triggerHaptic('warning');
       onOpenPaywall(
-        `Ücretsiz ${FREE_QUESTION_LIMIT} soru çözüm hakkınızı tamamladınız. Tüm ${TUS_VAKA_QUESTIONS.length}+ vaka sorusunu sınırsız çözmek için PRO pakete geçin.`
+        `Bugünkü ${DAILY_FREE_VAKA_LIMIT} ücretsiz soru hakkın doldu. PRO ile sınırsız devam et veya yarın yenilenmesini bekle.`
       );
       return;
     }
@@ -516,6 +520,11 @@ const VakaTestScreenInner: React.FC<VakaTestScreenProps> = ({
             {filteredQuestions.length > 0
               ? `${(safeIndex + 1).toLocaleString('tr-TR')} / ${filteredQuestions.length.toLocaleString('tr-TR')}`
               : '0 / 0'}
+            {!isPro && (
+              <span className="ml-1.5 text-amber-500">
+                • {Math.max(0, DAILY_FREE_VAKA_LIMIT - todayFreeUsed)} hak
+              </span>
+            )}
           </span>
           <div
             className={`h-1.5 w-full rounded-full overflow-hidden ${
@@ -683,9 +692,46 @@ const VakaTestScreenInner: React.FC<VakaTestScreenProps> = ({
         </div>
       )}
 
-      {/* Collapsible Filter / Year / Search Drawer (Hidden by Default for Maximum Calm!) */}
+      {/* Collapsible Filter / Difficulty / Year / Search Drawer (Hidden by Default for Maximum Calm!) */}
       {showFilters && (
         <div className={`rounded-2xl border p-3 space-y-2.5 ${cardBg}`}>
+          {/* Kolay / Orta / Zor Difficulty Filter */}
+          <div className="grid grid-cols-4 gap-1.5">
+            {(
+              [
+                { id: 'ALL' as const, label: 'Tüm Zorluk' },
+                { id: 'Kolay' as const, label: 'Kolay' },
+                { id: 'Orta' as const, label: 'Orta' },
+                { id: 'Zor' as const, label: 'Zor' },
+              ]
+            ).map((d) => {
+              const active = difficultyFilter === d.id;
+              return (
+                <button
+                  key={d.id}
+                  type="button"
+                  onClick={() => {
+                    triggerHaptic('selection');
+                    setDifficultyFilter(d.id);
+                  }}
+                  className={`h-9 rounded-xl text-xs font-extrabold border transition ${
+                    active
+                      ? d.id === 'Kolay'
+                        ? 'bg-emerald-600 border-emerald-600 text-white'
+                        : d.id === 'Zor'
+                        ? 'bg-rose-600 border-rose-600 text-white'
+                        : 'bg-[#2563EB] border-[#2563EB] text-white'
+                      : isLight
+                      ? 'bg-slate-50 border-slate-200 text-slate-600'
+                      : 'bg-white/[0.04] border-white/10 text-slate-300'
+                  }`}
+                >
+                  {d.label}
+                </button>
+              );
+            })}
+          </div>
+
           {/* Queue Baskets */}
           <div className="flex flex-wrap items-center gap-1.5">
             {[
@@ -835,6 +881,7 @@ const VakaTestScreenInner: React.FC<VakaTestScreenProps> = ({
               onClick={() => {
                 setSessionFilter('ALL');
                 setBranchFilter('ALL');
+                setDifficultyFilter('ALL');
                 setYearFilter('ALL');
                 setBasketFilter('all');
                 setSearchQuery('');
@@ -849,18 +896,31 @@ const VakaTestScreenInner: React.FC<VakaTestScreenProps> = ({
         </div>
       ) : (
         <div className={`rounded-3xl border p-4 sm:p-5 space-y-4 ${cardBg}`}>
-          {/* Clean 1-Line Subtle Context Header (Zero Duplicate Buttons/Badges!) */}
+          {/* Clean 1-Line Context Header + Subtle Difficulty Tag */}
           <div className="flex items-center justify-between gap-2">
-            <span
-              className={`text-xs font-bold truncate ${
-                isLight ? 'text-slate-500' : 'text-slate-400'
-              }`}
-            >
-              {isOsymTwinQuestion(currentQuestion) && currentQuestion.osymYearTag
-                ? `${currentQuestion.osymYearTag.replace(' Konsept İkizi', ' İkizi')} • `
-                : ''}
-              {currentQuestion.subTopic.replace(/^ÖSYM İkizi\s*•\s*/i, '')}
-            </span>
+            <div className="flex items-center gap-1.5 min-w-0">
+              <span
+                className={`px-2 py-0.5 rounded-md text-[10px] font-extrabold shrink-0 ${
+                  currentQuestion.difficultyLevel === 'Kolay'
+                    ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-300'
+                    : currentQuestion.difficultyLevel === 'Zor'
+                    ? 'bg-rose-500/15 text-rose-600 dark:text-rose-300'
+                    : 'bg-blue-500/15 text-[#2563EB] dark:text-blue-300'
+                }`}
+              >
+                {currentQuestion.difficultyLevel}
+              </span>
+              <span
+                className={`text-xs font-bold truncate ${
+                  isLight ? 'text-slate-500' : 'text-slate-400'
+                }`}
+              >
+                {isOsymTwinQuestion(currentQuestion) && currentQuestion.osymYearTag
+                  ? `${currentQuestion.osymYearTag.replace(' Konsept İkizi', ' İkizi')} • `
+                  : ''}
+                {currentQuestion.subTopic.replace(/^ÖSYM İkizi\s*•\s*/i, '')}
+              </span>
+            </div>
 
             {currentQuestion.clinicalClues.length > 0 && (
               <button
@@ -1051,13 +1111,10 @@ const VakaTestScreenInner: React.FC<VakaTestScreenProps> = ({
                   return;
                 }
 
-                if (
-                  !isPro &&
-                  safeIndex >= filteredQuestions.length - 1 &&
-                  sourcePool.length > FREE_QUESTION_LIMIT
-                ) {
+                if (!isPro && todayFreeUsed >= DAILY_FREE_VAKA_LIMIT) {
+                  triggerHaptic('warning');
                   onOpenPaywall(
-                    `Ücretsiz ${FREE_QUESTION_LIMIT} demo soruyu tamamladınız. ${sourcePool.length}+ soruluk tam havuzu açmak için PRO'ya geçin.`
+                    `Bugünkü ${DAILY_FREE_VAKA_LIMIT} ücretsiz soru hakkın doldu. PRO ile sınırsız devam et veya yarın yenilenmesini bekle.`
                   );
                   return;
                 }

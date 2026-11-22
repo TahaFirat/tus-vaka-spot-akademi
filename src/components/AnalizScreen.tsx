@@ -6,6 +6,7 @@ import {
   Compass,
   Download,
   Flame,
+  HelpCircle,
   Layers,
   RotateCcw,
   Share2,
@@ -38,6 +39,7 @@ interface AnalizScreenProps {
   onUpdateStudyState: (updater: (prev: TusStudyState) => TusStudyState) => void;
   onJumpToMistakes: (mode: 'vaka' | 'spot') => void;
   onOpenPaywall: (reason?: string) => void;
+  onOpenGuide?: (tab?: 'puan' | 'dagilim' | 'sistem') => void;
   onResetProgress: () => void;
   onReplayOnboarding: () => void;
 }
@@ -49,6 +51,7 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
   onUpdateStudyState,
   onJumpToMistakes,
   onOpenPaywall,
+  onOpenGuide,
   onResetProgress,
   onReplayOnboarding,
 }) => {
@@ -243,8 +246,8 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
       {/* 4 Özet İstatistik Kartı */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
         <div className={`rounded-2xl border p-3 ${cardClass}`}>
-          <div className="text-[10px] font-extrabold uppercase text-emerald-500">
-            TTBT (Temel)
+          <div className="text-[10.5px] font-extrabold uppercase text-[#2563EB]">
+            Temel
           </div>
           <div className="text-xl font-extrabold mt-0.5">%{stats.ttbtPct}</div>
           <div className="text-[11px] text-slate-400 tabular-nums">
@@ -253,8 +256,8 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
         </div>
 
         <div className={`rounded-2xl border p-3 ${cardClass}`}>
-          <div className="text-[10px] font-extrabold uppercase text-cyan-500">
-            KTBT (Klinik)
+          <div className="text-[10.5px] font-extrabold uppercase text-emerald-500">
+            Klinik
           </div>
           <div className="text-xl font-extrabold mt-0.5">%{stats.ktbtPct}</div>
           <div className="text-[11px] text-slate-400 tabular-nums">
@@ -263,26 +266,36 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
         </div>
 
         <div className={`rounded-2xl border p-3 ${cardClass}`}>
-          <div className="text-[10px] font-extrabold uppercase text-teal-500">
-            ÖSYM Neti
+          <div className="text-[10.5px] font-extrabold uppercase text-teal-500">
+            Toplam Net
           </div>
           <div className="text-xl font-extrabold text-emerald-500 mt-0.5 tabular-nums">
             {stats.overallNet}
           </div>
           <div className="text-[11px] text-slate-400 tabular-nums">
-            {stats.totalCorrect} D • {stats.totalWrong} Y
+            {stats.totalCorrect} D • {stats.totalWrong} Y (4Y=1D)
           </div>
         </div>
 
-        <div className={`rounded-2xl border p-3 ${cardClass}`}>
-          <div className="text-[10px] font-extrabold uppercase text-amber-500">
-            Tahmini TUS
+        <button
+          type="button"
+          onClick={() => {
+            triggerHaptic('light');
+            onOpenGuide?.('puan');
+          }}
+          className={`rounded-2xl border p-3 text-left transition active:scale-[0.98] ${cardClass}`}
+        >
+          <div className="flex items-center justify-between gap-1">
+            <span className="text-[10.5px] font-extrabold uppercase text-amber-500">
+              Tahmini Puan
+            </span>
+            <HelpCircle className="w-3.5 h-3.5 text-slate-400 shrink-0" />
           </div>
           <div className="text-xl font-extrabold text-amber-500 mt-0.5 tabular-nums">
             {stats.estimatedScore}
           </div>
-          <div className="text-[11px] text-slate-400">45–85 Bandı</div>
-        </div>
+          <div className="text-[11px] text-[#2563EB] font-bold">Nasıl hesaplanır?</div>
+        </button>
       </div>
 
       {/* Günlük Soru Hedefi & Hata Defteri */}
@@ -496,17 +509,36 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
             <span>Ayarlar & Yedekleme</span>
           </div>
 
-          <button
-            type="button"
-            onClick={() => {
-              triggerHaptic('light');
-              onReplayOnboarding();
-            }}
-            className="h-10 inline-flex items-center gap-1.5 px-3.5 rounded-xl bg-[#2563EB] hover:bg-blue-700 text-white text-xs font-extrabold transition active:scale-[0.98]"
-          >
-            <Compass className="w-4 h-4" />
-            <span>Ders Seçimi</span>
-          </button>
+          <div className="flex items-center gap-1.5">
+            {onOpenGuide && (
+              <button
+                type="button"
+                onClick={() => {
+                  triggerHaptic('light');
+                  onOpenGuide('puan');
+                }}
+                className={`h-10 inline-flex items-center gap-1.5 px-3 rounded-xl border text-xs font-extrabold transition ${
+                  isLight
+                    ? 'bg-slate-50 border-slate-200 text-slate-700'
+                    : 'bg-[#0A0E17] border-white/10 text-slate-200'
+                }`}
+              >
+                <HelpCircle className="w-4 h-4 text-[#2563EB]" />
+                <span>Puan Rehberi</span>
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => {
+                triggerHaptic('light');
+                onReplayOnboarding();
+              }}
+              className="h-10 inline-flex items-center gap-1.5 px-3.5 rounded-xl bg-[#2563EB] hover:bg-blue-700 text-white text-xs font-extrabold transition active:scale-[0.98]"
+            >
+              <Compass className="w-4 h-4" />
+              <span>Ders Seçimi</span>
+            </button>
+          </div>
         </div>
 
         {/* Günlük Hatırlatıcı & Karne Paylaşımı */}
@@ -567,7 +599,7 @@ export const AnalizScreen: React.FC<AnalizScreenProps> = ({
             onClick={() => {
               triggerHaptic('light');
               shareClinicalSummary(
-                `TUS Vaka & Spot Akademi Karnem • Çözülen: ${stats.totalSolved} Soru • ÖSYM Netim: ${stats.overallNet} • Tahmini TUS: ${stats.estimatedScore} • TUS'a Kalan: ${countdownDays} Gün`
+                `TUS Vaka & Spot Akademi Karnem • Çözülen: ${stats.totalSolved} Soru • Netim: ${stats.overallNet} • Tahmini Puan: ${stats.estimatedScore} • TUS'a Kalan: ${countdownDays} Gün`
               );
             }}
             className={`h-10 inline-flex items-center justify-center gap-1.5 px-3.5 rounded-xl border text-xs font-extrabold transition ${

@@ -56,6 +56,7 @@ import { OdakModuScreen, OdakSubTab } from './components/OdakModuScreen';
 import { BeklenenSpotlarScreen } from './components/BeklenenSpotlarScreen';
 import { PaywallModal } from './components/PaywallModal';
 import { OnboardingModal } from './components/OnboardingModal';
+import { TusGuideModal } from './components/TusGuideModal';
 
 type MainTabId =
   | 'home'
@@ -96,6 +97,8 @@ export const App: React.FC = () => {
   const [paywallReason, setPaywallReason] = useState<string | undefined>(undefined);
   const [proBannerVisible, setProBannerVisible] = useState<boolean>(false);
   const [replayOnboardingOpen, setReplayOnboardingOpen] = useState<boolean>(false);
+  const [guideOpen, setGuideOpen] = useState<boolean>(false);
+  const [guideTab, setGuideTab] = useState<'puan' | 'dagilim' | 'sistem'>('puan');
 
   // Smoothly dissolve the native-style Launch Curtain after React hydrates (zero jarring pop-in!)
   useEffect(() => {
@@ -315,6 +318,14 @@ export const App: React.FC = () => {
     setPaywallOpen(true);
   }, []);
 
+  const handleOpenGuide = useCallback(
+    (tab: 'puan' | 'dagilim' | 'sistem' = 'puan') => {
+      setGuideTab(tab);
+      setGuideOpen(true);
+    },
+    []
+  );
+
   const handleRecordVakaAnswer = useCallback(
     (
       questionId: string,
@@ -343,10 +354,14 @@ export const App: React.FC = () => {
           todaySolvedCount: alreadyExisted
             ? prev.todaySolvedCount
             : prev.todaySolvedCount + 1,
+          todayFreeVakaUsed:
+            !isPro && !alreadyExisted
+              ? prev.todayFreeVakaUsed + 1
+              : prev.todayFreeVakaUsed,
         };
       });
     },
-    []
+    [isPro]
   );
 
   const handleRecordSpotAnswer = useCallback(
@@ -377,10 +392,14 @@ export const App: React.FC = () => {
           todaySolvedCount: alreadyExisted
             ? prev.todaySolvedCount
             : prev.todaySolvedCount + 1,
+          todayFreeSpotUsed:
+            !isPro && !alreadyExisted
+              ? prev.todayFreeSpotUsed + 1
+              : prev.todayFreeSpotUsed,
         };
       });
     },
-    []
+    [isPro]
   );
 
   const handleToggleBookmarkVaka = useCallback((questionId: string) => {
@@ -427,12 +446,26 @@ export const App: React.FC = () => {
     });
   }, []);
 
-  const handleRecordExamAttempt = useCallback((attempt: TusExamAttempt) => {
+  const handleConsumeFreePearl = useCallback(() => {
+    if (isPro) return;
     setStudyState((prev) => ({
       ...prev,
-      examHistory: [attempt, ...prev.examHistory].slice(0, 30),
+      todayFreePearlUsed: prev.todayFreePearlUsed + 1,
     }));
-  }, []);
+  }, [isPro]);
+
+  const handleRecordExamAttempt = useCallback(
+    (attempt: TusExamAttempt) => {
+      setStudyState((prev) => ({
+        ...prev,
+        examHistory: [attempt, ...prev.examHistory].slice(0, 30),
+        todayFreeExamUsed: !isPro
+          ? prev.todayFreeExamUsed + 1
+          : prev.todayFreeExamUsed,
+      }));
+    },
+    [isPro]
+  );
 
   const handleJumpToMistakes = useCallback((mode: 'vaka' | 'spot') => {
     setStudyState((p) => ({ ...p, uiMode: 'akademi' }));
@@ -802,6 +835,7 @@ export const App: React.FC = () => {
               activeSubTab={odakSubTab}
               onChangeSubTab={setOdakSubTab}
               onUpdateStudyState={setStudyState}
+              onOpenGuide={handleOpenGuide}
             />
           ) : (
             <>
@@ -819,13 +853,17 @@ export const App: React.FC = () => {
 
               {activeTab === 'beklenen' && (
                 <BeklenenSpotlarScreen
+                  isPro={isPro}
                   isLight={isLightMode}
+                  todayFreePearlUsed={studyState.todayFreePearlUsed}
                   focusedPearlId={focusedPearlId}
                   openedFromWidget={openedFromWidget}
                   pinnedWidgetPearlId={studyState.pinnedWidgetPearlId}
                   savedPearlIds={studyState.savedExpectedPearlIds}
                   onTogglePinPearl={handleTogglePinPearl}
                   onToggleSavePearl={handleToggleSavePearl}
+                  onConsumeFreePearl={handleConsumeFreePearl}
+                  onOpenPaywall={handleOpenPaywall}
                   onJumpToBranchVaka={(branchId) =>
                     handleNavigateTab('vaka', { basket: 'unsolved', branchId })
                   }
@@ -838,7 +876,7 @@ export const App: React.FC = () => {
                   mode="standard"
                   isPro={isPro}
                   isLight={isLightMode}
-                  totalSolvedCount={summaryStats.totalSolved}
+                  todayFreeUsed={studyState.todayFreeVakaUsed}
                   vakaAnswers={studyState.vakaAnswers}
                   bookmarkedVakaIds={studyState.bookmarkedVakaIds}
                   onRecordVakaAnswer={handleRecordVakaAnswer}
@@ -865,7 +903,7 @@ export const App: React.FC = () => {
                   mode="osym_twin"
                   isPro={isPro}
                   isLight={isLightMode}
-                  totalSolvedCount={summaryStats.totalSolved}
+                  todayFreeUsed={studyState.todayFreeVakaUsed}
                   vakaAnswers={studyState.vakaAnswers}
                   bookmarkedVakaIds={studyState.bookmarkedVakaIds}
                   onRecordVakaAnswer={handleRecordVakaAnswer}
@@ -890,7 +928,7 @@ export const App: React.FC = () => {
                 <DogruYanlisScreen
                   isPro={isPro}
                   isLight={isLightMode}
-                  totalSolvedCount={summaryStats.totalSolved}
+                  todayFreeUsed={studyState.todayFreeSpotUsed}
                   spotAnswers={studyState.spotAnswers}
                   bookmarkedSpotIds={studyState.bookmarkedSpotIds}
                   onRecordSpotAnswer={handleRecordSpotAnswer}
@@ -910,11 +948,12 @@ export const App: React.FC = () => {
                 <DenemeRehberScreen
                   isPro={isPro}
                   isLight={isLightMode}
-                  totalSolvedCount={summaryStats.totalSolved}
+                  todayFreeExamUsed={studyState.todayFreeExamUsed}
                   vakaAnswers={studyState.vakaAnswers}
                   onRecordExamAttempt={handleRecordExamAttempt}
                   onRecordVakaAnswer={handleRecordVakaAnswer}
                   onOpenPaywall={handleOpenPaywall}
+                  onOpenGuide={handleOpenGuide}
                 />
               )}
 
@@ -926,6 +965,7 @@ export const App: React.FC = () => {
                   onUpdateStudyState={setStudyState}
                   onJumpToMistakes={handleJumpToMistakes}
                   onOpenPaywall={handleOpenPaywall}
+                  onOpenGuide={handleOpenGuide}
                   onResetProgress={handleResetProgress}
                   onReplayOnboarding={() => setReplayOnboardingOpen(true)}
                 />
@@ -1012,6 +1052,14 @@ export const App: React.FC = () => {
         onDismissReplay={() => setReplayOnboardingOpen(false)}
       />
 
+      {/* TUS Puan & Sistem Rehberi Modal */}
+      <TusGuideModal
+        isOpen={guideOpen}
+        onClose={() => setGuideOpen(false)}
+        isLight={isLightMode}
+        initialTab={guideTab}
+      />
+
       {/* Paywall Modal */}
       <PaywallModal
         isOpen={paywallOpen}
@@ -1020,7 +1068,7 @@ export const App: React.FC = () => {
           setIsPro(true);
           setProBannerVisible(true);
         }}
-        totalSolvedCount={summaryStats.totalSolved}
+        totalSolvedCount={studyState.todayFreeVakaUsed}
         reasonMessage={paywallReason}
         priceLabel={proPriceLabel}
         monthlyPriceLabel={proMonthlyPriceLabel}

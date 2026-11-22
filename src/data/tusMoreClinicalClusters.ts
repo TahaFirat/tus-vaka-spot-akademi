@@ -43,7 +43,7 @@ export const MORE_TUS_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           'Şakak bölgesine (pterion) künt travma sonrası kısa süreli bilinç kaybı, ardından bilincin açıldığı "lusid interval" dönemi ve birkaç saat sonra hızla gelişen koma ile beyin BT’de sütür hatlarını geçmeyen çift dışbükey (bikonveks / mercek) şekilli kanama saptanıyor.',
         clues: ['pterion', 'lusid interval', 'sütür hatlarını geçmeyen çift dışbükey (bikonveks / mercek)'],
-        questionPrompt: 'Bu hastada kanamanın tipi ve yırtılan vasküler yapı aşağıdakilerden hangisidir?',
+        questionPrompt: 'A. meningea media yırtılmasıyla bikonveks (lens şeklinde) kanama ve lucid interval oluşturan kafa travması tablosu hangisidir?',
         mechanism:
           'Pterion bölgesindeki temporal kırıkta A. meningea media (Foramen spinosum’dan geçer) yırtılır ve Epidural Hematom gelişir: Lusid interval vardır, BT’de sütürleri geçmeyen BİKONVEKS (mercek) görünüm izlenir. Subdural hematom ise kortikal KÖPRÜ VENLERİNİN (v. cerebri superiores) yırtılmasıyla oluşur ve BT’de sütürleri geçen HİLAL (kresent) görünümü verir.',
         whenCorrectNote: 'Pterion kırığı + A. meningea media yırtığı + Lusid interval + BT’de bikonveks (mercek) görünüm = Epidural Hematom.',
@@ -226,7 +226,7 @@ export const MORE_TUS_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           '2 yaşında erkek çocukta ağrısız vişne çürüğü renginde rektal kanama saptanıyor. Teknesyum-99m perteknetat sintigrafisinde ileoçekal valvin 50 cm proksimalinde ektopik mide mukozası içeren gerçek bir divertikül gösteriliyor.',
         clues: ['ağrısız vişne çürüğü renginde rektal kanama', 'Teknesyum-99m perteknetat', 'ektopik mide mukozası'],
-        questionPrompt: 'Embriyolojik dönemde hangi yapının kapanmaması Meckel divertikülüne, hangi yapının kapanmaması göbekten idrar gelmesine (Urakus fistülü) yol açar?',
+        questionPrompt: 'Omfalomezenterik (vitellin) kanal artığı ile allantois (urakus) artığını embriyolojik olarak karşılaştıran konjenital anomali ikilisi hangisidir?',
         mechanism:
           '1. Vitellin (Omfalomezenterik) kanalın ileal ucunun kapanmaması -> Meckel Divertikülü (2’ler kuralı, gerçek divertikül, ektopik mide mukozası -> ağrısız kanama, Tc-99m sintigrafisi); tamamen açık kalması -> Göbekten gaita gelmesi.\n2. Allantois (Urakus) kanalının açık kalması -> Patent Urakus (Göbekten idrar gelmesi); orta kısmının kistleşmesi -> Urakus kisti.',
         whenCorrectNote: 'Meckel divertikülü = Vitellin (omfalomezenterik) kanal kalıntısı; Urakus fistülü (göbekten idrar gelmesi) = Allantois kalıntısı.',
@@ -241,7 +241,7 @@ export const MORE_TUS_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           'Doğumdan hemen sonra ağır siyanoz, solunum sıkıntısı, kayık karın (scaphoid abdomen), kalp seslerinin sağ hemitoraksta duyulması ve akciğer grafisinde sol hemitoraksta bağırsak gazları saptanan yenidoğan değerlendiriliyor.',
         clues: ['kayık karın (scaphoid abdomen)', 'kalp seslerinin sağ hemitoraksta duyulması', 'sol hemitoraksta bağırsak gazları'],
-        questionPrompt: 'En sık sol posterolateralde görülen bu herninin embriyolojik nedeni ve mortaliteyi belirleyen en önemli komplikasyonu hangisidir?',
+        questionPrompt: 'En sık sol posterolateralde (Bochdalek) plöroperitoneal kanalın kapanmamasıyla oluşan ve mortalitesini pulmoner hipoplazinin belirlediği konjenital anomali hangisidir?',
         mechanism:
           'Konjenital diafragma hernisinin en sık tipi (%85-90 sol posterolateral yerleşimli) Bochdalek hernisidir ve embriyolojik olarak PLÖROPERİTONEAL MEMBRANLARIN kapanma kusuru sonucu gelişir. Mortaliteyi belirleyen en önemli faktör PULMONER HİPOPLAZİ ve Persistan Pulmoner Hipertansiyondur. Doğum salonunda yüz maskesi (balon-maske) ile pozitif basınçlı ventilasyon KESİNLİKLE KONTRENDİKEDİR (mide/bağırsakları şişirip akciğeri daha da ezer); bebek derhal entübe edilir ve NG sonda takılır!',
         whenCorrectNote: 'Sol posterolateral Bochdalek hernisi, plöroperitoneal membran kusuru, pulmoner hipoplazi, maske ile ventilasyon kontrendike (hemen entübasyon + NG sonda).',
@@ -265,7 +265,7 @@ export const MORE_TUS_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           '39 yaşında hastada ataklar halinde gelen şiddetli baş ağrısı, terleme, çarpıntı ve dirençli hipertansiyon saptanıyor. Plazma serbest metanefrin düzeyi yüksek ve adrenal BT’de 4 cm’lik sağ sürrenal kitle gösteriliyor.',
         clues: ['baş ağrısı, terleme, çarpıntı', 'Plazma serbest metanefrin', 'sürrenal kitle'],
-        questionPrompt: 'Bu hastayı sürrenalektomi ameliyatına hazırlarken uyulması gereken mutlak farmakolojik sıralama hangisidir?',
+        questionPrompt: 'Cerrahi hazırlığında önce alfa-blokör (fenoksibenzamin), ardından beta-blokör başlanması zorunlu olan adrenal tümörü hangisidir?',
         mechanism:
           'Feokromositoma adrenal medulla kromaffin hücrelerinden kaynaklanan katekolamin salgılayan tümördür (%10’lar tümörü; ailesel olanlarda en sık RET/MEN2, VHL, NF1 ve SDHB mutasyonu). Tanıda en duyarlı ilk test Plazma Serbest Metanefrinleri veya 24 saatlik idrar fraksiyone metanefrinleridir. Ameliyat hazırlığında ÖNCE ALFA BLOKÖR (Fenoksibenzamin / Doksazosin) + tuz/sıvı yüklemesi başlanır, yeterli alfa blokaj sağlandıktan SONRA taşikardi için Beta Blokör eklenir. Alfa blokaj yapılmadan tek başına Beta Blokör vermek alfa-1 vazokonstriksiyonu karşılıksız bırakarak ölümcül hipertansif krize yol açar!',
         whenCorrectNote: 'Baş ağrısı + terleme + çarpıntı triyadı, tanı metanefrinler, preoperatif ÖNCE Alfa blokör (Fenoksibenzamin) SONRA Beta blokör.',
@@ -310,7 +310,7 @@ export const MORE_TUS_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           '29 yaşında erkek hastada yılda 5 kez tekrarlayan oral aft, skrotumda skar bırakan genital ülser, eritema nodozum, hipopyonlu panüveit ve hemoptizi saptanıyor. Toraks BT anjiyografide bilateral pulmoner arter anevrizması görülüyor.',
         clues: ['oral aft', 'skar bırakan genital ülser', 'hipopyonlu panüveit', 'pulmoner arter anevrizması'],
-        questionPrompt: 'Her çapta hem arter hem venleri tutabilen bu vaskülitte en sık mortalite nedeni olan pulmoner arter anevrizması ve artrit özelliği hangisidir?',
+        questionPrompt: 'Her çapta arter-ven tutan vaskülit ile HLA-B27 ilişkili aksiyel spondiloartriti karşılaştıran klinik ayrım hangisidir?',
         mechanism:
           'Behçet hastalığı hem arter hem venleri her çapta tutabilen nötrofilik vaskülittir (HLA-B51 ilişkili). Oral aft (%100, skar bırakmaz), genital ülser (skar bırakır!), hipopyonlu üveit, paterji pozitifliği görülür. Artriti en sık diz eklemini tutar ve EROZYON/DEFORMİTE YAPMAZ. En sık ölüm nedeni Pulmoner Arter Anevrizması rüptürüdür (Behçet’in en karakteristik vasküler tutulumu!).',
         whenCorrectNote: 'HLA-B51, skar bırakan genital ülser, erozyon yapmayan diz artriti, en sık ölüm nedeni Pulmoner Arter Anevrizması.',
@@ -364,7 +364,7 @@ export const MORE_TUS_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           '8 yaşında çocuk geçirdiği streptokokal tonsillofarenjitten 14 gün sonra çay/kola rengi idrar (makroskopik hematüri), göz kapaklarında ödem ve hipertansiyon ile getiriliyor. İdrar mikroskopisinde dismorfik eritrositler ve eritrosit silendirleri, kan tetkikinde ASO yüksekliği ve Kompleman C3 düşüklüğü (C4 normal) saptanıyor.',
         clues: ['14 gün sonra', 'çay/kola rengi idrar', 'eritrosit silendirleri', 'Kompleman C3 düşüklüğü (C4 normal)'],
-        questionPrompt: 'Alternatif kompleman yolunun aktivasyonuyla C3’ün düştüğü ve 6-8 haftada normale döndüğü bu nefrit ile IgA nefropatisi (Berger) arasındaki en temel fark nedir?',
+        questionPrompt: 'Alternatif kompleman yolu aktivasyonuyla C3’ün düştüğü, farenjitten 10–14 gün sonra gelişen ve 6–8 haftada C3’ü normale dönen glomerülonefrit hangisidir?',
         mechanism:
           'APSGN’de farenjitten 1-2 hafta, impetigodan (cilt enfeksiyonu) 3-6 hafta sonra nefritik sendrom gelişir; alternatif yol aktivasyonuyla C3 DÜŞER (C4 normaldir) ve 6-8 haftada normale döner (8 haftayı aşan C3 düşüklüğünde MPGN düşünülür!). IgA Nefropatisinde (Berger hastalığı) ise ÜSYE ile EŞ ZAMANLI (1-3 gün içinde, "sinfarenjitik") makroskopik hematüri olur ve serum C3 düzeyi NORMALDİR!',
         whenCorrectNote: 'APSGN = Farenjitten 10-14 gün sonra hematüri + HT + C3 DÜŞÜK (6-8 haftada düzelir), EM’de subepitelyal hörgüç (hump) birikimi.',
@@ -379,7 +379,7 @@ export const MORE_TUS_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           '4 yaşında çocuk kanlı ishal atağından 5 gün sonra solukluk, peteşiler ve idrar çıkışında azalma (oligüri) ile getiriliyor. Hb: 6.8 g/dL, Trombosit: 32.000/mm³, Kreatinin: 3.1 mg/dL, Coombs testi negatif, PT/aPTT normal ve periferik yaymada miğfer/parçalanmış eritrositler (şistositler) izleniyor.',
         clues: ['kanlı ishal atağından 5 gün sonra', 'Trombosit: 32.000', 'Kreatinin: 3.1', 'Coombs testi negatif, PT/aPTT normal', 'şistositler'],
-        questionPrompt: 'Süt çocuğu ve erken çocukluk çağında kazanılmış akut böbrek yetmezliğinin en sık nedeni olan bu sendromda antibiyotik ve trombosit süspansiyonu yaklaşımı nasıldır?',
+        questionPrompt: 'Shiga toksin salınımını artıracağı için antibiyotikten ve mikrotrombüsü artıracağı için trombosit süspansiyonundan kaçınılan pediatrik sendrom hangisidir?',
         mechanism:
           'Tipik HÜS, enterohemorajik E. coli (EHEC O157:H7) veya Shigella dysenteriae’nin ürettiği Shiga-benzeri toksinin (Verotoksin) glomerül endoteline bağlanmasıyla gelişir. Klasik Triyadı: 1. Coombs (-) Mikroanjiyopatik Hemolitik Anemi (Şistositler), 2. Trombositopeni, 3. Akut Böbrek Yetmezliğidir (PT/aPTT normaldir -> DİK’ten farkı!). EHEC ishalinde antibiyotik vermek bakteri lizisiyle toksin salınımını artırarak HÜS riskini ARTIRIR; ayrıca aktif yaşamı tehdit eden kanama yoksa trombosit süspansiyonu verilmez (mikrotrombüsleri artırır).',
         whenCorrectNote: 'EHEC O157:H7 kanlı ishal sonrası MAHA (şistosit) + Trombositopeni + ABY; Coombs negatif ve PT/aPTT normaldir.',
@@ -394,7 +394,7 @@ export const MORE_TUS_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           '12 günlük bebek kusma, ağır dehidratasyon, hiponatremi (Na: 121 mEq/L), hiperkalemi (K: 7.4 mEq/L), hipoglisemi ve metabolik asidoz (tuz kaybı krizi) ile getiriliyor. Fizik muayenede 46,XX karyotipli kız bebekte klitoromegali ve labial füzyon (kuşkulu genitalya) saptanıyor.',
         clues: ['hiponatremi', 'hiperkalemi', 'klitoromegali ve labial füzyon', 'tuz kaybı krizi'],
-        questionPrompt: 'KAH olgularının %90-95’inden sorumlu olan bu enzim eksikliğinde tanı koydurucu serum belirteci hangisidir?',
+        questionPrompt: '21-hidroksilaz eksikliği nedeniyle 17-hidroksiprogesteronun belirgin yükseldiği ve tuz kaybettiren krize yol açabilen endokrin hastalık hangisidir?',
         mechanism:
           'Konjenital Adrenal Hiperplazinin (KAH) en sık (%95) nedeni 21-HİDROKSİLAZ eksikliğidir: Aldosteron ve Kortizol sentezlenemez, öncül maddeler Androjen yolağına kayar. Sonuçta tuz kaybı krizi (Hiponatremi + Hiperkalemi + Hipotansiyon) ve 46,XX kız bebekte virilizasyon (ambigus genitalya) gelişir. Tanıda serum 17-HİDROKSİPROGESTERON (17-OHP) düzeyi belirgin yüksektir. (11-beta hidroksilaz eksikliğinde ise DOC birikimine bağlı HİPERTANSİYON ve hipokalemi görülür!).',
         whenCorrectNote: '21-Hidroksilaz eksikliği = En sık KAH (%95), Hiponatremi + Hiperkalemi (tuz kaybı) + Virilizasyon + 17-OH Progesteron artışı.',
@@ -409,7 +409,7 @@ export const MORE_TUS_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           '2 yaşında çocukta düşük dereceli ateş, havlar tarzda (barking) öksürük, ses kısıklığı ve inspiratuvar stridor gelişiyor. Ön-arka boyun grafisinde subglottik daralmaya bağlı "kalem ucu / çan kulesi (steeple sign)" görünümü saptanıyor.',
         clues: ['havlar tarzda (barking) öksürük', 'inspiratuvar stridor', 'kalem ucu / çan kulesi (steeple sign)'],
-        questionPrompt: 'En sık Parainfluenza virüsünün yol açtığı bu tablonun tedavisi ve Akut Epiglottit ile radyolojik farkı hangisidir?',
+        questionPrompt: 'En sık Parainfluenza virüsünün yol açtığı, havlar tarzda öksürük ve boyun grafisinde kalem ucu (steeple) işareti veren üst solunum yolu enfeksiyonu hangisidir?',
         mechanism:
           'Krup (Akut Laringotrakeobronşit) en sık Parainfluenza tip 1 virüsü ile gelişir; subglottik ödem nedeniyle havlar tarzda öksürük, stridor ve grafide "Kalem ucu / Çan kulesi (Steeple sign)" görülür. Tedavide tek doz Deksametazon + Nebülize Adrenalin (rasemik epinefrin) verilir. Akut Epiglottit ise toksik görünüm, yüksek ateş, salya akması (drooling), tripod pozisyonu, öksürüğün OLMAMASI ve yan boyun grafisinde "Başparmak (Thumb) bulgusu" ile karakterizedir (Dil basacağı ile muayene kontrendikedir!).',
         whenCorrectNote: 'Krup = Parainfluenza, havlar tarzda öksürük, Kalem ucu (Çan kulesi) bulgusu, Deksametazon + Nebülize adrenalin.',
@@ -448,7 +448,7 @@ export const MORE_TUS_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           'Tiroid nodülü ve servikal lenfadenopatisi olan 34 yaşında hastanın serum Kalsitonin ve CEA düzeyleri yüksek saptanıyor. Tiroidektomi patolojisinde Kongo kırmızısı ile boyanan amiloid stroması içinde poligonal/iğsi hücreler ve genetik incelemede RET proto-onkogen mutasyonu gösteriliyor.',
         clues: ['Kalsitonin ve CEA', 'Kongo kırmızısı ile boyanan amiloid', 'RET proto-onkogen'],
-        questionPrompt: 'Nöral krest kökenli parafolliküler C hücrelerinden gelişen bu tümörde ameliyat öncesi mutlaka dışlanması gereken eşlikçi tümör hangisidir?',
+        questionPrompt: 'Nöral krest kökenli parafolliküler C hücrelerinden gelişen, kalsitonin pozitif ve ameliyat öncesi feokromositomanın dışlanmasını gerektiren tiroid kanseri hangisidir?',
         mechanism:
           'Medüller Tiroid Karsinomu (MTK), parafolliküler C hücrelerinden gelişir, Kalsitonin ve CEA salgılar, stromasında Kalsitonin kaynaklı AMİLOİD birikir. Radyoaktif iyot (I-131) TUTMAZ ve TSH baskılama tedavisi işe yaramaz! MEN 2A (MTK + Feokromositoma + Hiperparatiroidi) ve MEN 2B (MTK + Feokromositoma + Mukozal nöromlar/Marfanoid görünüm) sendromlarının parçası olabilir. Bu nedenle tiroid cerrahisinden ÖNCE mutlaka FEOKROMOSİTOMA araştırılmalı ve varsa önce sürrenalektomi yapılmalıdır!',
         whenCorrectNote: 'Parafolliküler C hücresi, Kalsitonin + Amiloid, RET mutasyonu (MEN 2A/2B), radyoaktif iyot tutmaz, cerrahi öncesi Feokromositoma dışlanmalı.',
@@ -532,7 +532,7 @@ export const MORE_TUS_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           '37 yaşında kadın hasta ilişki sonrası lekelenme tarzında kanama (postkoital kanama) ile başvuruyor. Servikal Pap-smear testinde HSIL (Yüksek dereceli skuamöz intraepitelyal lezyon) ve HPV Tip 16 pozitifliği saptanıyor.',
         clues: ['postkoital kanama', 'HSIL', 'HPV Tip 16'],
-        questionPrompt: 'Transformasyon zonundan (skuamokolumnar bileşkeden) kaynaklanan bu lezyonda bir sonraki tanısal adım ve viral onkoprotein mekanizması hangisidir?',
+        questionPrompt: 'HPV 16/18 E6-E7 onkoproteinleriyle transformasyon zonundan gelişen ve anormal smear sonrası kolposkopik biyopsi gerektiren malignite hangisidir?',
         mechanism:
           'Serviks kanserinin en önemli etiyolojik ajanı Yüksek Riskli HPV (en sık Tip 16 -> Skuamöz hücreli Ca; Tip 18 -> Adenokarsinom) enfeksiyonudur. HPV’nin E6 onkoproteini p53’ü yıkar, E7 onkoproteini ise Retinoblastom (Rb) proteinini inaktive eder. Pap-smear bir TARAMA testidir; HSIL veya HPV 16/18 saptandığında kesin tanı için bir sonraki adım KOLPOSKOPİ EŞLİĞİNDE SERVİKAL BİYOPSİDİR!',
         whenCorrectNote: 'HPV 16/18, E6 -> p53 yıkımı, E7 -> Rb inhibisyonu, postkoital kanama, smear anormal ise Kolposkopi + Biyopsi.',
@@ -577,7 +577,7 @@ export const MORE_TUS_CLUSTERS: DifferentialClusterSeed[] = [
         patientVignette:
           '10 haftalık gebe şiddetli hiperemezis gravidarum, gebelik haftasına göre büyük uterus, vajinal üzüm tanesi şeklinde vezikül düşürme, Beta-hCG >150.000 mIU/mL, bilateral teka-lutein kistleri ve USG’de fetüs izlenmeksizin "kar fırtınası / bal peteği" görünümü ile başvuruyor.',
         clues: ['Beta-hCG >150.000', 'teka-lutein kistleri', 'fetüs izlenmeksizin', 'kar fırtınası / bal peteği'],
-        questionPrompt: 'En sık 46,XX tümüyle babadan (paternal) gelen kromozomlarla oluşan bu tablonun tedavisi ve takibi aşağıdakilerden hangisidir?',
+        questionPrompt: '46,XX tümüyle paternal (p57 negatif) ve triploid formlara ayrılan, vakum küretaj ve seri Beta-hCG ile takip edilen gestasyonel trofoblastik hastalık ayrımı hangisidir?',
         mechanism:
           'Komplet Mol Hidatidiformda çekirdeksiz (boş) ovuma tek spermin girip kendini eşlemesiyle %90 46,XX (tümüyle PATERNAL diploid) karyotip oluşur: Fetüs/embriyo ve amniyon zarı YOKTUR, p57 boyaması NEGATİFTİR, teka-lutein kistleri ve gestasyonel trofoblastik neoplazi / Koryokarsinom gelişme riski (%15-20) çok daha yüksektir! (Parsiyel molde ise 69,XXY triploidi vardır, fetüs parçaları bulunur ve p57 pozitiftir). Tedavide Vakum Küretaj yapılır ve sonrasında haftalık/aylık seri Beta-hCG takibi (bu süreçte gebe kalınmaması için KOK) uygulanır.',
         whenCorrectNote: 'Komplet mol = 46,XX (tümüyle paternal), fetüs yok, p57 negatif, kar fırtınası USG, vakum küretaj + seri Beta-hCG takibi.',
