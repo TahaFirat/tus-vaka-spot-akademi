@@ -211,7 +211,7 @@ jobs:
                        -destination 'generic/platform=iOS' \
                        -configuration Release \
                        CURRENT_PROJECT_VERSION="${{ github.run_number }}" \
-                       MARKETING_VERSION="1.6" \
+                       MARKETING_VERSION="1.6.1" \
                        clean archive \
                        -archivePath ./build/App.xcarchive
           else
